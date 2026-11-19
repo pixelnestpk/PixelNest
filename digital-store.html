@@ -82,17 +82,17 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .trust-item span{color:var(--muted);font-size:.87rem}
 
 /* ---------- 3D circular rotating gallery ---------- */
-.c3d{background:#0B0E13;border-bottom:1px solid rgba(201,162,39,.35);overflow:hidden;padding:36px 0 40px}
-.c3d-scene{--tz:348px;width:214px;height:276px;margin:0 auto;perspective:1150px}
+.c3d{background:#0B0E13;border-bottom:1px solid rgba(201,162,39,.35);overflow:hidden;padding:20px 0 22px}
+.c3d-scene{--tz:174px;width:108px;height:156px;margin:0 auto;perspective:650px}
 .c3d-ring{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:c3dSpin 48s linear infinite}
 .c3d:hover .c3d-ring{animation-play-state:paused}
-.c3d-card{position:absolute;inset:0;background:#14181F;border:1px solid rgba(201,162,39,.55);border-radius:16px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(calc(var(--i)*36deg)) translateZ(var(--tz))}
-.c3d-card img{width:100%;height:172px;object-fit:cover}
-.c3d-info{padding:10px 13px}
-.c3d-info h4{color:#FBF7EA;font-size:.93rem;margin:0;line-height:1.25}
-.c3d-info p{color:rgba(255,255,255,.68);font-size:.74rem;margin:3px 0 0;line-height:1.4}
+.c3d-card{position:absolute;inset:0;background:#14181F;border:1px solid rgba(201,162,39,.55);border-radius:10px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(calc(var(--i)*36deg)) translateZ(var(--tz))}
+.c3d-card img{width:100%;height:82px;object-fit:cover}
+.c3d-info{padding:5px 7px}
+.c3d-info h4{color:#FBF7EA;font-size:.7rem;margin:0;line-height:1.25}
+.c3d-info p{color:rgba(255,255,255,.68);font-size:.58rem;margin:2px 0 0;line-height:1.3}
 @keyframes c3dSpin{from{transform:rotateY(0deg)}to{transform:rotateY(-360deg)}}
-@media (max-width:640px){ .c3d-scene{--tz:262px;width:164px;height:224px} .c3d-card img{height:132px} .c3d-info h4{font-size:.82rem} .c3d-info p{font-size:.68rem} }
+@media (max-width:640px){ .c3d-scene{--tz:140px;width:88px;height:128px} .c3d-card img{height:64px} .c3d-info{padding:4px 6px} .c3d-info h4{font-size:.62rem} .c3d-info p{font-size:.54rem} }
 
 /* ---------- Section heads ---------- */
 .sec-head{margin:64px 0 22px;max-width:720px}
