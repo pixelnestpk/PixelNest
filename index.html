@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23132033'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%232DD4BF'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23FFFFFF'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23FFFFFF'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%23F59E0B'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E1116'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%23C9A227'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23FFFFFF'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23FFFFFF'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%23C9A227'/%3E%3C/svg%3E">
 <title>PixelNest — Digital Products Store</title>
 <style>html{background:#FFFFFF}body{background:#FFFFFF;margin:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --bg:#FFFFFF; --soft:#F6F7F6; --soft2:#EDF1EF; --ink:#1C2434; --navy:#132033; --muted:#667085; --line:#E3E7E4;
@@ -448,6 +448,103 @@ footer a:hover{color:var(--teal)}
 }
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;scroll-behavior:auto!important} }
 </style>
+<style>
+/* ================= VIP PREMIUM — black & gold ================= */
+:root{
+  --navy:#101318; --ink:#1E222B;
+  --gold:#C9A227; --gold-deep:#9A7B1C; --gold-soft:#F8F1DC; --gold-line:#E7D9A8;
+  --teal:#9A7B1C; --teal-dark:#7C6213; --teal-soft:#F8F1DC;
+  --soft:#F8F6F1; --soft2:#EFEAE0; --line:#E7E1D2;
+  --shadow:0 20px 48px rgba(16,19,24,.12); --shadow-sm:0 4px 18px rgba(16,19,24,.07);
+}
+h1,h2,h3,.logo-text,.exp-big{font-family:'Playfair Display',Georgia,'Times New Roman',serif;letter-spacing:-.01em}
+a{color:var(--gold-deep)}
+.btn-primary{background:var(--gold);color:#17130A;box-shadow:0 10px 24px rgba(201,162,39,.28)}
+.btn-primary:hover{background:#B8931F}
+.btn-dark{background:var(--navy);color:#fff}
+.btn-dark:hover{background:#232833}
+.btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.55)}
+.btn-outline:hover{background:rgba(255,255,255,.12);border-color:#fff}
+
+/* Header — near-black with gold trim */
+header{background:#0B0E13;border-bottom:1px solid rgba(201,162,39,.5);color:#EDEEF0;backdrop-filter:none}
+.logo-text{color:#fff}
+.logo-text em{color:var(--gold)}
+.logo-text small{color:rgba(255,255,255,.55)}
+.nav a{color:#D9DCE1}
+.nav a:hover{background:rgba(255,255,255,.09);color:#fff}
+.nav a.home-link{color:var(--gold)}
+.head-search input{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);color:#fff}
+.head-search input::placeholder{color:rgba(255,255,255,.45)}
+.head-search input:focus{outline:2px solid var(--gold);background:rgba(255,255,255,.12)}
+.head-search svg{stroke:rgba(255,255,255,.55)}
+.cart-btn{background:var(--gold);color:#17130A}
+.cart-btn:hover{background:#B8931F}
+.mobile-nav a{background:rgba(255,255,255,.08);color:#E6E8EB}
+.mobile-nav a.home-link{color:var(--gold)}
+
+/* Hero — rich near-black, gold rule underneath */
+.hero{background:linear-gradient(165deg,#08090C 0%,#10131A 55%,#1A1607 130%);border-bottom:3px solid var(--gold);padding:72px 0 64px}
+.hero h1{color:#FBF7EA}
+.hero h1 em{color:var(--gold)}
+.hero p.lead{color:rgba(255,255,255,.74)}
+.eyebrow{background:rgba(201,162,39,.13);color:#EAC95C;border-color:rgba(201,162,39,.5)}
+.hero-img{border-color:rgba(201,162,39,.4);box-shadow:0 30px 60px rgba(0,0,0,.45)}
+.hero-img .float-tag{background:#0B0E13;border:1px solid rgba(201,162,39,.55);color:#F3E9C8}
+
+/* Section rhythm + gold divider under headings */
+.sec-head{margin-top:78px}
+.sec-head h2::after,.faq h2::after,.how h2::after,.reviews h2::after{content:"";display:block;width:54px;height:3px;border-radius:2px;background:var(--gold);margin-top:12px}
+.kicker{color:var(--gold-deep);letter-spacing:.14em}
+.toolbar{margin-top:78px}
+.how,.reviews,.custom,.why,.exp-strip,.free-band{margin-top:78px}
+
+/* Cards — refined shadows, elegant lift, premium badges */
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:#DCC987}
+.cat-card:hover,.sample:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.badge{background:linear-gradient(180deg,#FAF3DE,#F3E7C3);color:#8A6D14;border:1px solid #E3D096}
+.card.free-card{border:2px solid var(--gold)}
+.card .free-flag{background:var(--gold);color:#17130A}
+.stars .row{color:#D9D2BE}
+.card-btns .add-btn{background:var(--gold);color:#17130A}
+.card-btns .add-btn:hover{background:#B8931F}
+.card-btns .add-btn.added{background:var(--green);color:#fff}
+.card-btns .buy-btn{background:#101318;color:var(--gold);border:1.5px solid var(--gold)}
+.card-btns .buy-btn:hover{background:#22262F}
+.chip.active{border-color:var(--gold)}
+#ppBuy{background:#101318;color:var(--gold);border:1.5px solid var(--gold)}
+#ppBuy:hover{background:#22262F}
+.rate-stars button.on{color:var(--gold)}
+.rate-stars button.on:disabled{color:var(--gold)}
+.card-rate .cr-star{color:var(--gold)}
+
+/* Dark premium bands */
+.exp-strip{background:linear-gradient(135deg,#0B0E13,#181D26);border:1px solid rgba(201,162,39,.35)}
+.exp-big em{color:var(--gold)}
+.skill-chips span{background:rgba(201,162,39,.10);border-color:rgba(201,162,39,.45)}
+.free-band{background:linear-gradient(135deg,#0B0E13 55%,#2A2108)}
+.free-band .fb-tag{background:var(--gold);color:#17130A}
+.free-band ul li::before{color:var(--gold)}
+.custom{background:linear-gradient(135deg,#0B0E13,#181D26);border:1px solid rgba(201,162,39,.35)}
+.step .num{background:var(--gold);color:#17130A}
+.delivery-note{border-color:var(--gold-line)}
+.order-flow-note{border-color:var(--gold-line)}
+.seller-num-row .num-copy:hover{background:#232833}
+
+/* Footer — near-black with a gold top rule */
+footer{background:#0B0E13;border-top:3px solid var(--gold);color:rgba(255,255,255,.72)}
+footer h4{color:#fff}
+footer a{color:rgba(255,255,255,.72)}
+footer a:hover{color:var(--gold)}
+.foot-bottom{border-top-color:rgba(255,255,255,.14)}
+.seller-link{color:rgba(255,255,255,.55)}
+.seller-link:hover{color:var(--gold)}
+
+@media (max-width:900px){
+  .sec-head,.toolbar,.how,.reviews,.custom,.why,.exp-strip,.free-band{margin-top:52px}
+  .hero{padding:44px 0 40px}
+}
+</style>
 </head>
 <body id="top">
 
@@ -455,7 +552,7 @@ footer a:hover{color:var(--teal)}
   <div class="wrap">
     <div class="header-in">
       <a class="logo" href="#top" aria-label="PixelNest — back to home">
-        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#132033"/><rect x="7" y="7" width="8" height="8" rx="2" fill="#2DD4BF"/><rect x="17" y="7" width="8" height="8" rx="2" fill="#FFFFFF"/><rect x="7" y="17" width="8" height="8" rx="2" fill="#FFFFFF"/><rect x="17" y="17" width="8" height="8" rx="2" fill="#F59E0B"/></svg>
+        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#C9A227"/><rect x="7" y="7" width="8" height="8" rx="2" fill="#101318"/><rect x="17" y="7" width="8" height="8" rx="2" fill="#FFFFFF"/><rect x="7" y="17" width="8" height="8" rx="2" fill="#FFFFFF"/><rect x="17" y="17" width="8" height="8" rx="2" fill="#101318"/></svg>
         <span class="logo-text">Pixel<em>Nest</em><small>Digital Products Store</small></span>
       </a>
       <nav class="nav" aria-label="Main navigation">
@@ -1482,7 +1579,7 @@ window.PixelRatings = (function(){
   function avgOf(d){ return d && d.count > 0 ? d.total / d.count : 0; }
   function avgText(d){ return (Math.round(avgOf(d) * 10) / 10).toFixed(1); }
   function starsHtml(d){
-    var f = Math.round(avgOf(d)), s = '<span style="color:#F59E0B">', i;
+    var f = Math.round(avgOf(d)), s = '<span style="color:#C9A227">', i;
     for(i = 0; i < f; i++) s += "★";
     s += "</span>";
     for(i = f; i < 5; i++) s += "★";
