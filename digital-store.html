@@ -855,6 +855,13 @@ select option{color:#111827;background-color:#ffffff}
 #ordersPage .o-accept:hover{background:#B8931F;border-color:#B8931F}
 #ordersPage .o-accept:disabled{background:var(--soft);color:var(--muted);border-color:var(--line);cursor:default}
 #ordersPage .o-accept-note{font-size:.76rem;font-weight:700;color:#92400E;white-space:normal;max-width:210px;line-height:1.35}
+#ordersPage .o-setname{background:none;border:1.5px solid var(--gold-deep);color:var(--gold-deep);border-radius:999px;padding:0 14px;min-height:38px;font-weight:700;font-size:.82rem;cursor:pointer}
+#ordersPage .o-setname:hover{background:var(--gold);border-color:var(--gold);color:#17130A}
+#ordersPage .o-nameedit{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+#ordersPage .o-nameinput{border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;font-size:.85rem;min-height:38px;max-width:170px;background:#fff;color:var(--ink)}
+#ordersPage .o-namesave{background:var(--gold);color:#17130A;border:1.5px solid var(--gold);border-radius:999px;padding:0 14px;min-height:38px;font-weight:800;font-size:.82rem;cursor:pointer}
+#ordersPage .o-namesave:disabled{opacity:.6;cursor:default}
+#ordersPage .o-namecancel{background:none;border:0;color:var(--muted);font-weight:700;min-height:38px;padding:0 4px;cursor:pointer}
 #ordersPage .orow .up-box{margin:0;border:0;background:none;padding:0;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
 #ordersPage .orow .up-files{margin:0}
 #ordersPage .orow .up-label{padding:7px 14px;min-height:36px;font-size:.82rem}
@@ -2435,6 +2442,51 @@ function buyerNameFor(o, loc){
   }
   return "";
 }
+/* Seller-only name fix for an order whose buyer name was never
+   saved (orders placed before the checkout stored the name — they
+   render "Buyer —"). The row's action area then carries a small
+   "Set name" button; tapping it swaps in an inline input + Save
+   right in the row. Saving an online order writes the name to
+   orderPrivate.buyerName through PixelOrders.setBuyerName (the
+   watchAll feed merges it back into the row, and the optimistic
+   update below shows it at once); saving a browser-only order
+   writes it into that local record. Orders that already have a
+   name get no control at all — their name display is unchanged. */
+var nameEditKey = ""; /* "fs:<orderId>" or "local:<orderId>" while its row is being edited */
+function nameActionHtml(kind, id, resolvedName){
+  if(resolvedName) return "";
+  var key = kind + ":" + id;
+  if(nameEditKey === key){
+    return '<span class="o-nameedit"><input type="text" class="o-nameinput" data-nameinput="' + escHtml(key) + '" placeholder="Buyer name" autocomplete="off" aria-label="Buyer name for order ' + escHtml(id) + '">'
+      + '<button type="button" class="o-namesave" data-namesave="' + escHtml(key) + '">Save name</button>'
+      + '<button type="button" class="o-namecancel" data-namecancel="1">Cancel</button></span>';
+  }
+  return '<button type="button" class="o-setname" data-setname="' + escHtml(key) + '">Set name</button>';
+}
+function saveOrderBuyerName(key, nm, btn){
+  var kind = key.split(":")[0];
+  var id = key.slice(kind.length + 1);
+  if(kind === "local"){
+    orders.forEach(function(x){ if(x.id === id) x.name = nm; });
+    saveOrders();
+    nameEditKey = ""; renderOrders();
+    showToast("Buyer name saved for order " + id);
+    return;
+  }
+  btn.disabled = true; btn.textContent = "Saving…";
+  fsOrders.forEach(function(x){ if(x.orderId === id) x.buyerName = nm; });
+  orders.forEach(function(x){ if(x.id === id) x.name = nm; });
+  saveOrders();
+  nameEditKey = ""; renderOrders();
+  if(window.PixelOrders && window.PixelOrders.setBuyerName){
+    window.PixelOrders.setBuyerName(id, nm).then(function(ok){
+      if(ok) showToast("Buyer name saved for order " + id);
+      else showToast("The name could not be saved online — check your connection and try again");
+    });
+  } else {
+    showToast("Buyer name saved for order " + id);
+  }
+}
 /* One online (Firestore) order as a COMPACT ROW: Order ID, status
    pill, buyer name, total amount, Trx ID, quantity (when more than
    one), date, and the row's action — the Accept Order button while
@@ -2458,6 +2510,7 @@ function fsOrderCardHtml(o, localById){
     + (Number(o.quantity) > 1 ? '<span class="ofield"><span>Qty</span><b>' + escHtml(o.quantity) + '</b></span>' : '')
     + (fmtTs(o.createdAt) ? '<span class="orow-date">' + fmtTs(o.createdAt) + '</span>' : '')
     + '<span class="orow-actions">'
+    + nameActionHtml("fs", o.orderId, buyerNameFor(o, loc))
     + (st === "Pending" ? acceptBtnHtml("fs", o.orderId, orderCanAccept(pm, trx, o.total)) : '')
     + deliveryBlockHtml(o)
     + '</span></div>';
@@ -2474,6 +2527,7 @@ function localOrderCardHtml(o){
     + '<span class="ofield"><span>Trx ID</span><b>' + escHtml(o.trx || "—") + '</b></span>'
     + '<span class="orow-date">' + escHtml(o.date) + '</span>'
     + '<span class="orow-actions">'
+    + nameActionHtml("local", o.id, buyerNameFor(o, null))
     + (st === "Pending" ? acceptBtnHtml("local", o.id, orderCanAccept(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null))) : '')
     + '<button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button>'
     + '</span></div>';
@@ -2526,7 +2580,10 @@ function renderOrders(){
      custom orders, manual products — keeps its own group. Online
      and browser-only orders for the same product share one group,
      and each group also sums its Total Earned from the orders' real
-     totals. */
+     totals. Total Earned counts money actually received only:
+     an order adds its total once it is Active (accepted — its
+     payment received) or Completed; a Pending order has not been
+     paid for yet, so it contributes Rs. 0 whatever its total. */
   var groupByName = {};
   function addToGroup(name, entry){
     var cp = catalogProductFor(name);
@@ -2536,7 +2593,7 @@ function renderOrders(){
     g.entries.push(entry);
     if(g.counts.hasOwnProperty(entry.status)) g.counts[entry.status]++;
     var t = Number(entry.o && entry.o.total);
-    if(t > 0) g.earned += t;
+    if(t > 0 && (entry.status === "Active" || entry.status === "Completed")) g.earned += t;
   }
   fsOrders.forEach(function(o){ addToGroup(o.productName || "—", { kind: "fs", status: o.status || "Pending", o: o }); });
   localOnly.forEach(function(o){ addToGroup(o.product || "—", { kind: "local", status: o.status || "Pending", o: o }); });
@@ -2605,6 +2662,39 @@ document.getElementById("ordersList").addEventListener("click", function(e){
     saveOrders(); renderOrders();
     showToast("Order " + lid + " accepted — now Active");
   }
+});
+/* "Set name" inline editing in an order row: open the editor,
+   cancel it, or save the typed name. Enter inside the input saves
+   too. These controls live in the row's panel, outside the product
+   row itself, so they never trigger the row's expand toggle. */
+document.getElementById("ordersList").addEventListener("click", function(e){
+  var sb = e.target.closest ? e.target.closest("[data-setname]") : null;
+  if(sb){
+    nameEditKey = sb.getAttribute("data-setname");
+    renderOrders();
+    var inp = document.querySelector('[data-nameinput="' + nameEditKey + '"]');
+    if(inp) inp.focus();
+    return;
+  }
+  if(e.target.closest && e.target.closest("[data-namecancel]")){
+    nameEditKey = ""; renderOrders(); return;
+  }
+  var sv = e.target.closest ? e.target.closest("[data-namesave]") : null;
+  if(sv && !sv.disabled){
+    var key = sv.getAttribute("data-namesave");
+    var inp2 = document.querySelector('[data-nameinput="' + key + '"]');
+    var nm = inp2 ? inp2.value.trim() : "";
+    if(!nm){ if(inp2) inp2.focus(); return; }
+    saveOrderBuyerName(key, nm, sv);
+  }
+});
+document.getElementById("ordersList").addEventListener("keydown", function(e){
+  if(e.key !== "Enter") return;
+  var inp = e.target.closest ? e.target.closest("[data-nameinput]") : null;
+  if(!inp) return;
+  e.preventDefault();
+  var sv = document.querySelector('[data-namesave="' + inp.getAttribute("data-nameinput") + '"]');
+  if(sv) sv.click();
 });
 /* Landscape-row expansion — tapping a product row toggles ALL its
    orders under it; tapping one of its status stats toggles only
@@ -3270,6 +3360,28 @@ window.PixelOrders = (function(){
     } catch(e){}
   }
 
+  /* Seller dashboard "Set name": the seller types the buyer name
+     for an order whose name was never recorded (orders placed
+     before the checkout saved buyerName, whose buyer has not
+     signed in since, so no customers record names them either).
+     Same merge write into the private document as saveBuyerName,
+     but the promise reports success so the dashboard can confirm
+     it; the watchAll feed merges the saved name back into the
+     order row on the next snapshot. */
+  function setBuyerName(orderId, buyerName){
+    var d = getDb();
+    var nm = String(buyerName || "").trim();
+    if(!d || !orderId || !nm) return Promise.resolve(false);
+    try {
+      return d.collection("orderPrivate").doc(String(orderId)).set({ buyerName: nm }, { merge: true })
+        .then(function(){ return true; })
+        .catch(function(err){
+          if(window.console && console.error) console.error("PixelNest: setBuyerName failed for " + orderId, err);
+          return false;
+        });
+    } catch(e){ return Promise.resolve(false); }
+  }
+
   /* Returns a Promise for { ok, privateOk, privateError } so the
      checkout can surface a private-write failure visibly instead of
      failing silently. Order of writes: (1) the public order document,
@@ -3425,9 +3537,10 @@ window.PixelOrders = (function(){
   /* Store history / trust stats — every number counted LIVE from
      the real collections, never typed in or estimated:
        customers — documents in "customers" (one per registered
-                   account, written by the accounts module the first
-                   time an account is seen signed in; the seller's
-                   own account is never recorded as a customer);
+                   account, written by the accounts module on every
+                   sign-in where one is still missing — the seller's
+                   own account included, so the count is the real
+                   number of accounts that have signed in);
        orders / completed — documents in "orders", and how many of
                    them carry status "Completed";
        rating    — the real store ratings document the ratings
@@ -3474,6 +3587,7 @@ window.PixelOrders = (function(){
   return {
     createTracking: createTracking,
     setStatus: setStatus,
+    setBuyerName: setBuyerName,
     watchOrder: watchOrder,
     watchAll: watchAll,
     watchPrivate: watchPrivate,
@@ -3625,33 +3739,50 @@ window.PixelAccount = (function(){
      buyer name (the dashboard looks the record up by the order's
      uid). A record that already exists but has no name yet (older
      records held only the sign-up time) gets the name merged in.
-     The seller's own account is not a customer and is never
-     recorded. Any failure (offline, rules) is silent — sign-in
-     itself works exactly as before. */
-  var custRegTried = {};
+     EVERY signed-in account is recorded, the seller's own account
+     included — the count is the real number of registered
+     accounts, and the seller signs in too. (An earlier version
+     skipped the seller, which left the count at 0 whenever only
+     the seller had ever signed in.) The write is retried a few
+     times when it fails instead of being given up for the whole
+     session, and the trust strip / dashboard counts follow the
+     "customers" collection live, so the number reflects a new
+     record as soon as the write lands. Any lasting failure
+     (offline, rules) is silent — sign-in itself works exactly as
+     before. */
+  var custRegDone = {};
+  var custRegAttempts = {};
   function registerCustomer(){
-    if(!currentUser || !db || isSeller()) return;
+    if(!currentUser || !db) return;
     var uid = currentUser.uid;
-    if(!uid || custRegTried[uid]) return;
-    custRegTried[uid] = true;
+    if(!uid || custRegDone[uid]) return;
+    custRegAttempts[uid] = (custRegAttempts[uid] || 0) + 1;
     var nm = String(currentUser.displayName || "").trim()
       || (currentUser.email ? currentUser.email.split("@")[0] : "");
+    function retryLater(){
+      if(custRegAttempts[uid] < 4) setTimeout(function(){ registerCustomer(); }, 3000);
+    }
     try {
       var ref = db.collection("customers").doc(uid);
       ref.get().then(function(snap){
         if(!snap.exists){
-          ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }).catch(function(){});
+          ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() })
+            .then(function(){ custRegDone[uid] = true; })
+            .catch(function(){ retryLater(); });
         } else {
           var cd = snap.data() || {};
+          custRegDone[uid] = true;
           if(!cd.name && nm) ref.set({ uid: uid, name: nm }, { merge: true }).catch(function(){});
         }
       }).catch(function(){
         /* The read itself was refused — still try to leave the
            record behind with a merge write, so the count and the
            name exist for the strip and the dashboard. */
-        ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(function(){});
+        ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+          .then(function(){ custRegDone[uid] = true; })
+          .catch(function(){ retryLater(); });
       });
-    } catch(e){}
+    } catch(e){ retryLater(); }
   }
 
   /* Email verification gate (ordering only): an email/password user
