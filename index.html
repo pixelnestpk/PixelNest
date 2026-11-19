@@ -3829,26 +3829,29 @@ window.PixelAccount = (function(){
 
   /* ----- header account UI ----- */
   /* Laptop fit for the seller pill: at widths up to 1440px the pill
-     shows the short name before the @ ("shakircadet1") instead of
-     the full email, so the gold SELLER badge, the search icon and
-     the gold Cart button stay fully visible at the far right; only
-     wider screens show the full email. The matching CSS rule lives
-     in the header laptop-fit style block; this sync enforces the
-     same swap with inline styles and re-checks it on resize, so
-     the short name always applies at laptop widths. */
-  var acctSwapWired = false;
-  function syncSellerEmailSwap(){
-    var ab = $("acctBtn");
-    if(!ab || !ab.classList.contains("is-seller")) return;
-    var laptop = !!(window.matchMedia && window.matchMedia("(max-width: 1440px)").matches);
-    var ef = ab.querySelector(".acct-email-full");
-    var es = ab.querySelector(".acct-email-short");
-    /* Inline styles WITH the important flag, so the swap holds at
-       laptop widths no matter what any stylesheet says; on wider
-       screens the inline display is removed again and the plain
-       CSS defaults apply (full email shown, short name hidden). */
-    if(ef){ if(laptop) ef.style.setProperty("display", "none", "important"); else ef.style.removeProperty("display"); }
-    if(es){ if(laptop) es.style.setProperty("display", "inline", "important"); else es.style.removeProperty("display"); }
+     shows ONLY the short name before the @ ("shakircadet1"). The
+     full email is not rendered into the button at all at those
+     widths — paintAccount builds a single label span for the
+     current width — so no stylesheet, cached copy or later rule
+     can bring the full email back on a laptop screen. Only wider
+     screens get the full email in the pill; the full email always
+     stays available in the account dropdown and on hover (title).
+     The mode is re-checked on every resize, and crossing the
+     1440px line in either direction repaints the pill. A matching
+     CSS swap also lives in the header laptop-fit style block. */
+  var acctMode = null;
+  function sellerPillCompact(){
+    return !!(window.matchMedia && window.matchMedia("(max-width: 1440px)").matches);
+  }
+  var acctResizeWired = false;
+  function wireAcctResize(){
+    if(acctResizeWired) return;
+    acctResizeWired = true;
+    window.addEventListener("resize", function(){
+      if(!currentUser || !isSeller()) return;
+      var m = sellerPillCompact() ? "short" : "full";
+      if(m !== acctMode) paintAccount();
+    });
   }
   function paintAccount(){
     var si = $("signInBtn"), ab = $("acctBtn"), menu = $("acctMenu"), em = $("acctEmail");
@@ -3863,26 +3866,32 @@ window.PixelAccount = (function(){
       si.style.display = "none";
       ab.style.display = "";
       if(sellerOn){
-        /* Seller signed in: show the full seller email plus a solid
+        /* Seller signed in: show the seller label (short name on
+           laptop widths, full email on wide screens) plus a solid
            SELLER badge in the header itself, so the seller account is
            unmistakable at a glance — never confused with a customer view. */
         ab.classList.add("is-seller");
         ab.textContent = "";
         ab.title = currentUser.email || "";
-        var ef = document.createElement("span");
-        ef.className = "acct-email-full";
-        ef.textContent = currentUser.email || "Seller account";
-        ab.appendChild(ef);
-        var es = document.createElement("span");
-        es.className = "acct-email-short";
-        es.textContent = currentUser.email ? currentUser.email.split("@")[0] : "Seller";
-        ab.appendChild(es);
+        /* One label only, chosen for the current width: at 1440px
+           and below the pill gets the short name and the full email
+           never enters the button; above 1440px it gets the full
+           email. The SELLER badge follows either way. */
+        acctMode = sellerPillCompact() ? "short" : "full";
+        var pillLabel = document.createElement("span");
+        if(acctMode === "short"){
+          pillLabel.className = "acct-email-short";
+          pillLabel.textContent = currentUser.email ? currentUser.email.split("@")[0] : "Seller";
+        } else {
+          pillLabel.className = "acct-email-full";
+          pillLabel.textContent = currentUser.email || "Seller account";
+        }
+        ab.appendChild(pillLabel);
         var bd = document.createElement("span");
         bd.className = "seller-badge";
         bd.textContent = "SELLER";
         ab.appendChild(bd);
-        syncSellerEmailSwap();
-        if(!acctSwapWired){ acctSwapWired = true; window.addEventListener("resize", syncSellerEmailSwap); }
+        wireAcctResize();
         if(em){
           em.textContent = currentUser.email || "";
           var mb = document.createElement("span");
