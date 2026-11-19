@@ -545,6 +545,65 @@ footer a:hover{color:var(--gold)}
   .hero{padding:44px 0 40px}
 }
 </style>
+<style>
+/* ================= ORDER TRACKING + MOBILE HEADER FIX ================= */
+:root{--hdr-h:96px}
+@media (max-width:1080px){ :root{--hdr-h:198px} }
+section,.toolbar,footer{scroll-margin-top:calc(var(--hdr-h) + 12px)}
+header{padding-top:env(safe-area-inset-top,0px)}
+
+/* Compact mobile header so the sticky bar never crowds the hero */
+@media (max-width:900px){
+  .header-in{padding:10px 0 6px;gap:10px}
+  .logo-mark{width:38px;height:38px}
+  .mobile-nav{padding:0 0 8px}
+  .mobile-nav a{padding:8px 12px}
+  .hero{padding-top:36px}
+}
+
+/* Success panel — track button + free downloads */
+.success .track-btn{display:flex;width:100%;background:#101318;color:#EAC95C;border:1.5px solid #C9A227;border-radius:12px;min-height:52px;height:auto;padding:12px 14px;line-height:1.3;text-align:center;white-space:normal;margin-top:12px;font-weight:800}
+.success .track-btn:hover{background:#22262F}
+#freeDownloads{margin-top:14px;background:#fff;border:1px solid #A7D7B4;border-radius:12px;padding:12px}
+.fd-title{font-weight:800;color:var(--navy);font-size:.92rem}
+.dl-grid{display:grid;gap:8px;margin-top:10px}
+.dl-btn{display:flex;align-items:center;gap:10px;background:#101318;color:#F3E9C8;border:1.5px solid #C9A227;border-radius:12px;padding:12px 14px;font-weight:800;text-decoration:none;min-height:50px;font-size:.92rem}
+.dl-btn:hover{background:#22262F}
+.dl-fallback{font-size:.83rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.dl-fallback a{font-weight:800}
+
+/* Track Order page */
+.track-form{display:flex;gap:10px;flex-wrap:wrap}
+.track-form input{flex:1 1 220px;min-height:52px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:#fff;color:var(--ink);text-transform:uppercase}
+.track-form input:focus{outline:2px solid var(--gold)}
+.track-form .btn{border-radius:12px;min-height:52px}
+.track-card{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:18px;background:#fff}
+.track-note{background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:12px;padding:12px 14px;font-weight:600;margin-top:14px;font-size:.93rem;color:var(--ink)}
+.track-delivered{background:#DCFCE7;color:#14532D;border:1px solid #A7D7B4;border-radius:12px;padding:12px 14px;font-weight:700;margin-top:14px;font-size:.93rem}
+.track-free{border:1px solid #A7D7B4;border-radius:12px;padding:12px;margin-top:14px;background:#fff}
+
+/* Live status timeline */
+.tl{margin:20px 0 2px}
+.tl-step{display:flex;gap:14px;position:relative;padding-bottom:24px}
+.tl-step:last-child{padding-bottom:2px}
+.tl-step::before{content:"";position:absolute;left:15px;top:36px;bottom:2px;width:2px;background:var(--line)}
+.tl-step:last-child::before{display:none}
+.tl-step.done::before{background:var(--gold)}
+.tl-dot{width:32px;height:32px;flex:none;border-radius:50%;border:2px solid var(--line);background:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem;color:var(--muted);position:relative;z-index:1}
+.tl-step.done .tl-dot{background:var(--gold);border-color:var(--gold);color:#17130A}
+.tl-step.now .tl-dot{border-color:var(--gold);color:var(--gold-deep);box-shadow:0 0 0 5px var(--gold-soft)}
+.tl-step .tl-txt b{display:block;color:var(--navy);font-size:1rem;line-height:1.3}
+.tl-step .tl-txt span{color:var(--muted);font-size:.85rem}
+.tl-step.upcoming .tl-txt b{color:var(--muted)}
+
+/* Seller dashboard — local-only badge */
+.o-local{font-size:.68rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:#FEF3C7;color:#92400E;padding:4px 9px;border-radius:999px;white-space:nowrap}
+
+/* Tracking page — customer confirms delivery */
+.received-btn{display:flex;width:100%;background:var(--gold);color:#17130A;border:0;border-radius:12px;min-height:54px;height:auto;padding:13px 16px;line-height:1.3;text-align:center;white-space:normal;margin-top:12px;font-weight:800;cursor:pointer}
+.received-btn:hover{background:#B8931F}
+.received-btn[disabled]{opacity:.5;cursor:default}
+</style>
 </head>
 <body id="top">
 
@@ -562,6 +621,7 @@ footer a:hover{color:var(--gold)}
         <a href="#why">Why Us</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
+        <a href="#track" data-tracklink>Track Order</a>
       </nav>
       <div class="head-search">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -577,6 +637,7 @@ footer a:hover{color:var(--gold)}
       <a href="#why">Why Us</a>
       <a href="#about">About</a>
       <a href="#faq">FAQ</a>
+      <a href="#track" data-tracklink>Track Order</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -871,6 +932,7 @@ footer a:hover{color:var(--gold)}
           <li><a href="#categories">Categories</a></li>
           <li><a href="#samples">Samples</a></li>
           <li><a href="#custom">Custom Orders</a></li>
+          <li><a href="#track" data-tracklink>Track Your Order</a></li>
         </ul>
       </div>
       <div>
@@ -925,6 +987,8 @@ footer a:hover{color:var(--gold)}
         <a class="btn wa-open-btn" id="waOrderLink" href="whatsapp://send?phone=923355290894">Open WhatsApp &amp; Send Order →</a>
         <p style="margin:8px 0 0;font-size:.84rem;text-align:center">On a computer without the WhatsApp app? <a id="waOrderFallback" href="https://wa.me/923355290894" target="_blank" rel="noopener" style="font-weight:800">Open in browser instead</a></p>
         <p style="margin:10px 0 0;font-size:.87rem">Tap the green button above — it opens the seller's WhatsApp chat with your order ready; just press Send there. After you send it, the seller replies on YOUR number above, shares the payment number (not needed for the free pack), and sends your file on WhatsApp + email within 1 day (custom orders take 2–3 days).</p>
+        <button type="button" class="btn track-btn" id="trackThisOrder">Track Your Order — live status →</button>
+        <div id="freeDownloads" style="display:none"></div>
         <div class="order-msg-box">
           <div class="om-title">Your order message — if WhatsApp does not open, copy this and paste it in WhatsApp yourself:</div>
           <pre id="orderMsgText">Your order message will appear here after you place the order.</pre>
@@ -1010,7 +1074,7 @@ footer a:hover{color:var(--gold)}
   <div class="pp-card o-card">
     <div class="pp-top"><span class="o-top-title">Seller Orders</span><button class="icon-btn" id="ordersClose" aria-label="Close orders dashboard">✕</button></div>
     <div class="o-body">
-      <p class="o-note">This dashboard lives in <b>this browser on this device only</b>. Orders placed from this browser are recorded here automatically. Orders placed on a customer's own phone cannot be seen by the website — they arrive on your WhatsApp, so add them below with their Order ID to track them here.</p>
+      <p class="o-note">Orders placed on the website now sync online — open this dashboard on <b>any device</b> and you will see them, and each customer sees the same status live on the <b>Track Order</b> page. Status <b>khud badalta hai</b> — aapko kuch nahi karna: order place hote hi <b>Pending</b>, customer ke WhatsApp par order bhejte hi <b>Active</b>, aur free sample foran <b>Completed</b> — paid order tab <b>Completed</b> hota hai jab customer tracking page par “Mujhe files mil gayi” confirm karta hai. Purane orders jo sirf is browser mein save hue thay, un par <b>“sirf is browser mein”</b> likha hai. Customer ke name aur number sirf is browser mein rehte hain — online tracking mein sirf Order ID, product, quantity, total aur status jata hai.</p>
       <div class="o-stats">
         <div class="o-stat"><b id="oTotal">0</b><span>Total Orders</span></div>
         <div class="o-stat st-pending"><b id="oPending">0</b><span>Pending</span></div>
@@ -1018,21 +1082,33 @@ footer a:hover{color:var(--gold)}
         <div class="o-stat st-completed"><b id="oCompleted">0</b><span>Completed</span></div>
       </div>
       <h3>Add an order manually</h3>
-      <p class="o-note">For orders that arrived on WhatsApp: type the Order ID from the customer's message, the product, and their name and number.</p>
+      <p class="o-note">For orders that arrived on WhatsApp: type the Order ID from the customer's message and the product. Adding it also creates the online tracking, so that customer can track it with the same Order ID. Their name and number stay only in this browser.</p>
       <form class="o-form" id="manualOrderForm">
         <input required id="mOid" placeholder="Order ID (e.g. DS-ABC123)" aria-label="Order ID">
         <input id="mProduct" placeholder="Product name" aria-label="Product name">
         <input id="mName" placeholder="Customer name" aria-label="Customer name">
         <input id="mPhone" placeholder="Customer WhatsApp number" aria-label="Customer WhatsApp number" inputmode="tel">
-        <select id="mStatus" aria-label="Order status">
-          <option value="Pending" selected>Pending</option>
-          <option value="Active">Active</option>
-          <option value="Completed">Completed</option>
-        </select>
+        <input id="mQty" type="number" min="1" placeholder="Quantity (e.g. 1)" aria-label="Quantity">
+        <input id="mTotal" type="number" min="0" placeholder="Total Rs. (e.g. 449)" aria-label="Total in rupees">
         <button class="btn btn-primary" type="submit">Add Order</button>
       </form>
       <h3>All orders</h3>
       <div id="ordersList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACK ORDER PAGE (customer, live status) -->
+<div class="ppage" id="trackPage" role="dialog" aria-modal="true" aria-label="Track your order">
+  <div class="pp-card o-card">
+    <div class="pp-top"><span class="o-top-title">Track Your Order</span><button class="icon-btn" id="trackClose" aria-label="Close order tracking">✕</button></div>
+    <div class="o-body">
+      <p class="o-note">Apna <b>Order ID</b> likhein — jo ID order place karne par screen par mila tha. Status yahin <b>live aur khud</b> update hota hai — page refresh karne ki zaroorat nahi. Jab files mil jayen to neeche wala button daba kar confirm kar dein, order Completed ho jayega.</p>
+      <form class="track-form" id="trackForm">
+        <input id="trackInput" placeholder="Order ID (e.g. DS-ABC123)" aria-label="Order ID" autocomplete="off">
+        <button class="btn btn-primary" type="submit">Track Order</button>
+      </form>
+      <div id="trackResult"></div>
     </div>
   </div>
 </div>
@@ -1123,6 +1199,7 @@ var PRODUCTS = [
 var cart = {};
 var activeFilter = "all";
 var currentOrderId = "";
+var lastOrderWasFree = false;
 var ppCurrentId = "";
 var pendingRating = 0;
 
@@ -1249,7 +1326,7 @@ document.addEventListener("click", function(e){
   if(a){ addToCart(a.getAttribute("data-add")); a.classList.add("added"); }
 });
 document.addEventListener("keydown", function(e){
-  if(e.key==="Escape"){ closeProduct(); closeCart(); closeOrdersDashboard(); }
+  if(e.key==="Escape"){ closeProduct(); closeCart(); closeOrdersDashboard(); closeTrackPage(); }
   if((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("thumb")){
     e.preventDefault(); openProduct(e.target.getAttribute("data-sample"));
   }
@@ -1366,7 +1443,32 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   if(!document.getElementById("fName").value.trim() || !document.getElementById("fPhone").value.trim() || !document.getElementById("fEmail").value.trim()){ showToast("Please fill in your name, WhatsApp number and email"); return; }
   currentOrderId = makeOrderId();
   document.getElementById("orderIdText").textContent = currentOrderId;
-  recordOrder({ id: currentOrderId, product: Object.keys(cart).map(function(k){ var pp = byId(k); return pp ? pp.name + " x" + cart[k] : k; }).join(", "), name: document.getElementById("fName").value.trim(), phone: document.getElementById("fPhone").value.trim(), status: "Pending" });
+  var orderProductStr = Object.keys(cart).map(function(k){ var pp = byId(k); return pp ? pp.name + " x" + cart[k] : k; }).join(", ");
+  var orderQty = cartCountTotal();
+  var orderTotal = cartSum();
+  lastOrderWasFree = orderTotal === 0 && !!cart["free-sample"];
+  recordOrder({ id: currentOrderId, product: orderProductStr, name: document.getElementById("fName").value.trim(), phone: document.getElementById("fPhone").value.trim(), status: "Pending" });
+  /* Public tracking copy in Firestore — ONLY orderId, productName, quantity,
+     total, status, createdAt, deliveryNote. The customer's name, phone and
+     email are NEVER sent to Firestore: they stay in this browser's local
+     record and inside the WhatsApp message. Status is automatic: Pending
+     now; Active when the customer taps "Open WhatsApp & Send Order";
+     a FREE sample order is Completed at once. If the Firestore write
+     fails (offline), checkout continues exactly as before — no error
+     is shown to the customer. */
+  if(window.PixelOrders) window.PixelOrders.createTracking({
+    orderId: currentOrderId,
+    productName: orderProductStr,
+    quantity: orderQty,
+    total: orderTotal,
+    deliveryNote: lastOrderWasFree ? "FREE Starter Sample Pack — instant download available on the tracking page" : "Files WhatsApp / email par bhej diye jayenge — within 1 day",
+    thenStatus: lastOrderWasFree ? "Completed" : ""
+  });
+  var fdBox = document.getElementById("freeDownloads");
+  if(fdBox){
+    if(lastOrderWasFree){ fdBox.innerHTML = freeDownloadsHtml(currentOrderId); fdBox.style.display = "block"; }
+    else { fdBox.innerHTML = ""; fdBox.style.display = "none"; }
+  }
   /* Always the SELLER's number (also for FREE orders). The customer's typed
      number stays inside buildOrderText() as "WhatsApp: ..." for the reply.
      The send button is a REAL anchor whose href is the whatsapp:// app
@@ -1386,8 +1488,18 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   showToast("Order " + currentOrderId + " ready — tap the green WhatsApp button below");
 });
 
-document.getElementById("copyOrderMsg").addEventListener("click", function(){
-  var t = document.getElementById("orderMsgText").textContent;
+/* Automatic status: the customer tapping "Open WhatsApp & Send Order"
+   means the order has been sent to the seller — it becomes Active by
+   itself. Free sample orders are already Completed, so they skip this. */
+document.getElementById("waOrderLink").addEventListener("click", function(){
+  if(currentOrderId && !lastOrderWasFree && window.PixelOrders) window.PixelOrders.setStatus(currentOrderId, "Active");
+});
+document.getElementById("trackThisOrder").addEventListener("click", function(){
+  closeCart();
+  openTrackPage(currentOrderId);
+});
+
+document.getElementById("copyOrderMsg").addEventListener("click", function(){  var t = document.getElementById("orderMsgText").textContent;
   if(!t || t.indexOf("will appear here") > -1){ showToast("Place your order first — the message appears here"); return; }
   copyText(t, "Order message copied — paste it in the seller's WhatsApp chat");
 });
@@ -1418,6 +1530,9 @@ document.getElementById("customForm").addEventListener("submit", function(e){
   var detail=document.getElementById("cDetail").value.trim();
   var oid=makeOrderId();
   recordOrder({ id: oid, product: "Custom — " + type, name: name, phone: "", status: "Pending" });
+  /* Custom orders get online tracking too, and go straight to Active —
+     this submit is what sends the order to the seller's WhatsApp. */
+  if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: "Custom — " + type, quantity: 1, total: 0, deliveryNote: "Custom order — files WhatsApp / email par bheje jayenge, within 2–3 days", thenStatus: "Active" });
   var msg="*NEW ORDER — PIXELNEST*\nOrder ID: "+oid+"\nProduct: Custom Order\n\nCustomer: "+name+"\nType: "+type+"\nDetails: "+detail+"\nDelivery: within 2–3 days\n\nI placed this custom order on the website. Please confirm the price. Thank you!\nStore: https://aloneboy5186khan-creator.github.io/PixelNest/";
   showToast("Custom order ready — Order ID: "+oid);
   openWhatsApp(msg);
@@ -1456,7 +1571,15 @@ document.getElementById("revSend").addEventListener("click", function(){
   if(window.PixelRatings) window.PixelRatings.rateStore(revRating);
 });
 
-/* ---------- Seller orders dashboard (this browser only) ---------- */
+/* ---------- Seller orders dashboard ----------
+   Online orders live in Firestore ("orders" collection) so this dashboard
+   works on ANY device. Statuses are AUTOMATIC — the seller never changes
+   them: Pending when the order is placed, Active when the customer sends
+   it on WhatsApp, Completed when the customer confirms delivery on the
+   tracking page (free sample orders complete at once). localStorage
+   records are merged in for the customer's name/number (which NEVER go
+   to Firestore) and for older orders that exist only in this browser —
+   those are marked "sirf is browser mein". */
 var ORDERS_KEY = "pixelnest_orders_v1";
 function loadOrders(){ try { var raw = localStorage.getItem(ORDERS_KEY); var arr = raw ? JSON.parse(raw) : []; return Array.isArray(arr) ? arr : []; } catch(e){ return []; } }
 function saveOrders(){ try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); } catch(e){} }
@@ -1471,45 +1594,67 @@ if(!orders.some(function(x){ return x.id === "DS-NMV8QK"; })){
 }
 function todayStr(){ return new Date().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" }); }
 function escHtml(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fmtTs(ts){
+  if(!ts) return "";
+  var d = null;
+  if(typeof ts.toDate === "function"){ try { d = ts.toDate(); } catch(e){} }
+  else if(typeof ts === "number") d = new Date(ts);
+  else if(ts.seconds) d = new Date(ts.seconds * 1000);
+  if(!d || isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" }) + ", " + d.toLocaleTimeString("en-GB", { hour:"numeric", minute:"2-digit" });
+}
 function recordOrder(o){
   if(!o || !o.id) return;
   if(orders.some(function(x){ return x.id === o.id; })) return;
   orders.unshift({ id:o.id, product:o.product || "—", name:o.name || "—", phone:o.phone || "", date: todayStr(), status:o.status || "Pending" });
   saveOrders(); renderOrders();
 }
+var fsOrders = [];
+var fsWatchStarted = false;
+function startFsWatch(){
+  if(fsWatchStarted) return;
+  fsWatchStarted = true;
+  if(window.PixelOrders) window.PixelOrders.watchAll(function(arr){ fsOrders = arr || []; renderOrders(); });
+}
 function renderOrders(){
+  var fsIds = {};
+  fsOrders.forEach(function(o){ if(o && o.orderId) fsIds[o.orderId] = o; });
+  var localById = {};
+  orders.forEach(function(o){ localById[o.id] = o; });
+  var localOnly = orders.filter(function(o){ return !fsIds[o.id]; });
   var counts = { Pending:0, Active:0, Completed:0 };
-  orders.forEach(function(o){ if(counts.hasOwnProperty(o.status)) counts[o.status]++; });
-  document.getElementById("oTotal").textContent = orders.length;
+  fsOrders.forEach(function(o){ if(counts.hasOwnProperty(o.status)) counts[o.status]++; });
+  localOnly.forEach(function(o){ if(counts.hasOwnProperty(o.status)) counts[o.status]++; });
+  document.getElementById("oTotal").textContent = fsOrders.length + localOnly.length;
   document.getElementById("oPending").textContent = counts.Pending;
   document.getElementById("oActive").textContent = counts.Active;
   document.getElementById("oCompleted").textContent = counts.Completed;
   var box = document.getElementById("ordersList");
-  if(!orders.length){
-    box.innerHTML = '<p class="o-note">No orders yet. Orders placed from this browser will appear here automatically, and you can add WhatsApp orders manually above.</p>';
+  if(!fsOrders.length && !localOnly.length){
+    box.innerHTML = '<p class="o-note">No orders yet. Website par place hue orders yahan khud aa jayenge, aur WhatsApp par aaye orders neeche form se add karein.</p>';
     return;
   }
-  box.innerHTML = orders.map(function(o){
-    var opts = ["Pending","Active","Completed"].map(function(st){
-      return '<option value="' + st + '"' + (o.status === st ? " selected" : "") + '>' + st + '</option>';
-    }).join("");
-    return '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.id) + '</span><span class="o-pill pill-' + escHtml(o.status) + '">' + escHtml(o.status) + '</span></div>'
+  var html = "";
+  fsOrders.forEach(function(o){
+    var loc = localById[o.orderId];
+    var st = o.status || "Pending";
+    html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.orderId) + '</span><span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span></div>'
+      + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.productName || "—") + '</b><br>Quantity: ' + (o.quantity || 1) + ' · Total: ' + (o.total > 0 ? "Rs. " + Number(o.total).toLocaleString("en-PK") : "FREE")
+      + (loc ? '<br>Customer: ' + escHtml(loc.name) + (loc.phone ? ' · ' + escHtml(loc.phone) : '') : '')
+      + (fmtTs(o.createdAt) ? '<br>Date: ' + fmtTs(o.createdAt) : '') + '</div></div>';
+  });
+  localOnly.forEach(function(o){
+    html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.id) + '</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="o-local">sirf is browser mein</span><span class="o-pill pill-' + escHtml(o.status) + '">' + escHtml(o.status) + '</span></span></div>'
       + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.product) + '</b><br>Customer: ' + escHtml(o.name) + (o.phone ? ' · ' + escHtml(o.phone) : '') + '<br>Date: ' + escHtml(o.date) + '</div>'
-      + '<div class="o-status"><label style="font-size:.85rem;font-weight:700;color:var(--muted)">Status <select data-ostatus="' + escHtml(o.id) + '" aria-label="Change status for order ' + escHtml(o.id) + '">' + opts + '</select></label>'
-      + '<button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button></div></div>';
-  }).join("");
+      + '<div class="o-status"><button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button></div></div>';
+  });
+  box.innerHTML = html;
 }
-function openOrdersDashboard(){ renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden"; }
+function openOrdersDashboard(){ startFsWatch(); renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden"; }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
 document.getElementById("openOrders").addEventListener("click", openOrdersDashboard);
 document.getElementById("ordersClose").addEventListener("click", closeOrdersDashboard);
 document.getElementById("ordersPage").addEventListener("click", function(e){ if(e.target === this) closeOrdersDashboard(); });
-document.getElementById("ordersList").addEventListener("change", function(e){
-  var sel = e.target.closest("[data-ostatus]"); if(!sel) return;
-  var id = sel.getAttribute("data-ostatus");
-  orders.forEach(function(o){ if(o.id === id) o.status = sel.value; });
-  saveOrders(); renderOrders(); showToast("Order " + id + " marked " + sel.value);
-});
 document.getElementById("ordersList").addEventListener("click", function(e){
   var del = e.target.closest("[data-odel]"); if(!del) return;
   var id = del.getAttribute("data-odel");
@@ -1518,13 +1663,146 @@ document.getElementById("ordersList").addEventListener("click", function(e){
 });
 document.getElementById("manualOrderForm").addEventListener("submit", function(e){
   e.preventDefault();
-  var oid = document.getElementById("mOid").value.trim();
+  var oid = document.getElementById("mOid").value.trim().toUpperCase();
   if(!oid){ showToast("Please enter the Order ID"); return; }
-  if(orders.some(function(x){ return x.id === oid; })){ showToast("That Order ID is already in the list"); return; }
-  orders.unshift({ id: oid, product: document.getElementById("mProduct").value.trim() || "—", name: document.getElementById("mName").value.trim() || "—", phone: document.getElementById("mPhone").value.trim(), date: todayStr(), status: document.getElementById("mStatus").value });
+  if(orders.some(function(x){ return x.id === oid; }) || fsOrders.some(function(x){ return x.orderId === oid; })){ showToast("That Order ID is already in the list"); return; }
+  var prod = document.getElementById("mProduct").value.trim() || "—";
+  var qty = parseInt(document.getElementById("mQty").value, 10) || 1;
+  var tot = parseInt(document.getElementById("mTotal").value, 10) || 0;
+  orders.unshift({ id: oid, product: prod, name: document.getElementById("mName").value.trim() || "—", phone: document.getElementById("mPhone").value.trim(), date: todayStr(), status: "Pending" });
   saveOrders(); renderOrders();
-  this.reset(); document.getElementById("mStatus").value = "Pending";
-  showToast("Order " + oid + " added");
+  /* Online tracking bhi ban jata hai — customer isi Order ID se apna order
+     track kar sakta hai. Name aur number Firestore mein NAHI jata; woh
+     sirf is browser ke local record mein rehta hai. */
+  if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: prod, quantity: qty, total: tot, deliveryNote: "Files WhatsApp / email par bhej diye jayenge — within 1 day" });
+  this.reset();
+  showToast("Order " + oid + " added — customer ab isay track kar sakta hai");
+});
+
+/* ---------- FREE sample instant delivery ---------- */
+var SAMPLE_FILES = [
+  { name: "Wall Art — Geometric Poster (PNG)", path: "files/wall-art-geometric.png" },
+  { name: "Wall Art — Mountain Poster (PNG)", path: "files/wall-art-mountain.png" },
+  { name: "Colouring Page — Cat (PNG)", path: "files/colouring-cat.png" },
+  { name: "Colouring Page — Car (PNG)", path: "files/colouring-car.png" }
+];
+function freeDownloadsHtml(oid){
+  var waMsg = "Hello! Meri FREE sample file download nahi ho rahi. Order ID: " + oid;
+  var btns = SAMPLE_FILES.map(function(f){ return '<a class="dl-btn" href="' + f.path + '" download>Download · ' + escHtml(f.name) + '</a>'; }).join("");
+  return '<div class="fd-title">Your FREE sample files — download them right now:</div>'
+    + '<div class="dl-grid">' + btns + '</div>'
+    + '<p class="dl-fallback">Agar koi file download na ho, to <a href="' + waAppUrl(waMsg) + '" data-wa-web="' + waWebUrl(waMsg) + '">WhatsApp par yehi file mangwa lein</a> — seller wahi files bhej dega.</p>';
+}
+function isFreeSampleData(data){
+  return !!data && Number(data.total) === 0 && /free starter sample/i.test(data.productName || "");
+}
+
+/* ---------- Track Order page (customer, live via Firestore) ---------- */
+var trackUnsub = null;
+function openTrackPage(id){
+  var pg = document.getElementById("trackPage");
+  pg.classList.add("open");
+  pg.scrollTop = 0;
+  document.body.style.overflow = "hidden";
+  if(id){
+    document.getElementById("trackInput").value = id;
+    startTracking(id);
+  } else {
+    setTimeout(function(){ var ti = document.getElementById("trackInput"); if(ti) ti.focus(); }, 80);
+  }
+}
+function closeTrackPage(){
+  var pg = document.getElementById("trackPage");
+  if(pg && pg.classList.contains("open")){ pg.classList.remove("open"); document.body.style.overflow = ""; }
+  if(trackUnsub){ trackUnsub(); trackUnsub = null; }
+}
+function startTracking(rawId){
+  var id = (rawId || "").trim().toUpperCase();
+  var box = document.getElementById("trackResult");
+  if(!id){ box.innerHTML = '<p class="o-note" style="margin-top:14px">Pehle apna Order ID likhein.</p>'; return; }
+  if(trackUnsub){ trackUnsub(); trackUnsub = null; }
+  box.innerHTML = '<p class="o-note" style="margin-top:14px">Order ' + escHtml(id) + ' dhoondh rahe hain…</p>';
+  if(!window.PixelOrders){ box.innerHTML = '<p class="o-note" style="margin-top:14px">Tracking abhi available nahi — apna status WhatsApp par pooch lein.</p>'; return; }
+  trackUnsub = window.PixelOrders.watchOrder(id, function(data){ renderTrackResult(id, data); });
+}
+function renderTrackResult(id, data){
+  var box = document.getElementById("trackResult");
+  if(!box) return;
+  if(!data){
+    box.innerHTML = '<div class="track-card"><b style="color:var(--navy)">Order nahi mila</b><p class="o-note" style="margin:6px 0 0">Order ID <b>' + escHtml(id) + '</b> se koi order nahi mila. ID check karke dobara try karein — ID order place karne par screen par mila tha.</p></div>';
+    return;
+  }
+  var status = data.status || "Pending";
+  var idx = status === "Completed" ? 2 : (status === "Active" ? 1 : 0);
+  var steps = [
+    { label: "Order Received", desc: "Aapka order website par place ho gaya hai", date: fmtTs(data.createdAt) },
+    { label: "Active", desc: "Order seller ko WhatsApp par bhej diya gaya hai — files tayyar ho rahi hain", date: "" },
+    { label: "Completed", desc: "Files deliver ho gayi hain", date: fmtTs(data.deliveredAt) }
+  ];
+  var tl = steps.map(function(s, i){
+    var cls, dot;
+    if(status === "Completed" || i < idx){ cls = "done"; dot = "✓"; }
+    else if(i === idx){ cls = "now"; dot = String(i + 1); }
+    else { cls = "upcoming"; dot = String(i + 1); }
+    return '<div class="tl-step ' + cls + '"><span class="tl-dot">' + dot + '</span><span class="tl-txt"><b>' + s.label + '</b><span>' + s.desc + (s.date ? ' · ' + s.date : '') + '</span></span></div>';
+  }).join("");
+  var free = isFreeSampleData(data);
+  var deliveryHtml;
+  if(free){
+    deliveryHtml = '<div class="track-free">' + freeDownloadsHtml(data.orderId || id) + '</div>';
+  } else if(status === "Completed"){
+    deliveryHtml = '<div class="track-delivered">Delivered — files WhatsApp/email par bhej diye gaye.</div>';
+  } else {
+    deliveryHtml = '<div class="track-note">' + escHtml(data.deliveryNote || "Files WhatsApp / email par bhej diye jayenge — within 1 day") + '</div>'
+      + '<button type="button" class="received-btn" id="receivedBtn">Mujhe files mil gayi — order complete karein</button>';
+  }
+  var totalTxt = Number(data.total) > 0 ? "Rs. " + Number(data.total).toLocaleString("en-PK") : (free ? "FREE" : "Rs. 0");
+  box.innerHTML = '<div class="track-card">'
+    + '<div class="o-item-top"><span class="oid">' + escHtml(data.orderId || id) + '</span><span class="o-pill pill-' + escHtml(status) + '">' + escHtml(status) + '</span></div>'
+    + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(data.productName || "") + '</b><br>Quantity: ' + (data.quantity || 1) + ' · Total: <b style="color:var(--navy)">' + totalTxt + '</b></div>'
+    + '<div class="tl">' + tl + '</div>'
+    + deliveryHtml
+    + '</div>';
+  var rb = document.getElementById("receivedBtn");
+  if(rb) rb.addEventListener("click", function(){
+    rb.disabled = true;
+    rb.textContent = "Confirm ho raha hai…";
+    if(window.PixelOrders) window.PixelOrders.setStatus(id, "Completed").then(function(ok){
+      if(ok) showToast("Shukriya! Order " + id + " Completed ho gaya");
+      else { rb.disabled = false; rb.textContent = "Mujhe files mil gayi — order complete karein"; showToast("Confirm nahi ho saka — internet check karke dobara try karein"); }
+    });
+  });
+}
+document.getElementById("trackClose").addEventListener("click", closeTrackPage);
+document.getElementById("trackPage").addEventListener("click", function(e){ if(e.target === this) closeTrackPage(); });
+document.getElementById("trackForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  startTracking(document.getElementById("trackInput").value);
+});
+document.addEventListener("click", function(e){
+  var t = e.target.closest ? e.target.closest("[data-tracklink]") : null;
+  if(t){ e.preventDefault(); openTrackPage(); }
+});
+
+/* Keep anchored sections clear of the sticky header at every width —
+   measures the real header height (mobile header is taller: logo row,
+   search row and the mobile nav row), so the hero text and section
+   headings are never covered or cut off. */
+function syncHeaderOffset(){
+  var h = document.querySelector("header");
+  if(h) document.documentElement.style.setProperty("--hdr-h", h.offsetHeight + "px");
+}
+window.addEventListener("resize", syncHeaderOffset);
+window.addEventListener("load", syncHeaderOffset);
+syncHeaderOffset();
+
+/* A shared tracking link (?order=ORDER_ID) opens the tracking page
+   with that order already loaded. */
+window.addEventListener("load", function(){
+  try {
+    var q = new URLSearchParams(window.location.search).get("order");
+    if(q && q.trim()) openTrackPage(q.trim());
+  } catch(e){}
 });
 
 renderSamples();
@@ -1747,6 +2025,127 @@ window.PixelRatings = (function(){
     storeRated: function(){ return !!lsGet("pixelnest_rated_store"); },
     rateProduct: rateProduct,
     rateStore: rateStore
+  };
+})();
+</script>
+
+<script>
+/* =====================================================================
+   PixelNest order tracking — Cloud Firestore "orders" collection.
+
+   PRIVACY RULE (hard): a tracking document holds ONLY these fields —
+     orderId, productName, quantity, total, status, createdAt,
+     deliveryNote   (+ deliveredAt, added by the status update)
+   The customer's name, phone number and email are NEVER written to
+   Firestore. They exist only in the seller browser's localStorage
+   record and inside the WhatsApp order message.
+
+   Statuses are AUTOMATIC — nobody changes them by hand:
+     "Pending"   — set at creation, when the order is placed.
+     "Active"    — set when the customer taps "Open WhatsApp & Send
+                   Order" (the order has reached the seller).
+     "Completed" — free sample orders complete at once; paid orders
+                   complete when the customer taps "Mujhe files mil
+                   gayi" on the tracking page.
+   Writes match the published Firestore rules: create carries exactly
+   the tracking fields with status "Pending"; updates touch only
+   status (and deliveredAt). Reads are public; nothing is deleted.
+
+   This module reuses the Firebase app the ratings module initialises
+   (it never calls initializeApp itself, so the two never collide).
+   Every write is fire-and-forget with a silent catch: if Firestore is
+   unreachable (offline), checkout and the rest of the store keep
+   working exactly as before.
+   ===================================================================== */
+window.PixelOrders = (function(){
+  var db = null;
+
+  function getDb(){
+    if(db) return db;
+    if(typeof window.firebase === "undefined" || !window.firebase.firestore) return null;
+    if(window.firebase.apps && window.firebase.apps.length){
+      try { db = window.firebase.app().firestore(); } catch(e){ db = null; }
+    }
+    return db;
+  }
+  /* The ratings module initialises the app on DOMContentLoaded and its
+     listener was registered first, so by the time this one runs the
+     app exists and the shared Firestore handle can be warmed up. */
+  document.addEventListener("DOMContentLoaded", function(){ getDb(); });
+
+  function setStatus(orderId, status){
+    var d = getDb();
+    if(!d || !orderId) return Promise.resolve(false);
+    try {
+      var FV = window.firebase.firestore.FieldValue;
+      var upd = { status: status };
+      if(status === "Completed") upd.deliveredAt = FV.serverTimestamp();
+      return d.collection("orders").doc(String(orderId)).update(upd)
+        .then(function(){ return true; })
+        .catch(function(){ return false; });
+    } catch(e){ return Promise.resolve(false); }
+  }
+
+  function createTracking(o){
+    var d = getDb();
+    if(!d || !o || !o.orderId) return;
+    try {
+      var FV = window.firebase.firestore.FieldValue;
+      var doc = {
+        orderId: String(o.orderId),
+        productName: String(o.productName || "—"),
+        quantity: Number(o.quantity) || 1,
+        total: Number(o.total) || 0,
+        status: "Pending",
+        createdAt: FV.serverTimestamp(),
+        deliveryNote: String(o.deliveryNote || "")
+      };
+      var ref = d.collection("orders").doc(doc.orderId);
+      ref.get().then(function(snap){
+        if(snap.exists){
+          /* Never reset an existing order — only apply the follow-up
+             automatic status if one was requested. */
+          if(o.thenStatus) setStatus(doc.orderId, o.thenStatus);
+          return;
+        }
+        return ref.set(doc).then(function(){
+          if(o.thenStatus && o.thenStatus !== "Pending") setStatus(doc.orderId, o.thenStatus);
+        });
+      }).catch(function(){ /* offline — localStorage + WhatsApp fallback */ });
+    } catch(e){}
+  }
+
+  function watchOrder(orderId, cb){
+    var d = getDb();
+    if(!d){ cb(null); return function(){}; }
+    try {
+      return d.collection("orders").doc(String(orderId)).onSnapshot(
+        function(snap){ cb(snap.exists ? snap.data() : null); },
+        function(){ cb(null); }
+      );
+    } catch(e){ cb(null); return function(){}; }
+  }
+
+  function watchAll(cb){
+    var d = getDb();
+    if(!d){ cb([]); return function(){}; }
+    try {
+      return d.collection("orders").orderBy("createdAt", "desc").limit(100).onSnapshot(
+        function(snap){
+          var arr = [];
+          snap.forEach(function(doc){ arr.push(doc.data()); });
+          cb(arr);
+        },
+        function(){ /* keep showing whatever is already rendered */ }
+      );
+    } catch(e){ return function(){}; }
+  }
+
+  return {
+    createTracking: createTracking,
+    setStatus: setStatus,
+    watchOrder: watchOrder,
+    watchAll: watchAll
   };
 })();
 </script>
