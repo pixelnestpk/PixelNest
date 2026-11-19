@@ -839,8 +839,10 @@ select option{color:#111827;background-color:#ffffff}
    button while Pending, the delivery upload otherwise) — so a
    product with 50 orders stays a short, scannable list instead of a
    huge stack of cards. The Accept button is gold when the order can
-   be accepted (Trx ID present, or a free order) and a disabled grey
-   "Waiting for payment" when a paid order has no Trx ID yet. */
+   be accepted (Trx ID present, or a free order) and disabled grey
+   when a paid order has no Trx ID yet — still labelled "Accept
+   Order", with the note "Waiting for payment — the customer has
+   not paid" beside it. */
 #ordersPage .orow{display:flex;align-items:center;gap:7px 14px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;font-size:.85rem}
 #ordersPage .orow:last-child{margin-bottom:0}
 #ordersPage .orow .oid{font-size:.88rem}
@@ -852,6 +854,7 @@ select option{color:#111827;background-color:#ffffff}
 #ordersPage .o-accept{background:var(--gold);color:#17130A;border:1.5px solid var(--gold);border-radius:999px;padding:0 16px;min-height:38px;font-weight:800;font-size:.85rem;cursor:pointer}
 #ordersPage .o-accept:hover{background:#B8931F;border-color:#B8931F}
 #ordersPage .o-accept:disabled{background:var(--soft);color:var(--muted);border-color:var(--line);cursor:default}
+#ordersPage .o-accept-note{font-size:.76rem;font-weight:700;color:#92400E;white-space:normal;max-width:210px;line-height:1.35}
 #ordersPage .orow .up-box{margin:0;border:0;background:none;padding:0;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
 #ordersPage .orow .up-files{margin:0}
 #ordersPage .orow .up-label{padding:7px 14px;min-height:36px;font-size:.82rem}
@@ -1001,8 +1004,11 @@ select option{color:#111827;background-color:#ffffff}
   .nav a{padding:10px 8px}
   .cart-btn{margin-left:8px;padding:0 16px}
   .acct-btn.is-seller{max-width:228px;padding:0 14px;gap:7px}
-  .acct-btn.is-seller .acct-email-full{display:none}
-  .acct-btn.is-seller .acct-email-short{display:inline}
+  /* The email swap is !important on purpose: at laptop widths the
+     pill MUST show the short name ("shakircadet1"), never the full
+     email — no other rule may win this back. */
+  .acct-btn.is-seller .acct-email-full{display:none !important}
+  .acct-btn.is-seller .acct-email-short{display:inline !important}
 }
 @media (max-width:1280px){
   .header-in{gap:10px}
@@ -2277,8 +2283,9 @@ document.getElementById("revSend").addEventListener("click", function(){
    works on ANY device. Status flow: EVERY order is placed as Pending —
    paid or free — and stays Pending until the seller ACCEPTS it here
    (the Accept Order button on each Pending order; for a paid order it
-   works only when the order's Trx ID is present, otherwise it reads
-   "Waiting for payment" and does nothing). Accepting moves the order
+   works only when the order's Trx ID is present — otherwise the
+   button stays visible but disabled, with the note "Waiting for
+   payment — the customer has not paid"). Accepting moves the order
    to Active. It becomes Completed only when the seller uploads the
    delivery file for it.
    Each Firestore order also carries paymentMethod + trxId, shown here
@@ -2343,9 +2350,10 @@ function deliveryBlockHtml(o){
 /* Can this Pending order be accepted right now? A paid order only
    once its Trx ID is present (payment sent); a genuinely free order
    (no payment due — the free sample, or a manual order the seller
-   added himself) can be accepted at once. When it cannot, the
-   button renders disabled as "Waiting for payment" and does
-   nothing. */
+   added himself) can be accepted at once. EVERY Pending order always
+   shows a visible button labelled "Accept Order": when it cannot be
+   accepted yet, the button is disabled and carries the note
+   "Waiting for payment — the customer has not paid" beside it. */
 function orderCanAccept(paymentMethod, trxId, total){
   if(String(trxId || "").trim()) return true;
   var pm = String(paymentMethod || "");
@@ -2356,7 +2364,8 @@ function orderCanAccept(paymentMethod, trxId, total){
 }
 function acceptBtnHtml(kind, id, can){
   if(can) return '<button type="button" class="o-accept" data-accept-' + kind + '="' + escHtml(id) + '">Accept Order</button>';
-  return '<button type="button" class="o-accept" disabled title="No Trx ID yet — the customer has not paid">Waiting for payment</button>';
+  return '<button type="button" class="o-accept" disabled title="Waiting for payment — the customer has not paid">Accept Order</button>'
+    + '<span class="o-accept-note">Waiting for payment — the customer has not paid</span>';
 }
 function rowTotalHtml(productName, paymentMethod, total){
   if(total === null || total === undefined) return /^free/i.test(paymentMethod || "") ? "FREE" : "—";
@@ -2408,12 +2417,16 @@ function syncSellerFilterTabs(){
 }
 /* Resolve the buyer's name for a dashboard order card from every
    place it can live, in order: (1) orderPrivate.buyerName, merged
-   into the order by PixelOrders.watchAll; (2) a name field on the
-   order record itself (orders placed before the private split kept
-   their payment fields on the public document); (3) this browser's
-   local order record for the same Order ID. A stored "—"
-   placeholder counts as missing, so the order row shows the real
-   name whenever one exists anywhere instead of a bare dash. */
+   into the order by PixelOrders.watchAll (the checkout writes it
+   there at order time); (2) the buyer's registered-customer record
+   in "customers", looked up by the order's uid and merged in by
+   watchAll the same way — this is what names orders placed before
+   buyerName was ever saved; (3) a name field on the order record
+   itself (orders placed before the private split kept their
+   payment fields on the public document); (4) this browser's local
+   order record for the same Order ID. A stored "—" placeholder
+   counts as missing, so the order row shows the real name whenever
+   one exists anywhere instead of a bare dash. */
 function buyerNameFor(o, loc){
   var cands = [o && o.buyerName, o && o.name, o && o.customerName, o && o.buyer, loc && loc.name, loc && loc.buyerName];
   for(var i = 0; i < cands.length; i++){
@@ -2492,10 +2505,15 @@ function renderOrders(){
   var localById = {};
   orders.forEach(function(o){ localById[o.id] = o; });
   var localOnly = orders.filter(function(o){ return !fsIds[o.id]; });
+  /* The four totals at the top count the REAL online orders only
+     (Firestore) — the exact same set the homepage trust strip
+     ("Orders Placed") and the store-history row below count, so all
+     three always agree. Browser-only records (like the seller's own
+     "Website test order", DS-NMV8QK) still appear in their product
+     row further down, but they never inflate these shared totals. */
   var counts = { Pending:0, Active:0, Completed:0 };
   fsOrders.forEach(function(o){ if(counts.hasOwnProperty(o.status)) counts[o.status]++; });
-  localOnly.forEach(function(o){ if(counts.hasOwnProperty(o.status)) counts[o.status]++; });
-  document.getElementById("oTotal").textContent = fsOrders.length + localOnly.length;
+  document.getElementById("oTotal").textContent = fsOrders.length;
   document.getElementById("oPending").textContent = counts.Pending;
   document.getElementById("oActive").textContent = counts.Active;
   document.getElementById("oCompleted").textContent = counts.Completed;
@@ -2563,8 +2581,9 @@ function renderOrders(){
    to Firestore, so the customer sees Active live on Track Order and
    My Orders; the local copy is updated optimistically so the row
    moves at once. Accepting a browser-only order just updates its
-   local record. A disabled "Waiting for payment" button (paid order,
-   no Trx ID yet) never reaches this handler. */
+   local record. A disabled Accept Order button (paid order, no Trx
+   ID yet — the "Waiting for payment" note case) never reaches this
+   handler. */
 document.getElementById("ordersList").addEventListener("click", function(e){
   var ab = e.target.closest ? e.target.closest("[data-accept-fs]") : null;
   if(ab && !ab.disabled){
@@ -3135,8 +3154,9 @@ window.PixelRatings = (function(){
      "Active"    — set only when the seller taps "Accept Order" on
                    the order in the Seller Orders dashboard. For a
                    paid order the button works only when the order's
-                   Trx ID is present (without one it reads "Waiting
-                   for payment" and does nothing); a free order can
+                   Trx ID is present (without one it stays visible
+                   but disabled, with the note "Waiting for payment —
+                   the customer has not paid"); a free order can
                    be accepted at once. Custom orders follow the same
                    rule. Customers never see the Accept button.
      "Completed" — set only when the seller uploads the delivery
@@ -3321,7 +3341,7 @@ window.PixelOrders = (function(){
   function watchAll(cb){
     var d = getDb();
     if(!d){ cb([]); return function(){}; }
-    var ordersArr = null, privMap = {};
+    var ordersArr = null, privMap = {}, custNameByUid = {};
     function emit(){
       if(!ordersArr) return;
       cb(ordersArr.map(function(o){
@@ -3337,6 +3357,13 @@ window.PixelOrders = (function(){
            fields on the public document). */
         if(p.buyerName) m.buyerName = p.buyerName;
         if(!m.buyerName && p.name) m.buyerName = p.name;
+        /* Last resort for orders placed before buyerName was ever
+           saved (their private document holds no name at all):
+           resolve the name from the buyer's registered-customer
+           record, looked up by the order's uid — the accounts
+           module writes one "customers/<uid>" record, name
+           included, on every sign-in. */
+        if(!m.buyerName && o.uid && custNameByUid[o.uid]) m.buyerName = custNameByUid[o.uid];
         if(p.deliveryFiles !== undefined) m.deliveryFiles = p.deliveryFiles;
         if(!m.deliveryFiles) m.deliveryFiles = o.deliveryFiles || [];
         return m;
@@ -3362,7 +3389,22 @@ window.PixelOrders = (function(){
           function(){ /* private halves unavailable — public fields still render */ }
         );
       } catch(e){}
-      return function(){ try { un1(); } catch(e){} try { un2(); } catch(e){} };
+      var un3 = function(){};
+      try {
+        un3 = d.collection("customers").onSnapshot(
+          function(snap){
+            custNameByUid = {};
+            snap.forEach(function(doc){
+              var cd = doc.data() || {};
+              var nm = String(cd.name || "").trim();
+              if(nm) custNameByUid[doc.id] = nm;
+            });
+            emit();
+          },
+          function(){ /* customer records unavailable — other name sources still render */ }
+        );
+      } catch(e){}
+      return function(){ try { un1(); } catch(e){} try { un2(); } catch(e){} try { un3(); } catch(e){} };
     } catch(e){ return function(){}; }
   }
 
@@ -3468,8 +3510,18 @@ window.PixelOrders = (function(){
     var rn = document.getElementById("tsRatingNote");
     if(rn) rn.textContent = note;
   }
+  var startTries = 0;
   function start(){
-    if(started) return; started = true;
+    if(started) return;
+    /* Never give up before the shared Firebase app exists: starting
+       the watchers too early would leave every number on its dash
+       placeholder for the whole visit, even though the collections
+       are perfectly readable a moment later. */
+    if(!(window.firebase && window.firebase.apps && window.firebase.apps.length)){
+      if(++startTries < 80) setTimeout(start, 250);
+      return;
+    }
+    started = true;
     if(window.PixelOrders && window.PixelOrders.watchSiteStats) window.PixelOrders.watchSiteStats(paint);
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(start, 300); });
@@ -3559,27 +3611,46 @@ window.PixelAccount = (function(){
     return !!currentUser && (currentUser.email || "").toLowerCase() === SELLER_EMAIL;
   }
 
-  /* Registered-customer record — the first time an account is seen
-     signed in, one tiny document is created in "customers/<uid>"
-     holding nothing but the sign-up time (no email, no name), so
-     the store's real registered-customer count is simply the number
-     of these documents, shown live on the homepage trust strip and
-     in the seller dashboard. The seller's own account is not a
-     customer and is never recorded. Any failure (offline, rules)
-     is silent — sign-in itself works exactly as before. */
+  /* Registered-customer record — on every sign-in (email/password
+     OR Google; both arrive through onAuthStateChanged), if this
+     account has no record yet, one document is written to
+     "customers/<uid>" holding { uid, name, createdAt }: the uid,
+     the account's display name (typed at sign-up, or provided by
+     Google; the part of the email before the @ when no name is
+     set) and the sign-up time. The store's real registered-customer
+     count is simply the number of these documents, shown live on
+     the homepage trust strip and in the seller dashboard — and the
+     name is what lets the seller dashboard show who placed an
+     order even for orders placed before the checkout saved the
+     buyer name (the dashboard looks the record up by the order's
+     uid). A record that already exists but has no name yet (older
+     records held only the sign-up time) gets the name merged in.
+     The seller's own account is not a customer and is never
+     recorded. Any failure (offline, rules) is silent — sign-in
+     itself works exactly as before. */
   var custRegTried = {};
   function registerCustomer(){
     if(!currentUser || !db || isSeller()) return;
     var uid = currentUser.uid;
     if(!uid || custRegTried[uid]) return;
     custRegTried[uid] = true;
+    var nm = String(currentUser.displayName || "").trim()
+      || (currentUser.email ? currentUser.email.split("@")[0] : "");
     try {
       var ref = db.collection("customers").doc(uid);
       ref.get().then(function(snap){
         if(!snap.exists){
-          ref.set({ createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }).catch(function(){});
+          ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }).catch(function(){});
+        } else {
+          var cd = snap.data() || {};
+          if(!cd.name && nm) ref.set({ uid: uid, name: nm }, { merge: true }).catch(function(){});
         }
-      }).catch(function(){});
+      }).catch(function(){
+        /* The read itself was refused — still try to leave the
+           record behind with a merge write, so the count and the
+           name exist for the strip and the dashboard. */
+        ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(function(){});
+      });
     } catch(e){}
   }
 
@@ -3640,8 +3711,12 @@ window.PixelAccount = (function(){
     var laptop = !!(window.matchMedia && window.matchMedia("(max-width: 1440px)").matches);
     var ef = ab.querySelector(".acct-email-full");
     var es = ab.querySelector(".acct-email-short");
-    if(ef) ef.style.display = laptop ? "none" : "";
-    if(es) es.style.display = laptop ? "inline" : "none";
+    /* Inline styles WITH the important flag, so the swap holds at
+       laptop widths no matter what any stylesheet says; on wider
+       screens the inline display is removed again and the plain
+       CSS defaults apply (full email shown, short name hidden). */
+    if(ef){ if(laptop) ef.style.setProperty("display", "none", "important"); else ef.style.removeProperty("display"); }
+    if(es){ if(laptop) es.style.setProperty("display", "inline", "important"); else es.style.removeProperty("display"); }
   }
   function paintAccount(){
     var si = $("signInBtn"), ab = $("acctBtn"), menu = $("acctMenu"), em = $("acctEmail");
