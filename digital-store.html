@@ -2147,8 +2147,8 @@ function recordOrder(o){
 function payLineHtml(paymentMethod, trxId, total, buyerName){
   var pm = paymentMethod || "—";
   var bn = String(buyerName || "").trim();
-  if(/^free/i.test(pm) || (Number(total) === 0 && !paymentMethod)) return '<div class="pay-verify-free">Payment: ' + escHtml(pm) + ' · Total: FREE · no Trx ID needed</div>';
-  var buyerHtml = bn ? '<div class="pay-verify-buyer"><span>Buyer</span>' + escHtml(bn) + '</div>' : '';
+  if(/^free/i.test(pm) || (Number(total) === 0 && !paymentMethod)) return '<div class="pay-verify-free">Payment: ' + escHtml(pm) + ' · Buyer: ' + escHtml(bn || "—") + ' · Total: FREE · no Trx ID needed</div>';
+  var buyerHtml = '<div class="pay-verify-buyer"><span>Buyer</span>' + escHtml(bn || "—") + '</div>';
   var totalHtml = (total === null || total === undefined)
     ? ''
     : '<div class="pay-verify-total"><span>Total amount</span>' + (Number(total) > 0 ? 'Rs. ' + Number(total).toLocaleString("en-PK") : 'FREE') + '</div>';
@@ -2157,7 +2157,7 @@ function payLineHtml(paymentMethod, trxId, total, buyerName){
       + '<div class="pay-verify-trx"><span>Trx ID — ' + escHtml(pm) + '</span>' + escHtml(trxId) + '</div></div>'
       + '<p class="pay-verify-note"><b>Check before you deliver:</b> Open your <b>Easypaisa app</b> and check the <b>Trx ID</b> and <b>amount</b> shown here match a payment received on <b>your number 03361520429</b>. A Trx ID only proves a payment happened — it does <b>not</b> prove the money reached your number. A buyer could paste a Trx ID from a payment sent to a different number, so do not deliver the file until you have confirmed the money is in your Easypaisa account.</p></div>';
   }
-  return '<div class="pay-verify-pending"><b>Payment pending — no Trx ID submitted.</b>' + (bn ? '<br>Buyer: <b>' + escHtml(bn) + '</b>' : '') + (totalHtml ? '<br>Total amount: <b>' + (Number(total) > 0 ? 'Rs. ' + Number(total).toLocaleString("en-PK") : 'FREE') + '</b>' : '')
+  return '<div class="pay-verify-pending"><b>Payment pending — no Trx ID submitted.</b>' + '<br>Buyer: <b>' + escHtml(bn || "—") + '</b>' + (totalHtml ? '<br>Total amount: <b>' + (Number(total) > 0 ? 'Rs. ' + Number(total).toLocaleString("en-PK") : 'FREE') + '</b>' : '')
     + '<br><b>Do not deliver yet.</b> Check your Easypaisa app before delivering any file — a Trx ID only proves a payment happened, not that the money reached your number (03361520429).</div>';
 }
 var fsOrders = [];
