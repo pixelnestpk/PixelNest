@@ -82,17 +82,17 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .trust-item span{color:var(--muted);font-size:.87rem}
 
 /* ---------- 3D circular rotating gallery ---------- */
-.c3d{background:#0B0E13;border-bottom:1px solid rgba(201,162,39,.35);overflow:hidden;padding:20px 0 22px}
-.c3d-scene{--tz:174px;width:108px;height:156px;margin:0 auto;perspective:650px}
-.c3d-ring{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:c3dSpin 48s linear infinite}
+.c3d{background:#0B0E13;border-bottom:1px solid rgba(201,162,39,.35);overflow:hidden;padding:12px 0 14px}
+.c3d-scene{--tz:238px;width:148px;height:208px;margin:0 auto;perspective:950px}
+.c3d-ring{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:c3dSpin 36s linear infinite}
 .c3d:hover .c3d-ring{animation-play-state:paused}
 .c3d-card{position:absolute;inset:0;background:#14181F;border:1px solid rgba(201,162,39,.55);border-radius:10px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(calc(var(--i)*36deg)) translateZ(var(--tz))}
-.c3d-card img{width:100%;height:82px;object-fit:cover}
-.c3d-info{padding:5px 7px}
-.c3d-info h4{color:#FBF7EA;font-size:.7rem;margin:0;line-height:1.25}
-.c3d-info p{color:rgba(255,255,255,.68);font-size:.58rem;margin:2px 0 0;line-height:1.3}
-@keyframes c3dSpin{from{transform:rotateY(0deg)}to{transform:rotateY(-360deg)}}
-@media (max-width:640px){ .c3d-scene{--tz:140px;width:88px;height:128px} .c3d-card img{height:64px} .c3d-info{padding:4px 6px} .c3d-info h4{font-size:.62rem} .c3d-info p{font-size:.54rem} }
+.c3d-card img{width:100%;height:110px;object-fit:cover}
+.c3d-info{padding:7px 9px}
+.c3d-info h4{color:#FBF7EA;font-size:.84rem;margin:0;line-height:1.25}
+.c3d-info p{color:rgba(255,255,255,.68);font-size:.68rem;margin:2px 0 0;line-height:1.3}
+@keyframes c3dSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+@media (max-width:640px){ .c3d-scene{--tz:188px;width:116px;height:168px} .c3d-card img{height:84px} .c3d-info{padding:5px 7px} .c3d-info h4{font-size:.72rem} .c3d-info p{font-size:.6rem} }
 
 /* ---------- Section heads ---------- */
 .sec-head{margin:64px 0 22px;max-width:720px}
@@ -707,6 +707,72 @@ select option{color:#111827;background-color:#ffffff}
 .nav a{padding:10px 10px}
 .nav a.chat-link{display:none}
 </style>
+<style>
+/* ================= SELLER DASHBOARD — COMPACT + STATUS FILTER TABS =================
+   The dashboard shared the roomy .o-* styles with the customer pages, so
+   a couple of orders filled the whole screen and meant endless scrolling.
+   Everything here is scoped to #ordersPage (the Track Order and My Orders
+   pages keep their normal spacing): tighter header, smaller type, less
+   padding on the stat boxes, the manual-order form and every order card.
+   The four stat boxes double as the status filter tabs — tap one to
+   filter the list to that status, tap it again (or Total Orders) to
+   show all orders again; the active tab gets the gold highlight. */
+#ordersPage .pp-top{padding:9px 14px}
+#ordersPage .o-top-title{font-size:.98rem}
+#ordersPage .icon-btn{width:38px;height:38px;font-size:15px}
+#ordersPage .o-body{padding:14px 16px 22px}
+#ordersPage .o-note{font-size:.82rem;line-height:1.45;margin:0 0 10px}
+#ordersPage .o-body h3{font-size:1rem;margin:14px 0 6px}
+#ordersPage .o-stats{gap:8px}
+#ordersPage .o-stat{padding:9px 12px;border-radius:10px;cursor:pointer}
+#ordersPage .o-stat b{font-size:1.3rem}
+#ordersPage .o-stat span{font-size:.68rem}
+#ordersPage .o-stat:hover{border-color:var(--gold)}
+#ordersPage .o-stat:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#ordersPage .o-stat.is-filter{border-color:var(--gold);background:var(--gold-soft);box-shadow:inset 0 0 0 1px var(--gold)}
+#ordersPage .o-form{gap:8px}
+#ordersPage .o-form input{min-height:40px;border-radius:10px;padding:0 11px;font-size:.9rem}
+#ordersPage .o-form .btn{min-height:42px}
+#ordersPage .o-item{padding:10px 12px;margin-bottom:8px;border-radius:12px}
+#ordersPage .o-item .oid{font-size:.93rem}
+#ordersPage .o-item .o-meta{font-size:.8rem;line-height:1.5;margin-top:1px}
+#ordersPage .o-pill{font-size:.66rem;padding:3px 8px}
+#ordersPage .o-local{font-size:.62rem;padding:3px 7px}
+#ordersPage .o-status{margin-top:4px}
+#ordersPage .o-del{min-height:32px;font-size:.85rem}
+#ordersPage .up-box{margin-top:8px;padding:9px 10px;border-radius:10px}
+#ordersPage .up-label{padding:7px 14px;min-height:36px;font-size:.82rem}
+#ordersPage .up-hint{font-size:.76rem;margin-top:6px;line-height:1.45}
+#ordersPage .up-files{margin-bottom:6px}
+#ordersPage .up-file{font-size:.74rem;padding:4px 9px}
+#ordersPage .up-stat{font-size:.82rem}
+@media (min-width:761px){ #ordersPage .o-form{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:560px){
+  #ordersPage .o-stats{grid-template-columns:repeat(4,1fr)}
+  #ordersPage .o-stat{padding:8px 9px}
+  #ordersPage .o-stat b{font-size:1.12rem}
+  #ordersPage .o-stat span{font-size:.6rem}
+  #ordersPage .o-body{padding:12px 12px 18px}
+  #ordersPage .o-form{grid-template-columns:1fr 1fr}
+  #ordersPage .o-form .btn{grid-column:1/-1}
+}
+</style>
+<style>
+/* ================= SEARCH ICON IN HEADER =================
+   The wide search input used to sit in the header row itself; once the
+   signed-in account button appeared, the row overflowed and the search
+   wrapped UNDER the Cart button. The header now carries only a small
+   round magnifier button — tapping it opens a search panel directly
+   under the header row, holding the same #searchInput with the same
+   live filtering, so the header row itself can never wrap. */
+.search-toggle{flex:none;width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(201,162,39,.55);background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer;padding:0}
+.search-toggle svg{width:19px;height:19px;stroke:#EAC95C;fill:none;stroke-width:2.2;stroke-linecap:round;pointer-events:none}
+.search-toggle:hover{background:rgba(201,162,39,.16)}
+.search-panel{padding:2px 0 12px}
+.search-panel[hidden]{display:none}
+.search-panel .head-search{max-width:520px;margin:0 auto}
+@media (max-width:900px){ .search-panel .head-search{max-width:none} .search-toggle{width:42px;height:42px} }
+</style>
 </head>
 <body id="top">
 
@@ -737,11 +803,16 @@ select option{color:#111827;background-color:#ffffff}
         <a href="#track" data-tracklink>Track Order</a>
         <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
       </nav>
+      <button class="search-toggle" id="searchToggle" type="button" aria-label="Search products" aria-expanded="false" aria-controls="searchPanel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <button class="cart-btn" id="openCart" aria-label="Open cart">Cart <span class="cart-count" id="cartCount">0</span></button>
+    </div>
+    <div class="search-panel" id="searchPanel" hidden>
       <div class="head-search">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input type="search" id="searchInput" placeholder="Search products — CV, budget, poster, planner…" aria-label="Search products">
       </div>
-      <button class="cart-btn" id="openCart" aria-label="Open cart">Cart <span class="cart-count" id="cartCount">0</span></button>
     </div>
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <a class="home-link" href="#top">Home</a>
@@ -1237,11 +1308,11 @@ select option{color:#111827;background-color:#ffffff}
     <div class="pp-top"><span class="o-top-title">Seller Orders</span><button class="icon-btn" id="ordersClose" aria-label="Close orders dashboard">✕</button></div>
     <div class="o-body">
       <p class="o-note">Orders placed on the website now sync online — open this dashboard on <b>any device</b> and you will see them, and each customer sees the same status live on the <b>Track Order</b> page. Statuses change <b>automatically</b> — you never change them yourself: <b>Pending</b> when the order is placed, <b>Active</b> when the customer submitted a <b>Trx ID</b> (payment sent — verify the Trx ID in your own app; every order below shows its payment method and Trx ID), and the free sample is <b>Completed</b> at once — a paid order becomes <b>Completed</b> automatically when you upload the delivery file, or on its own once the product's delivery time has passed after it became Active (for example when the file was sent on WhatsApp). The customer never taps anything to complete an order. With no Trx ID the order stays <b>Pending</b> (payment pending). Older orders saved only in this browser are marked <b>“Only in this browser”</b>. The customer’s name and number stay only in this browser — online tracking carries the Order ID, product, quantity, total, status, payment method, Trx ID, the customer’s account ID (uid) and the delivery files; the name, phone and email never go online. Every online order below has an <b>“Upload delivery file”</b> button — upload the finished file there and the customer gets a <b>download button</b> on that order (Track Order and My Orders) and the order becomes <b>Completed (Delivered)</b> automatically. If file upload is not set up yet, the upload shows a clear message instead of hanging — send the file on WhatsApp for now. This dashboard opens only with your seller account (<b>shakircadet1@gmail.com</b>) — signed in with email/password or Google; nobody else can open it.</p>
-      <div class="o-stats">
-        <div class="o-stat"><b id="oTotal">0</b><span>Total Orders</span></div>
-        <div class="o-stat st-pending"><b id="oPending">0</b><span>Pending</span></div>
-        <div class="o-stat st-active"><b id="oActive">0</b><span>Active</span></div>
-        <div class="o-stat st-completed"><b id="oCompleted">0</b><span>Completed</span></div>
+      <div class="o-stats" id="oStats" role="group" aria-label="Filter orders by status — tap a status to filter the list, tap it again to show all orders">
+        <div class="o-stat is-filter" data-ofilter="all" role="button" tabindex="0" aria-pressed="true"><b id="oTotal">0</b><span>Total Orders</span></div>
+        <div class="o-stat st-pending" data-ofilter="Pending" role="button" tabindex="0" aria-pressed="false"><b id="oPending">0</b><span>Pending</span></div>
+        <div class="o-stat st-active" data-ofilter="Active" role="button" tabindex="0" aria-pressed="false"><b id="oActive">0</b><span>Active</span></div>
+        <div class="o-stat st-completed" data-ofilter="Completed" role="button" tabindex="0" aria-pressed="false"><b id="oCompleted">0</b><span>Completed</span></div>
       </div>
       <h3>Add an order manually</h3>
       <p class="o-note">For orders that arrived on WhatsApp: type the Order ID from the customer's message and the product. Adding it also creates the online tracking, so that customer can track it with the same Order ID. Their name and number stay only in this browser.</p>
@@ -1254,7 +1325,7 @@ select option{color:#111827;background-color:#ffffff}
         <input id="mTotal" type="number" min="0" placeholder="Total Rs. (e.g. 990)" aria-label="Total in rupees">
         <button class="btn btn-primary" type="submit">Add Order</button>
       </form>
-      <h3>All orders</h3>
+      <h3 id="ordersHeading">All orders</h3>
       <div id="ordersList"></div>
     </div>
   </div>
@@ -1948,6 +2019,24 @@ function deliveryBlockHtml(o){
     + '<span class="up-stat" id="upstat-' + escHtml(o.orderId) + '"></span>'
     + '<p class="up-hint">Upload the finished file here — the customer will get a download button on this order and the order will become Completed (Delivered) automatically. This works for every product, not just wall art. If upload is not set up yet, a clear message appears here — send the file on WhatsApp for now.</p></div>';
 }
+/* Status filter for the dashboard list. The four stat boxes at the top
+   of the dashboard are the filter tabs: "all" (Total Orders) shows
+   everything; tapping a status filters the list to only that status;
+   tapping the active status again — or Total Orders — shows all again. */
+var sellerStatusFilter = "all";
+function setSellerFilter(f){
+  sellerStatusFilter = (!f || f === sellerStatusFilter) ? "all" : f;
+  renderOrders();
+}
+function syncSellerFilterTabs(){
+  document.querySelectorAll("#oStats .o-stat").forEach(function(el){
+    var on = el.getAttribute("data-ofilter") === sellerStatusFilter;
+    el.classList.toggle("is-filter", on);
+    el.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  var h = document.getElementById("ordersHeading");
+  if(h) h.textContent = sellerStatusFilter === "all" ? "All orders" : sellerStatusFilter + " orders";
+}
 function renderOrders(){
   var fsIds = {};
   fsOrders.forEach(function(o){ if(o && o.orderId) fsIds[o.orderId] = o; });
@@ -1961,16 +2050,22 @@ function renderOrders(){
   document.getElementById("oPending").textContent = counts.Pending;
   document.getElementById("oActive").textContent = counts.Active;
   document.getElementById("oCompleted").textContent = counts.Completed;
+  syncSellerFilterTabs();
   var box = document.getElementById("ordersList");
   if(!fsOrders.length && !localOnly.length){
     box.innerHTML = '<p class="o-note">No orders yet. Orders placed on the website will appear here automatically, and orders that arrived on WhatsApp can be added with the form below.</p>';
     return;
   }
+  /* Automatic completion check — an Active order whose delivery time
+     has passed (no file uploaded) completes itself. Runs for every
+     online order, including ones the current filter hides. */
+  fsOrders.forEach(function(o){ window.autoCompleteIfDue(o); });
+  /* The status filter applies to what is LISTED only — the counts above
+     always cover every order. */
+  var fsShown = sellerStatusFilter === "all" ? fsOrders : fsOrders.filter(function(o){ return (o.status || "Pending") === sellerStatusFilter; });
+  var localShown = sellerStatusFilter === "all" ? localOnly : localOnly.filter(function(o){ return o.status === sellerStatusFilter; });
   var html = "";
-  fsOrders.forEach(function(o){
-    /* Automatic completion check — an Active order whose delivery
-       time has passed (no file uploaded) completes itself. */
-    window.autoCompleteIfDue(o);
+  fsShown.forEach(function(o){
     var loc = localById[o.orderId];
     var st = o.status || "Pending";
     html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.orderId) + '</span><span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span></div>'
@@ -1980,11 +2075,14 @@ function renderOrders(){
       + (fmtTs(o.createdAt) ? '<br>Date: ' + fmtTs(o.createdAt) : '') + '</div>'
       + deliveryBlockHtml(o) + '</div>';
   });
-  localOnly.forEach(function(o){
+  localShown.forEach(function(o){
     html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.id) + '</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="o-local">Only in this browser</span><span class="o-pill pill-' + escHtml(o.status) + '">' + escHtml(o.status) + '</span></span></div>'
       + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.product) + '</b>' + (o.pay ? payLineHtml(o.pay, o.trx, 1) : '') + '<br>Customer: ' + escHtml(o.name) + (o.phone ? ' · ' + escHtml(o.phone) : '') + '<br>Date: ' + escHtml(o.date) + '</div>'
       + '<div class="o-status"><button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button></div></div>';
   });
+  if(!html){
+    html = '<p class="o-note">No ' + escHtml(sellerStatusFilter) + ' orders right now — tap <b>Total Orders</b> above to see all orders.</p>';
+  }
   box.innerHTML = html;
 }
 function openOrdersDashboard(){
@@ -2006,6 +2104,20 @@ document.getElementById("ordersList").addEventListener("click", function(e){
   var id = del.getAttribute("data-odel");
   orders = orders.filter(function(o){ return o.id !== id; });
   saveOrders(); renderOrders(); showToast("Order " + id + " removed");
+});
+/* Status filter tabs — tapping a stat box filters the order list to
+   that status; tapping the same status again, or Total Orders, shows
+   all orders again. Keyboard: Enter/Space on a focused tab. */
+document.getElementById("oStats").addEventListener("click", function(e){
+  var tab = e.target.closest ? e.target.closest("[data-ofilter]") : null;
+  if(!tab) return;
+  setSellerFilter(tab.getAttribute("data-ofilter"));
+});
+document.getElementById("oStats").addEventListener("keydown", function(e){
+  if(e.key !== "Enter" && e.key !== " ") return;
+  var tab = e.target.closest ? e.target.closest("[data-ofilter]") : null;
+  if(!tab) return;
+  e.preventDefault(); setSellerFilter(tab.getAttribute("data-ofilter"));
 });
 /* Seller delivery upload — file picker change inside the dashboard.
    Uploads to Firebase Storage via PixelDelivery, which then marks the
@@ -3359,6 +3471,27 @@ window.PixelAccount = (function(){
     openAuth: openAuth,
     openMyOrders: openMyOrders
   };
+})();
+</script>
+<script>
+/* Header search: the magnifier button toggles the search panel under
+   the header row and focuses the input, so tapping the icon opens the
+   search exactly as before — the live filtering on #searchInput is
+   unchanged. Escape closes the panel again. */
+(function(){
+  var toggle = document.getElementById("searchToggle");
+  var panel = document.getElementById("searchPanel");
+  var input = document.getElementById("searchInput");
+  if(!toggle || !panel || !input) return;
+  function setOpen(open){
+    panel.hidden = !open;
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if(open){ try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }
+  }
+  toggle.addEventListener("click", function(){ setOpen(panel.hidden); });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && !panel.hidden) setOpen(false);
+  });
 })();
 </script>
 </body>
