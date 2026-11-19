@@ -760,6 +760,39 @@ select option{color:#111827;background-color:#ffffff}
 }
 </style>
 <style>
+/* ================= SELLER DASHBOARD — ORDERS GROUPED BY PRODUCT =================
+   The order list is no longer one long flat scroll. Orders are grouped
+   by product: each product gets one compact block with its name, its
+   total order count, and three clickable status counts (Pending /
+   Active / Completed). Tapping a status count opens a dropdown panel
+   under that product listing only the orders with that status — buyer
+   name, total and Trx ID in the usual payment box, plus the delivery
+   upload — and tapping it again closes it. Everything starts closed,
+   so the whole dashboard stays short no matter how many orders exist. */
+#ordersPage .pgroup{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;background:#fff}
+#ordersPage .pgroup-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+#ordersPage .pgroup-name{font-weight:800;color:var(--navy);font-size:.98rem;line-height:1.3}
+#ordersPage .pgroup-total{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--gold-soft);border:1px solid var(--gold-line);color:var(--gold-deep);padding:4px 10px;border-radius:999px;white-space:nowrap}
+#ordersPage .pgroup-counts{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+#ordersPage .pcount{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:0 13px;min-height:40px;font-weight:700;font-size:.85rem;cursor:pointer;font:inherit}
+#ordersPage .pcount b{font-size:1rem;line-height:1}
+#ordersPage .pcount .pc-chev{font-size:.68rem;color:var(--muted);transition:transform .15s}
+#ordersPage .pcount:hover{border-color:var(--gold)}
+#ordersPage .pcount:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#ordersPage .pcount.pc-Pending b{color:var(--amber)}
+#ordersPage .pcount.pc-Active b{color:var(--gold-deep)}
+#ordersPage .pcount.pc-Completed b{color:var(--green)}
+#ordersPage .pcount.is-open{border-color:var(--gold);background:var(--gold-soft);box-shadow:inset 0 0 0 1px var(--gold)}
+#ordersPage .pcount.is-open .pc-chev{transform:rotate(180deg)}
+#ordersPage .pcount:disabled{opacity:.45;cursor:default}
+#ordersPage .pcount:disabled:hover{border-color:var(--line)}
+#ordersPage .pgroup-panel{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px}
+#ordersPage .pgroup-panel .o-item{background:var(--soft)}
+#ordersPage .pgroup-panel .o-item:last-child{margin-bottom:0}
+#ordersPage .pgroup-empty{color:var(--muted);font-size:.85rem;margin:2px 0}
+@media (max-width:560px){ #ordersPage .pcount{flex:1 1 0;justify-content:center;padding:0 8px;font-size:.8rem} }
+</style>
+<style>
 /* ================= SEARCH ICON IN HEADER =================
    The wide search input used to sit in the header row itself; once the
    signed-in account button appeared, the row overflowed and the search
@@ -1390,7 +1423,7 @@ select option{color:#111827;background-color:#ffffff}
     <div class="pp-top"><span class="o-top-title">Seller Orders</span><button class="icon-btn" id="ordersClose" aria-label="Close orders dashboard">✕</button></div>
     <div class="o-body">
       <p class="o-note">Orders placed on the website now sync online — open this dashboard on <b>any device</b> and you will see them, and each customer sees the same status live on the <b>Track Order</b> page. Statuses change <b>automatically</b> — you never change them yourself: <b>Pending</b> when the order is placed, <b>Active</b> when the customer submitted a <b>Trx ID</b> (payment sent — <b>always check the Trx ID and total amount together in your Easypaisa app before delivering: a Trx ID only proves a payment happened, not that the money reached your number 03361520429</b>; every order below shows its Trx ID and total amount together in a gold payment box with this check), and the free sample is <b>Completed</b> at once — a paid order becomes <b>Completed</b> automatically when you upload the delivery file, or on its own once the product's delivery time has passed after it became Active (for example when the file was sent on WhatsApp). The customer never taps anything to complete an order. Paid <b>shop</b> orders cannot be placed without a Trx ID at all; <b>custom</b> orders with no Trx ID stay <b>Pending</b> (payment pending) until a Trx ID is submitted, then become Active. Older orders saved only in this browser are marked <b>“Only in this browser”</b>. The buyer’s name is saved privately with the order (readable only by you and the buyer — never on the public tracking page) so it shows in the payment box below together with the total amount and the Trx ID; the phone number and email never go online — online tracking carries the Order ID, product, quantity, total, status, payment method, Trx ID, the customer’s account ID (uid) and the delivery files. Every online order below has an <b>“Upload delivery file”</b> button — upload the finished file there (free upload, no card or billing needed) and the customer gets a <b>download button</b> on that order (Track Order and My Orders) and the order becomes <b>Completed (Delivered)</b> automatically. If an upload ever fails, a clear message appears instead of hanging — send the file on WhatsApp instead. This dashboard opens only with your seller account (<b>shakircadet1@gmail.com</b>) — signed in with email/password or Google; nobody else can open it.</p>
-      <div class="o-stats" id="oStats" role="group" aria-label="Filter orders by status — tap a status to filter the list, tap it again to show all orders">
+      <div class="o-stats" id="oStats" role="group" aria-label="Order totals — tap a status to open that status under every product below, tap it again to close them all">
         <div class="o-stat is-filter" data-ofilter="all" role="button" tabindex="0" aria-pressed="true"><b id="oTotal">0</b><span>Total Orders</span></div>
         <div class="o-stat st-pending" data-ofilter="Pending" role="button" tabindex="0" aria-pressed="false"><b id="oPending">0</b><span>Pending</span></div>
         <div class="o-stat st-active" data-ofilter="Active" role="button" tabindex="0" aria-pressed="false"><b id="oActive">0</b><span>Active</span></div>
@@ -1407,7 +1440,8 @@ select option{color:#111827;background-color:#ffffff}
         <input id="mTotal" type="number" min="0" placeholder="Total Rs. (e.g. 990)" aria-label="Total in rupees">
         <button class="btn btn-primary" type="submit">Add Order</button>
       </form>
-      <h3 id="ordersHeading">All orders</h3>
+      <h3 id="ordersHeading">Orders by product</h3>
+      <p class="o-note">Orders are grouped by product below. Each product shows its total orders and its <b>Pending</b>, <b>Active</b> and <b>Completed</b> counts — tap a count to open the orders with that status for that product (buyer name, total amount and Trx ID), tap it again to close.</p>
       <div id="ordersList"></div>
     </div>
   </div>
@@ -2148,13 +2182,33 @@ function deliveryBlockHtml(o){
     + '<span class="up-stat" id="upstat-' + escHtml(o.orderId) + '"></span>'
     + '<p class="up-hint">Upload the finished file here — the customer will get a download button on this order and the order will become Completed (Delivered) automatically. This works for every product, not just wall art. Uploading is free — no card or billing needed. If an upload ever fails, a clear message appears here — send the file on WhatsApp instead.</p></div>';
 }
-/* Status filter for the dashboard list. The four stat boxes at the top
-   of the dashboard are the filter tabs: "all" (Total Orders) shows
-   everything; tapping a status filters the list to only that status;
-   tapping the active status again — or Total Orders — shows all again. */
+/* Orders are grouped BY PRODUCT. Each product gets one compact block:
+   its name, its total order count, and its Pending / Active / Completed
+   counts as clickable chips. Tapping a chip opens a dropdown panel
+   under that product listing only the orders with that status — each
+   with the buyer name, total amount and Trx ID in the usual payment
+   box, plus the delivery-file upload — and tapping it again closes it.
+   One status can be open per product at a time and everything starts
+   closed, so the dashboard stays short instead of one long list.
+   productOpen maps a product name to the status currently open for it;
+   it survives re-renders (live order updates) because it is keyed by
+   product name, not by position. lastGroups holds the groups from the
+   most recent render so a chip click can find its product by index. */
+var productOpen = {};
+var lastGroups = [];
+/* The four stat boxes at the top stay as the overall totals. Tapping a
+   status there opens that status under EVERY product that has such
+   orders; tapping it again — or Total Orders — closes everything. */
 var sellerStatusFilter = "all";
 function setSellerFilter(f){
-  sellerStatusFilter = (!f || f === sellerStatusFilter) ? "all" : f;
+  if(!f || f === sellerStatusFilter){
+    sellerStatusFilter = "all";
+    productOpen = {};
+  } else {
+    sellerStatusFilter = f;
+    productOpen = {};
+    lastGroups.forEach(function(g){ if(g.counts[f] > 0) productOpen[g.name] = f; });
+  }
   renderOrders();
 }
 function syncSellerFilterTabs(){
@@ -2164,7 +2218,36 @@ function syncSellerFilterTabs(){
     el.setAttribute("aria-pressed", on ? "true" : "false");
   });
   var h = document.getElementById("ordersHeading");
-  if(h) h.textContent = sellerStatusFilter === "all" ? "All orders" : sellerStatusFilter + " orders";
+  if(h) h.textContent = "Orders by product";
+}
+/* One online (Firestore) order card — unchanged details: Order ID,
+   status, quantity, customer, date, the gold payment box (buyer name,
+   total amount, Trx ID) and the delivery-file upload block. */
+function fsOrderCardHtml(o, localById){
+  var loc = localById[o.orderId];
+  var st = o.status || "Pending";
+  return '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.orderId) + '</span><span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span></div>'
+    + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.productName || "—") + '</b><br>Quantity: ' + (o.quantity || 1)
+    + (loc ? '<br>Customer: ' + escHtml(loc.name) + (loc.phone ? ' · ' + escHtml(loc.phone) : '') : '')
+    + (fmtTs(o.createdAt) ? '<br>Date: ' + fmtTs(o.createdAt) : '') + '</div>'
+    + payLineHtml(o.paymentMethod, o.trxId, (/^custom/i.test(o.productName || "") && Number(o.total) === 0 ? null : o.total), o.buyerName || (loc ? loc.name : ""))
+    + deliveryBlockHtml(o) + '</div>';
+}
+/* One browser-only order card — unchanged details, with its Remove
+   button. */
+function localOrderCardHtml(o){
+  return '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.id) + '</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="o-local">Only in this browser</span><span class="o-pill pill-' + escHtml(o.status) + '">' + escHtml(o.status) + '</span></span></div>'
+    + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.product) + '</b><br>Customer: ' + escHtml(o.name) + (o.phone ? ' · ' + escHtml(o.phone) : '') + '<br>Date: ' + escHtml(o.date) + '</div>'
+    + (o.pay ? payLineHtml(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null), o.name) : '')
+    + '<div class="o-status"><button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button></div></div>';
+}
+/* One clickable status-count chip for a product group. A status with
+   zero orders is shown disabled — there is nothing to open. */
+function pcountHtml(g, gi, st){
+  var n = g.counts[st] || 0;
+  var open = productOpen[g.name] === st;
+  return '<button type="button" class="pcount pc-' + st + (open ? ' is-open' : '') + '" data-ptoggle data-pidx="' + gi + '" data-pstatus="' + st + '" aria-expanded="' + (open ? 'true' : 'false') + '"' + (n ? '' : ' disabled') + '>'
+    + st + ' <b>' + n + '</b><span class="pc-chev" aria-hidden="true">▾</span></button>';
 }
 function renderOrders(){
   var fsIds = {};
@@ -2181,40 +2264,61 @@ function renderOrders(){
   document.getElementById("oCompleted").textContent = counts.Completed;
   syncSellerFilterTabs();
   var box = document.getElementById("ordersList");
+  lastGroups = [];
   if(!fsOrders.length && !localOnly.length){
     box.innerHTML = '<p class="o-note">No orders yet. Orders placed on the website will appear here automatically, and orders that arrived on WhatsApp can be added with the form below.</p>';
     return;
   }
   /* Automatic completion check — an Active order whose delivery time
      has passed (no file uploaded) completes itself. Runs for every
-     online order, including ones the current filter hides. */
+     online order, including ones whose product panel is closed. */
   fsOrders.forEach(function(o){ window.autoCompleteIfDue(o); });
-  /* The status filter applies to what is LISTED only — the counts above
-     always cover every order. */
-  var fsShown = sellerStatusFilter === "all" ? fsOrders : fsOrders.filter(function(o){ return (o.status || "Pending") === sellerStatusFilter; });
-  var localShown = sellerStatusFilter === "all" ? localOnly : localOnly.filter(function(o){ return o.status === sellerStatusFilter; });
-  var html = "";
-  fsShown.forEach(function(o){
-    var loc = localById[o.orderId];
-    var st = o.status || "Pending";
-    html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.orderId) + '</span><span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span></div>'
-      + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.productName || "—") + '</b><br>Quantity: ' + (o.quantity || 1)
-      + (loc ? '<br>Customer: ' + escHtml(loc.name) + (loc.phone ? ' · ' + escHtml(loc.phone) : '') : '')
-      + (fmtTs(o.createdAt) ? '<br>Date: ' + fmtTs(o.createdAt) : '') + '</div>'
-      + payLineHtml(o.paymentMethod, o.trxId, (/^custom/i.test(o.productName || "") && Number(o.total) === 0 ? null : o.total), o.buyerName || (loc ? loc.name : ""))
-      + deliveryBlockHtml(o) + '</div>';
-  });
-  localShown.forEach(function(o){
-    html += '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.id) + '</span><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="o-local">Only in this browser</span><span class="o-pill pill-' + escHtml(o.status) + '">' + escHtml(o.status) + '</span></span></div>'
-      + '<div class="o-meta"><b style="color:var(--navy)">' + escHtml(o.product) + '</b><br>Customer: ' + escHtml(o.name) + (o.phone ? ' · ' + escHtml(o.phone) : '') + '<br>Date: ' + escHtml(o.date) + '</div>'
-      + (o.pay ? payLineHtml(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null), o.name) : '')
-      + '<div class="o-status"><button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button></div></div>';
-  });
-  if(!html){
-    html = '<p class="o-note">No ' + escHtml(sellerStatusFilter) + ' orders right now — tap <b>Total Orders</b> above to see all orders.</p>';
+  /* Build the product groups, in the order products first appear
+     (online orders arrive newest first). Online and browser-only
+     orders for the same product share one group. */
+  var groupByName = {};
+  function addToGroup(name, entry){
+    var g = groupByName[name];
+    if(!g){ g = { name: name, entries: [], counts: { Pending:0, Active:0, Completed:0 } }; groupByName[name] = g; lastGroups.push(g); }
+    g.entries.push(entry);
+    if(g.counts.hasOwnProperty(entry.status)) g.counts[entry.status]++;
   }
+  fsOrders.forEach(function(o){ addToGroup(o.productName || "—", { kind: "fs", status: o.status || "Pending", o: o }); });
+  localOnly.forEach(function(o){ addToGroup(o.product || "—", { kind: "local", status: o.status || "Pending", o: o }); });
+  var html = "";
+  lastGroups.forEach(function(g, gi){
+    var total = g.entries.length;
+    html += '<div class="pgroup"><div class="pgroup-head"><span class="pgroup-name">' + escHtml(g.name) + '</span>'
+      + '<span class="pgroup-total">Total: ' + total + (total === 1 ? ' order' : ' orders') + '</span></div>'
+      + '<div class="pgroup-counts" role="group" aria-label="Status counts for ' + escHtml(g.name) + ' — tap a status to open its orders">'
+      + pcountHtml(g, gi, "Pending") + pcountHtml(g, gi, "Active") + pcountHtml(g, gi, "Completed")
+      + '</div>';
+    var open = productOpen[g.name];
+    if(open && g.counts[open] > 0){
+      html += '<div class="pgroup-panel">';
+      g.entries.forEach(function(en){
+        if(en.status !== open) return;
+        html += en.kind === "fs" ? fsOrderCardHtml(en.o, localById) : localOrderCardHtml(en.o);
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
   box.innerHTML = html;
 }
+/* Per-product status chips — tapping one opens that status's orders
+   under its product (closing any other status open for that product);
+   tapping the open one again closes the dropdown. */
+document.getElementById("ordersList").addEventListener("click", function(e){
+  var btn = e.target.closest ? e.target.closest("[data-ptoggle]") : null;
+  if(!btn || btn.disabled) return;
+  var g = lastGroups[parseInt(btn.getAttribute("data-pidx"), 10)];
+  if(!g) return;
+  var st = btn.getAttribute("data-pstatus");
+  if(productOpen[g.name] === st) delete productOpen[g.name];
+  else productOpen[g.name] = st;
+  renderOrders();
+});
 function openOrdersDashboard(){
   /* Seller-only: the dashboard opens ONLY for the seller's signed-in
      account. Anyone else gets the sign-in page or "Seller access only". */
