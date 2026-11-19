@@ -291,6 +291,13 @@ footer a:hover{color:var(--teal)}
 .rate-stars button{background:none;border:0;font-size:29px;line-height:1;cursor:pointer;color:#CBD2CE;padding:2px;min-height:44px;min-width:44px}
 .rate-stars button.on{color:#F59E0B}
 .rate-send{margin-top:10px;width:100%}
+.card-rate{font-size:.86rem;font-weight:700;color:var(--muted);margin-top:6px}
+.card-rate:empty{display:none}
+.card-rate .cr-star{color:#F59E0B}
+.rate-box .rate-summary,.rev-pop .rate-summary{font-size:.9rem;font-weight:700;color:var(--navy);margin:10px 0 0}
+.rate-stars button:disabled{cursor:default}
+.rate-stars button:disabled:hover{color:#CBD2CE}
+.rate-stars button.on:disabled{color:#F59E0B}
 .related{padding:0 22px 26px}
 .related h3{font-size:1.25rem;margin:6px 0 14px}
 .rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -700,9 +707,9 @@ footer a:hover{color:var(--teal)}
     <section id="reviews">
       <div class="reviews">
         <span class="kicker">Reviews &amp; ratings</span>
-        <h2>This store is new — no reviews yet</h2>
-        <span class="stars"><span class="row">★★★★★</span> No reviews yet</span>
-        <p>Ratings here are never invented. Every product shows “No reviews yet” until a real buyer rates it. Bought something? Open the product, tap the stars under “Rate this product”, and send your rating on WhatsApp with your Order ID — real ratings from real orders are what will appear here.</p>
+        <h2 id="storeRevHead">This store is new — no reviews yet</h2>
+        <span class="stars" id="storeStarsLine"><span class="row">★★★★★</span> No reviews yet</span>
+        <p>Ratings here are never invented. Every product shows “No reviews yet” until a real visitor rates it. Bought something? Open the product and tap the stars under “Rate this product” — your rating is saved right here on the website and counted in the average, together with the number of people who have rated, just like the Play Store. You can also rate the store itself from the “Rate your visit” popup.</p>
       </div>
     </section>
 
@@ -746,7 +753,7 @@ footer a:hover{color:var(--teal)}
       <details><summary>Do I pay first or get the file first?</summary><p>First the order is placed on the website, then confirmed on WhatsApp, then payment, then the file. Always keep your payment screenshot — it is matched with your Order ID.</p></details>
       <details><summary>Will the Excel templates work on my computer?</summary><p>Yes — the templates are built for both Microsoft Excel and Google Sheets, with formulas ready. You only add your own data.</p></details>
       <details><summary>How do I edit the Canva templates?</summary><p>The social media pack includes an editable Canva link — open it with a free Canva account, change the text and photos, and download.</p></details>
-      <details><summary>How do ratings work on this store?</summary><p>Every product starts with “No reviews yet”. After buying, open the product page, choose your stars under “Rate this product”, and send the rating on WhatsApp with your Order ID. Only ratings from real buyers are ever shown — nothing is made up.</p></details>
+      <details><summary>How do ratings work on this store?</summary><p>Every product starts with “No reviews yet”. After buying, open the product page and tap the stars under “Rate this product” — your rating is saved on the website itself and counted in the product's average, with the total number of ratings shown next to it, just like the Play Store. One rating per product per browser. Only real ratings are ever shown — nothing is made up.</p></details>
       <details><summary>What if the file is wrong or I don't like it?</summary><p>Message on WhatsApp — if the file has a mistake, it will be fixed and re-sent. For custom orders, a preview is shown before final delivery.</p></details>
     </section>
   </div>
@@ -873,7 +880,7 @@ footer a:hover{color:var(--teal)}
       <div class="pp-right">
         <span class="badge" id="ppBadge"></span>
         <h2 id="ppName" style="font-size:1.5rem;margin:9px 0 6px"></h2>
-        <span class="stars"><span class="row">★★★★★</span> No reviews yet</span>
+        <span class="stars" id="ppStarsLine"><span class="row">★★★★★</span> No reviews yet</span>
         <div class="price" id="ppPrice" style="margin-top:12px"></div>
         <div class="pp-actions">
           <button class="btn btn-primary" id="ppAdd">Add to Cart</button>
@@ -882,7 +889,7 @@ footer a:hover{color:var(--teal)}
         <div class="pp-note">Pay by <b>Easypaisa · JazzCash · NayaPay · SadaPay</b> (Payoneer for international buyers).<br>Every order gets an Order ID on the website. At checkout, WhatsApp opens in the <b>seller's chat (0335 5290894)</b> with your order already typed — you just press Send. The WhatsApp number you type at checkout is <b>your own</b>: it is written inside the order message, and your file is delivered on that number.<br>Delivery: <b>within 1 day</b> after payment is confirmed for ready-made products; custom orders take 2–3 days.<br>Sold by <b>PixelNest</b> — run by Shakir Ullah, freelancer with 3+ Years Experience.</div>
         <div class="pp-badges"><span>✓ Delivered within 1 day</span><span>✓ Order ID included</span><span>✓ Secure checkout</span><span>✓ Mistakes fixed free</span></div>
         <div class="rate-box">
-          <p><b>Rate this product</b> — bought it already? Choose your stars and send the rating to the seller on WhatsApp with your Order ID. Only real buyer ratings are shown on this store.</p>
+          <p><b>Rate this product</b> — tap the stars to rate it right here on the website. Ratings from all visitors are saved together and counted in the average, like on the Play Store.</p>
           <div class="rate-stars" id="rateStars" role="radiogroup" aria-label="Choose your star rating">
             <button type="button" data-star="1" aria-label="1 star">★</button>
             <button type="button" data-star="2" aria-label="2 stars">★</button>
@@ -890,7 +897,7 @@ footer a:hover{color:var(--teal)}
             <button type="button" data-star="4" aria-label="4 stars">★</button>
             <button type="button" data-star="5" aria-label="5 stars">★</button>
           </div>
-          <button class="btn btn-outline rate-send" id="rateSend" type="button">Send Rating on WhatsApp</button>
+          <p class="rate-summary" id="rateSummary"></p>
         </div>
       </div>
     </div>
@@ -938,7 +945,7 @@ footer a:hover{color:var(--teal)}
   <button class="icon-btn rev-close" id="revClose" aria-label="Close review popup">✕</button>
   <span class="kicker">Enjoying PixelNest?</span>
   <h3>Rate your visit</h3>
-  <p>Tap the stars to rate the store. You can also write a short review — it goes straight to the seller on WhatsApp.</p>
+  <p>Tap the stars and submit — your rating is saved right here on the website and counted in the store's average, together with how many people have rated, like on the Play Store.</p>
   <div class="rate-stars" id="revStars" role="radiogroup" aria-label="Choose your star rating">
     <button type="button" data-rstar="1" aria-label="1 star">★</button>
     <button type="button" data-rstar="2" aria-label="2 stars">★</button>
@@ -946,19 +953,21 @@ footer a:hover{color:var(--teal)}
     <button type="button" data-rstar="4" aria-label="4 stars">★</button>
     <button type="button" data-rstar="5" aria-label="5 stars">★</button>
   </div>
-  <input id="revName" placeholder="Your name (optional)" autocomplete="name">
-  <textarea id="revText" placeholder="Write a short review (optional) — what did you like?"></textarea>
-  <button class="btn btn-primary rev-send" id="revSend" type="button">Send Rating on WhatsApp</button>
+  <p class="rate-summary" id="revSummary"></p>
+  <button class="btn btn-primary rev-send" id="revSend" type="button">Submit Rating</button>
   <button class="rev-later" id="revLater" type="button">Maybe later</button>
-  <p class="rev-note">Real ratings from real visitors only — nothing is posted publicly without a real order.</p>
+  <p class="rev-note">One rating per visitor — real ratings only, nothing is made up.</p>
 </div>
 
 <div class="toast" id="toast" role="status"><span id="toastText">Added to cart</span><button class="toast-close" id="toastClose" type="button" aria-label="Close message">✕</button></div>
 
 <script>
-/* Seller's WhatsApp — EVERY order, rating and review opens a chat with THIS
-   number only. The number a customer types in the checkout form is their own:
-   it is only written inside the message text so the seller can reply to them.
+/* Seller's WhatsApp — EVERY order opens a chat with THIS
+   number only. (Ratings are NOT sent on WhatsApp anymore — they are saved
+   on the website itself via Firebase/Firestore, see the ratings script at
+   the end of this page.) The number a customer types in the checkout form
+   is their own: it is only written inside the message text so the seller
+   can reply to them.
    Never build a WhatsApp link from the customer's typed number. */
 var WA_NUMBER = "923355290894";
 /* WhatsApp opening: the https://wa.me page is blocked inside in-app webviews
@@ -1023,7 +1032,7 @@ var pendingRating = 0;
 function fmt(n){ return "Rs. " + n.toLocaleString("en-PK"); }
 function priceText(p){ return p.price===0 ? "FREE" : fmt(p.price); }
 function byId(id){ return PRODUCTS.find(function(x){ return x.id===id; }); }
-function starLine(){ return '<span class="stars"><span class="row">★★★★★</span> No reviews yet</span>'; }
+function starLine(p){ return '<span class="stars" data-rate-line="'+p.id+'"><span class="row">★★★★★</span> No reviews yet</span>'; }
 
 function renderSamples(){
   document.getElementById("sampleGrid").innerHTML = PRODUCTS.map(function(p){
@@ -1036,7 +1045,10 @@ function renderSamples(){
 
 function openProduct(id){
   var p = byId(id); if(!p) return;
-  ppCurrentId = id; pendingRating = 0; paintRateStars();
+  ppCurrentId = id; paintRateStars(0);
+  var psl = document.getElementById("ppStarsLine");
+  if(psl) psl.innerHTML = '<span class="row">★★★★★</span> No reviews yet';
+  if(window.PixelRatings) window.PixelRatings.productOpened(id);
   var img = document.getElementById("ppImg"); img.src = p.img; img.alt = p.alt;
   var thumbs = document.getElementById("ppThumbs");
   thumbs.innerHTML = "";
@@ -1079,20 +1091,17 @@ document.getElementById("ppage").addEventListener("click", function(e){ if(e.tar
 document.getElementById("ppAdd").addEventListener("click", function(){ if(ppCurrentId) addToCart(ppCurrentId); });
 document.getElementById("ppBuy").addEventListener("click", function(){ if(ppCurrentId){ addToCart(ppCurrentId, true); closeProduct(); openCart(); } });
 
-function paintRateStars(){
+function paintRateStars(n){
   document.querySelectorAll("#rateStars button").forEach(function(b){
-    b.classList.toggle("on", parseInt(b.getAttribute("data-star"),10) <= pendingRating);
+    b.classList.toggle("on", parseInt(b.getAttribute("data-star"),10) <= n);
   });
 }
 document.getElementById("rateStars").addEventListener("click", function(e){
-  var b = e.target.closest("[data-star]"); if(!b) return;
-  pendingRating = parseInt(b.getAttribute("data-star"),10); paintRateStars();
-});
-document.getElementById("rateSend").addEventListener("click", function(){
-  if(!pendingRating){ showToast("Please choose your stars first"); return; }
-  var p = byId(ppCurrentId); if(!p) return;
-  var msg = "*PRODUCT RATING — PixelNest*\n\nProduct: "+p.name+"\nMy rating: "+pendingRating+" / 5 stars\nMy Order ID: (I will add it here)\n\nI bought this product and this is my real rating.";
-  openWhatsApp(msg);
+  var b = e.target.closest("[data-star]"); if(!b || b.disabled) return;
+  var stars = parseInt(b.getAttribute("data-star"),10);
+  paintRateStars(stars);
+  /* Ratings are saved on the website itself (Firebase / Firestore) — no WhatsApp. */
+  if(window.PixelRatings) window.PixelRatings.rateProduct(ppCurrentId, stars);
 });
 
 function renderProducts(){
@@ -1112,14 +1121,16 @@ function renderProducts(){
       + '<div class="card-body">'
       + '<span class="badge">'+p.badge+'</span>'
       + '<h3 data-sample="'+p.id+'">'+p.name+'</h3>'
-      + starLine()
+      + starLine(p)
       + '<p class="desc">'+p.desc+'</p>'
       + '<div class="meta">'+meta+'</div>'
       + '<div class="price-row"><div class="price">'+priceText(p)+'<small>'+(p.price===0?"Free sample · delivered on WhatsApp · no payment":"One-time payment · no monthly fee")+'</small></div>'
+      + '<div class="card-rate" data-card-rate="'+p.id+'"></div>'
       + '<div class="card-btns"><button class="add-btn" data-add="'+p.id+'">Add to Cart'+inCart+'</button>'
       + '<button class="buy-btn" data-buynow="'+p.id+'">Buy Now</button></div></div>'
       + '</div></article>';
   }).join("");
+  if(window.PixelRatings) window.PixelRatings.repaint();
 }
 
 document.addEventListener("click", function(e){
@@ -1240,7 +1251,7 @@ function buildOrderText(){
   var email=document.getElementById("fEmail").value.trim();
   var pay=document.querySelector('input[name="pay"]:checked').value;
   var oid = currentOrderId || makeOrderId();
-  var lines=["*PIXELNEST — WEBSITE ORDER*","Order ID: "+oid,""];
+  var lines=["*NEW ORDER — PIXELNEST*","Order ID: "+oid,"","Product:"];
   Object.keys(cart).forEach(function(id, idx){
     var p=byId(id);
     lines.push((idx+1)+". "+p.name+"  x"+cart[id]+"  = "+(p.price===0 ? "FREE" : fmt(p.price*cart[id])));
@@ -1248,7 +1259,7 @@ function buildOrderText(){
   var closing = cartSum()===0
     ? "This order is the FREE sample pack — no payment needed. Please send the sample file on WhatsApp. Thank you!"
     : "I placed this order on the website. Please share the payment number — I will pay and send the screenshot. Thank you!";
-  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(cartSum()))+"*","Payment method: "+pay,"Delivery: within 1 day","","Name: "+name,"WhatsApp: "+phone,"Email: "+email,"",closing);
+  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(cartSum()))+"*","Payment method: "+pay,"Delivery: within 1 day","","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"",closing,"Store: https://aloneboy5186khan-creator.github.io/PixelNest/");
   return lines.join("\n");
 }
 
@@ -1310,7 +1321,7 @@ document.getElementById("customForm").addEventListener("submit", function(e){
   var detail=document.getElementById("cDetail").value.trim();
   var oid=makeOrderId();
   recordOrder({ id: oid, product: "Custom — " + type, name: name, phone: "", status: "Pending" });
-  var msg="*CUSTOM ORDER — PixelNest (Website)*\nOrder ID: "+oid+"\n\nName: "+name+"\nType: "+type+"\nDetails: "+detail+"\n\nI placed this custom order on the website. Delivery expected within 2–3 days, depending on the work. Please confirm the price. Thank you!";
+  var msg="*NEW ORDER — PIXELNEST*\nOrder ID: "+oid+"\nProduct: Custom Order\n\nCustomer: "+name+"\nType: "+type+"\nDetails: "+detail+"\nDelivery: within 2–3 days\n\nI placed this custom order on the website. Please confirm the price. Thank you!\nStore: https://aloneboy5186khan-creator.github.io/PixelNest/";
   showToast("Custom order ready — Order ID: "+oid);
   openWhatsApp(msg);
 });
@@ -1326,12 +1337,14 @@ function paintRevStars(){
 function hideRevPop(){ document.getElementById("revPop").classList.remove("show"); }
 function maybeShowReview(){
   if(revShown) return;
+  if(window.PixelRatings && window.PixelRatings.storeRated()) return;
   if(document.getElementById("ppage").classList.contains("open") || document.getElementById("drawer").classList.contains("open")){
     setTimeout(maybeShowReview, 4000);
     return;
   }
   revShown = true;
   document.getElementById("revPop").classList.add("show");
+  if(window.PixelRatings) window.PixelRatings.storePopupShown();
 }
 setTimeout(maybeShowReview, 10000);
 document.getElementById("revClose").addEventListener("click", hideRevPop);
@@ -1342,15 +1355,8 @@ document.getElementById("revStars").addEventListener("click", function(e){
 });
 document.getElementById("revSend").addEventListener("click", function(){
   if(!revRating){ showToast("Please tap the stars to choose your rating first"); return; }
-  var name = document.getElementById("revName").value.trim();
-  var text = document.getElementById("revText").value.trim();
-  var msg = "*PIXELNEST — WEBSITE REVIEW*\n\nRating: "+revRating+" / 5 stars"
-    + (name ? "\nName: "+name : "")
-    + (text ? "\nReview: "+text : "\nReview: (stars only)")
-    + "\n\nSent from the PixelNest website review popup.";
-  hideRevPop();
-  showToast("Thank you! Opening WhatsApp to send your rating…");
-  openWhatsApp(msg);
+  /* Store ratings are saved on the website itself (Firebase / Firestore) — no WhatsApp. */
+  if(window.PixelRatings) window.PixelRatings.rateStore(revRating);
 });
 
 /* ---------- Seller orders dashboard (this browser only) ---------- */
@@ -1427,6 +1433,225 @@ document.getElementById("manualOrderForm").addEventListener("submit", function(e
 renderSamples();
 renderProducts();
 renderCart();
+</script>
+
+<!-- Firebase v10 (compat builds — classic scripts exposing the global
+     "firebase" namespace, with the same Firestore database, increment()
+     transforms and merge writes as the modular SDK). -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* =====================================================================
+   PixelNest shared ratings — Firebase (free) + Cloud Firestore.
+
+   Ratings are stored in Firestore so EVERY visitor sees the same
+   average and the same "how many people rated" count, like the
+   Play Store. Data model:
+     productRatings/<productId>  { starsTotal, ratingsCount }
+     storeRatings/store          { starsTotal, ratingsCount }
+   Average = starsTotal / ratingsCount, computed when read.
+   Writes use FieldValue.increment() with merge, so the first rating
+   creates the document atomically.
+
+   SETUP — paste your own Firebase web config below. Get these values
+   from the Firebase console: Project Settings → General → "Your apps"
+   → Web app (</>) → Firebase SDK snippet (config).
+   Until real values are pasted in, the rating widgets simply show
+   "Ratings jald aa rahe hain" and the rest of the store works
+   exactly as before.
+   ===================================================================== */
+var FIREBASE_CONFIG = {
+  apiKey: "PASTE_API_KEY_HERE",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+
+window.PixelRatings = (function(){
+  var configured = FIREBASE_CONFIG.apiKey !== "PASTE_API_KEY_HERE"
+    && FIREBASE_CONFIG.projectId !== "PASTE_PROJECT_ID";
+  var db = null;
+  var productData = {};            /* productId -> { total, count } */
+  var storeData = { total: 0, count: 0 };
+  var currentProductId = "";
+
+  function lsGet(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } }
+  function lsSet(k, v){ try { window.localStorage.setItem(k, v); } catch(e){} }
+  function avgOf(d){ return d && d.count > 0 ? d.total / d.count : 0; }
+  function avgText(d){ return (Math.round(avgOf(d) * 10) / 10).toFixed(1); }
+  function starsHtml(d){
+    var f = Math.round(avgOf(d)), s = '<span style="color:#F59E0B">', i;
+    for(i = 0; i < f; i++) s += "★";
+    s += "</span>";
+    for(i = f; i < 5; i++) s += "★";
+    return s;
+  }
+
+  /* ----- painting ----- */
+  function paintCards(){
+    Object.keys(productData).forEach(function(id){
+      var d = productData[id];
+      document.querySelectorAll('[data-card-rate="' + id + '"]').forEach(function(el){
+        el.innerHTML = d.count > 0
+          ? '<span class="cr-star">★</span> ' + avgText(d) + ' (' + d.count + ' ratings)'
+          : '';
+      });
+      if(d.count > 0){
+        document.querySelectorAll('[data-rate-line="' + id + '"]').forEach(function(el){
+          el.innerHTML = '<span class="row">' + starsHtml(d) + '</span> ' + avgText(d) + ' · ' + d.count + ' ratings';
+        });
+      }
+    });
+  }
+
+  function paintProductWidget(){
+    if(!currentProductId) return;
+    var id = currentProductId;
+    var d = productData[id] || { total: 0, count: 0 };
+    var summary = document.getElementById("rateSummary");
+    var stars = document.querySelectorAll("#rateStars button");
+    var line = document.getElementById("ppStarsLine");
+    if(line && d.count > 0){
+      line.innerHTML = '<span class="row">' + starsHtml(d) + '</span> ' + avgText(d) + ' · ' + d.count + ' ratings';
+    }
+    if(!configured){
+      if(summary) summary.textContent = "Ratings jald aa rahe hain";
+      stars.forEach(function(b){ b.disabled = true; });
+      return;
+    }
+    var mine = lsGet("pixelnest_rated_" + id);
+    if(mine){
+      var m = parseInt(mine, 10) || 0;
+      if(typeof paintRateStars === "function") paintRateStars(m);
+      stars.forEach(function(b){ b.disabled = true; });
+      if(summary) summary.textContent = "Shukriya! You rated " + m + " stars"
+        + (d.count > 0 ? " · Average " + avgText(d) + " from " + d.count + " ratings" : "");
+    } else {
+      stars.forEach(function(b){ b.disabled = false; });
+      if(summary) summary.textContent = d.count > 0
+        ? "Average " + avgText(d) + " from " + d.count + " ratings" : "";
+    }
+  }
+
+  function paintStore(){
+    if(storeData.count > 0){
+      var head = document.getElementById("storeRevHead");
+      var line = document.getElementById("storeStarsLine");
+      if(head) head.textContent = "Rated by our visitors";
+      if(line) line.innerHTML = '<span class="row">' + starsHtml(storeData) + '</span> '
+        + avgText(storeData) + ' average · ' + storeData.count + ' ratings';
+    }
+    paintStorePopup();
+  }
+
+  function paintStorePopup(){
+    var summary = document.getElementById("revSummary");
+    var stars = document.querySelectorAll("#revStars button");
+    var send = document.getElementById("revSend");
+    if(!configured){
+      if(summary) summary.textContent = "Ratings jald aa rahe hain";
+      stars.forEach(function(b){ b.disabled = true; });
+      if(send) send.disabled = true;
+      return;
+    }
+    var mine = lsGet("pixelnest_rated_store");
+    if(mine){
+      var m = parseInt(mine, 10) || 0;
+      if(typeof paintRevStars === "function"){ revRating = m; paintRevStars(); }
+      stars.forEach(function(b){ b.disabled = true; });
+      if(send) send.disabled = true;
+      if(summary) summary.textContent = "Shukriya! You rated the store " + m + " stars"
+        + (storeData.count > 0 ? " · Average " + avgText(storeData) + " from " + storeData.count + " ratings" : "");
+    } else if(summary){
+      summary.textContent = storeData.count > 0
+        ? "Store average: " + avgText(storeData) + " from " + storeData.count + " ratings" : "";
+    }
+  }
+
+  function paintAll(){ paintCards(); paintProductWidget(); paintStore(); }
+
+  /* ----- writes (atomic increment + merge) ----- */
+  function rateProduct(id, stars){
+    if(!id || !stars) return;
+    if(!configured || !db){ showToast("Ratings jald aa rahe hain"); return; }
+    if(lsGet("pixelnest_rated_" + id)){ paintProductWidget(); return; }
+    var FV = window.firebase.firestore.FieldValue;
+    db.collection("productRatings").doc(id).set({
+      starsTotal: FV.increment(stars),
+      ratingsCount: FV.increment(1)
+    }, { merge: true }).then(function(){
+      lsSet("pixelnest_rated_" + id, String(stars));
+      var d = productData[id] || (productData[id] = { total: 0, count: 0 });
+      d.total += stars; d.count += 1;
+      paintCards(); paintProductWidget();
+      showToast("Shukriya! Average " + avgText(d) + " from " + d.count + " ratings");
+    }).catch(function(){
+      showToast("Rating save nahi ho saki — dobara try karein");
+    });
+  }
+
+  function rateStore(stars){
+    if(!stars) return;
+    if(!configured || !db){ showToast("Ratings jald aa rahe hain"); return; }
+    if(lsGet("pixelnest_rated_store")){ paintStorePopup(); return; }
+    var FV = window.firebase.firestore.FieldValue;
+    db.collection("storeRatings").doc("store").set({
+      starsTotal: FV.increment(stars),
+      ratingsCount: FV.increment(1)
+    }, { merge: true }).then(function(){
+      lsSet("pixelnest_rated_store", String(stars));
+      storeData.total += stars; storeData.count += 1;
+      paintStore();
+      showToast("Shukriya! Store average " + avgText(storeData) + " from " + storeData.count + " ratings");
+      setTimeout(hideRevPop, 900);
+    }).catch(function(){
+      showToast("Rating save nahi ho saki — dobara try karein");
+    });
+  }
+
+  /* ----- init ----- */
+  function init(){
+    if(typeof PRODUCTS !== "undefined"){
+      PRODUCTS.forEach(function(p){
+        if(!productData[p.id]) productData[p.id] = { total: 0, count: 0 };
+      });
+    }
+    paintAll();
+    if(!configured) return;
+    if(typeof window.firebase === "undefined" || !window.firebase.firestore) return;
+    try {
+      window.firebase.initializeApp(FIREBASE_CONFIG);
+      db = window.firebase.firestore();
+    } catch(e){ db = null; return; }
+    db.collection("productRatings").get().then(function(snap){
+      snap.forEach(function(doc){
+        var v = doc.data() || {};
+        productData[doc.id] = { total: Number(v.starsTotal) || 0, count: Number(v.ratingsCount) || 0 };
+      });
+      paintCards(); paintProductWidget();
+    }).catch(function(){});
+    db.collection("storeRatings").doc("store").get().then(function(doc){
+      if(doc.exists){
+        var v = doc.data() || {};
+        storeData = { total: Number(v.starsTotal) || 0, count: Number(v.ratingsCount) || 0 };
+      }
+      paintStore();
+    }).catch(function(){});
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+
+  return {
+    repaint: paintAll,
+    productOpened: function(id){ currentProductId = id; paintProductWidget(); },
+    storePopupShown: paintStorePopup,
+    storeRated: function(){ return !!lsGet("pixelnest_rated_store"); },
+    rateProduct: rateProduct,
+    rateStore: rateStore
+  };
+})();
 </script>
 </body>
 </html>
