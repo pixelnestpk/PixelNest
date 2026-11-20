@@ -892,48 +892,54 @@ select option{color:#111827;background-color:#ffffff}
 #ordersPage .orow .up-label{padding:7px 14px;min-height:36px;font-size:.82rem}
 #ordersPage .orow .o-del{min-height:36px}
 @media (max-width:560px){ #ordersPage .orow-actions{margin-inline-start:0} }
+/* Clicking an order row opens the order's full detail — buyer,
+   product, total, Trx ID, status, date — in a dropdown inside the
+   row; the row's own buttons and links keep their own actions. */
+#ordersPage .orow{cursor:pointer}
+#ordersPage .orow-chev{font-size:.66rem;color:var(--muted);transition:transform .15s;flex:none}
+#ordersPage .orow.is-open .orow-chev{transform:rotate(180deg)}
+#ordersPage .orow-detail{flex:1 1 100%;border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:4px;cursor:default}
 </style>
 <style>
-/* ================= SELLER DASHBOARD — FIVERR-STYLE LANDSCAPE PRODUCT ROWS =================
-   Each product is ONE horizontal row, like a gig on Fiverr's
-   dashboard: the product picture and name on one side, then stat
-   columns — Total Orders, Pending, Active, Completed and Total
-   Earned (Rs., the real sum of that product's order totals). The
-   dashboard runs right-to-left, so the picture sits on the right
-   and the stats flow to the left. Clicking the row expands the
-   compact order list under it (all its orders); clicking a status
-   stat expands only that status. Products with no orders yet still
-   get a row, with real zeros. */
-#ordersPage #ordersList{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+/* ================= SELLER DASHBOARD — SIMPLE PRODUCT LINES =================
+   Each product is ONE simple line, the way gigs list on Fiverr:
+   the product name and its price on a single row — no picture, no
+   stat columns, nothing big. Tapping the line opens a dropdown
+   panel under it carrying that product's stats (Total Orders /
+   Pending / Active / Completed / Total Earned) and its orders;
+   tapping a status stat inside the panel filters the order list
+   to that status. Tapping the line again closes it. Products with
+   no orders yet still get a line, with real zeros in the panel. */
+#ordersPage #ordersList{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 #ordersPage .pgroup{padding:0;height:auto;overflow:hidden}
-#ordersPage .prow{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:10px 12px;cursor:pointer}
+#ordersPage .prow{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer}
 #ordersPage .prow:hover{background:var(--gold-soft)}
 #ordersPage .prow:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-#ordersPage .prow-thumb{width:88px;height:60px;object-fit:cover;border-radius:8px;flex:none;border:1px solid var(--line);background:var(--soft)}
-#ordersPage .prow-thumb-ph{display:grid;place-items:center;background:var(--gold-soft);color:var(--gold-deep);font-weight:800;font-size:1.3rem}
-#ordersPage .prow-name{font-weight:800;color:var(--navy);font-size:.95rem;line-height:1.3;flex:1 1 150px;min-width:110px}
-#ordersPage .pstat{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:62px;padding:5px 7px;border:0;border-radius:9px;background:none;color:var(--ink);font:inherit}
+#ordersPage .prow-name{font-weight:800;color:var(--navy);font-size:.95rem;line-height:1.3;flex:1 1 auto;min-width:0}
+#ordersPage .prow-price{font-weight:800;color:var(--gold-deep);font-size:.95rem;white-space:nowrap;flex:none}
+#ordersPage .prow-chev{font-size:.7rem;color:var(--muted);transition:transform .15s;flex:none}
+#ordersPage .prow.is-open .prow-chev{transform:rotate(180deg)}
+#ordersPage .pgroup-panel{margin-top:0;border-top:1px dashed var(--line);padding:9px 10px}
+#ordersPage .pgroup-stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+#ordersPage .pstat{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:62px;padding:5px 7px;border:0;border-radius:9px;background:var(--soft);color:var(--ink);font:inherit}
 #ordersPage button.pstat{cursor:pointer}
-#ordersPage button.pstat:hover{background:var(--soft)}
+#ordersPage button.pstat:hover{background:var(--gold-soft)}
 #ordersPage button.pstat:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 #ordersPage button.pstat:disabled{cursor:default;opacity:.55}
-#ordersPage button.pstat:disabled:hover{background:none}
+#ordersPage button.pstat:disabled:hover{background:var(--soft)}
 #ordersPage .pstat b{font-size:1.06rem;line-height:1.15;color:var(--navy)}
 #ordersPage .pstat span{font-size:.58rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 #ordersPage .pstat.pst-Pending b{color:var(--amber)}
 #ordersPage .pstat.pst-Completed b{color:var(--green)}
 #ordersPage .pstat.pstat-earned b{color:var(--gold-deep)}
 #ordersPage .pstat.is-open{background:var(--gold-soft);box-shadow:inset 0 0 0 1px var(--gold)}
-#ordersPage .prow-chev{font-size:.7rem;color:var(--muted);transition:transform .15s;flex:none}
-#ordersPage .prow.is-open .prow-chev{transform:rotate(180deg)}
-#ordersPage .pgroup-panel{margin-top:0;border-top:1px dashed var(--line);padding:9px 10px}
 @media (max-width:560px){
-  #ordersPage .prow{gap:6px 8px;padding:9px 10px}
-  #ordersPage .prow-thumb{width:64px;height:46px}
-  #ordersPage .prow-name{flex:1 1 120px;font-size:.88rem}
+  #ordersPage .prow{padding:10px 11px}
+  #ordersPage .prow-name{font-size:.88rem}
   #ordersPage .pstat{min-width:52px;padding:4px 5px}
   #ordersPage .pstat b{font-size:.95rem}
 }
+
 </style>
 <style>
 /* ================= STORE HISTORY — LIVE TRUST STATS STRIP =================
@@ -1170,15 +1176,16 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
      store's existing service worker (sw.js) doubles as the
      OneSignal worker - it imports the OneSignal worker code at its
      top - so serviceWorkerPath points at it and no second worker
-     fights over the same scope. The REST API key below is the
-     seller's own: he sent it himself knowing it ships in this
-     public store code, and it can only send notifications from his
-     own OneSignal app. -->
+     fights over the same scope. The REST API key is kept in this code at the owner's decision — see the note at REST_KEY below. -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.PixelPush = (function(){
   var APP_ID = "7b3f05b6-3f8b-47f0-8e9f-d113f896fecb";
+  /* OneSignal REST API key, kept in this client code at the store
+     owner's explicit decision (same setup as the live store): the
+     buyer's browser uses it to send the "New PixelNest Order" push
+     to the seller-tagged subscription when an order is placed. */
   var REST_KEY = "os_v2_app_pm7qlnr7rnd7bdu72ej7rfx6zm2nl56omaqe4m5idju5iaw6257254w7ztjrtbhrzsfvvejgceu4sz52rkafqzye3d5d7dv3q2tybyi";
   var STORE_URL = "https://pixelnestpk.github.io/PixelNest/";
   var inAssets = /\/assets\//.test(window.location.pathname || "");
@@ -1214,11 +1221,12 @@ window.PixelPush = (function(){
     });
   }
   /* Buyer side - called the moment an order is placed (shop
-     checkout and the custom-order form). Sends the push through
-     the OneSignal REST API to the seller-tagged subscription.
-     Best-effort and silent: a failed push never affects the order,
-     which is already saved exactly as before. */
+     checkout and the custom-order form). Posts the order push to
+     the OneSignal REST API, addressed only to subscriptions
+     tagged role=seller. The order itself is saved exactly the
+     same either way; a failed push never blocks checkout. */
   function sendNewOrder(orderId, productName, total){
+    if(!REST_KEY) return;
     try {
       var body = "Order " + String(orderId || "") + " \u2014 " + String(productName || "New order");
       var t = Number(total) || 0;
@@ -1326,6 +1334,20 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
 #ordersPage .notif-item b{color:var(--navy);font-size:.92rem}
 #ordersPage .notif-item .notif-meta{color:var(--muted);font-size:.8rem;margin-top:1px}
 #ordersPage .notif-item.is-unread .notif-meta{color:#7C6213}
+#ordersPage .notif-item{cursor:pointer}
+#ordersPage .notif-item:hover{border-color:var(--gold)}
+#ordersPage .notif-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#ordersPage .notif-top{display:flex;align-items:flex-start;gap:8px}
+#ordersPage .notif-top b{flex:1 1 auto}
+#ordersPage .notif-item.is-unread .notif-top b{font-weight:800}
+#ordersPage .notif-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:5px;box-shadow:0 0 0 3px rgba(201,162,39,.25)}
+#ordersPage .notif-tick{flex:none;display:inline-flex;align-items:center;color:#16A34A;margin-top:3px}
+#ordersPage .notif-chev{font-size:.68rem;color:var(--muted);transition:transform .15s;flex:none;margin-top:3px}
+#ordersPage .notif-item.is-open .notif-chev{transform:rotate(180deg)}
+#ordersPage .notif-detail{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;display:grid;gap:4px;cursor:default}
+#ordersPage .nd-row{display:flex;gap:8px;font-size:.84rem;line-height:1.45}
+#ordersPage .nd-row>span{flex:none;width:72px;font-size:.64rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+#ordersPage .nd-row>b{color:var(--navy);font-weight:700;font-size:.86rem;word-break:break-word}
 </style>
 </head>
 <body id="top">
@@ -1337,9 +1359,11 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         <button class="acct-btn" id="acctBtn" type="button" style="display:none" aria-label="Your account">Account</button>
         <div class="acct-menu" id="acctMenu" style="display:none">
           <div class="am-email" id="acctEmail"></div>
+          <button type="button" id="acctSellerBtn">Seller Account</button>
+          <button type="button" id="acctBuyBtn">Buy</button>
+          <button type="button" id="acctInfoBtn">Account</button>
+          <button type="button" id="acctOutBtn">Log Out</button>
           <button type="button" id="acctOrdersBtn">My Orders</button>
-          <button type="button" id="acctSellerBtn" style="display:none">Seller Orders</button>
-          <button type="button" id="acctOutBtn">Sign Out</button>
         </div>
       </div>
       <a class="logo" href="./" aria-label="PixelNest — back to home">
@@ -1788,7 +1812,7 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
       <p class="order-flow-note"><b>How ordering works:</b> fill in the form, pay the amount shown to <b>03361520429</b> via Easypaisa in your own app <b>first</b>, paste the <b>Trx ID (required for paid orders)</b> and tap “Place Order” — your order completes <b>right here</b> with an Order ID, no WhatsApp step, and is placed as <b>Pending</b>; the seller accepts it once your payment is confirmed. <b>A paid order will not be placed without a Trx ID.</b> Sign in first (button at the top) — an account is required to order, so your files stay private: only you can see your orders and downloads. The FREE sample pack (Rs. 0) needs no payment and no Trx ID — it is placed as Pending like every order, and the seller accepts it and delivers the sample files in the app.</p>
       <div id="verifyGate" style="display:none;background:#FEF3C7;border:1px solid #E7D9A8;border-radius:12px;padding:14px">
         <b style="color:var(--navy)">Please verify your email first</b>
-        <p style="margin:6px 0 0;font-size:.9rem">Your email is not verified yet, so you cannot place an order yet. We sent a verification link to your email — open it, then tap “Check again”. Browsing, ratings and tracking work without verification.</p>
+        <p style="margin:6px 0 0;font-size:.9rem">Your email is not verified yet, so you cannot place an order yet. We sent a verification link to your email — open it, then tap “Check again”. Accounts can sign in only after the email is verified.</p>
         <div style="display:grid;gap:8px;margin-top:12px">
           <button class="btn btn-primary" id="resendVerifyBtn2" type="button" style="border-radius:12px;width:100%">Resend verification email</button>
           <button class="btn" id="checkVerifyBtn2" type="button" style="border-radius:12px;width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--navy);min-height:50px;font-weight:800">I have verified — check again</button>
@@ -1928,17 +1952,36 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         <label>Password <input id="authPass" type="password" required autocomplete="current-password" placeholder="Password"></label>
         <p class="auth-error" id="authError" style="display:none"></p>
         <button class="btn btn-primary auth-submit" id="authSubmit" type="submit">Sign In</button>
+        <button class="btn btn-copy" id="authResendBtn" type="button" style="display:none;border-radius:12px;width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--navy);min-height:50px;font-weight:800;margin-top:8px">Resend verification email</button>
       </form>
       <div class="auth-or"><span>or</span></div>
       <button class="btn google-btn" id="googleBtn" type="button">Sign in with Google</button>
       <div id="authVerifyBox" style="display:none;background:#FEF3C7;border:1px solid #E7D9A8;border-radius:12px;padding:14px;margin-top:14px">
         <b style="color:var(--navy)">Please verify your email first</b>
-        <p style="margin:6px 0 0;font-size:.9rem;color:var(--ink)">We sent a verification link to your email address. Open it, then come back here — you can place an order only after your email is verified. Browsing, ratings and order tracking work without verification.</p>
+        <p style="margin:6px 0 0;font-size:.9rem;color:var(--ink)">We sent a verification link to your email address. Open it, then Sign In again — an account can sign in only after its email is verified, and ordering needs a signed-in, verified account.</p>
         <div style="display:grid;gap:8px;margin-top:12px">
           <button class="btn btn-primary" id="resendVerifyBtn" type="button" style="border-radius:12px;width:100%">Resend verification email</button>
           <button class="btn btn-copy" id="checkVerifyBtn" type="button" style="border-radius:12px;width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--navy);min-height:50px;font-weight:800">I have verified — check again</button>
         </div>
         <p id="verifyMsg" style="margin:10px 0 0;font-size:.86rem;font-weight:700;color:var(--navy)"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT (signed-in account details) -->
+<div class="ppage" id="accountPage" role="dialog" aria-modal="true" aria-label="Your account">
+  <div class="pp-card auth-card">
+    <div class="pp-top"><span class="o-top-title">Account</span><button class="icon-btn" id="accountClose" aria-label="Close account">✕</button></div>
+    <div class="o-body">
+      <table class="spec-table">
+        <tr><td>Name</td><td id="accountName">—</td></tr>
+        <tr><td>Email</td><td id="accountEmail">—</td></tr>
+        <tr><td>Account type</td><td id="accountType">Customer</td></tr>
+      </table>
+      <div style="display:grid;gap:8px;margin-top:14px">
+        <button class="btn btn-primary" id="accountOrdersBtn" type="button" style="border-radius:12px;width:100%">My Orders</button>
+        <button class="btn btn-copy" id="accountOutBtn" type="button" style="border-radius:12px;width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--navy);min-height:50px;font-weight:800">Log Out</button>
       </div>
     </div>
   </div>
@@ -3038,12 +3081,18 @@ function startFsWatch(){
    Notifications: built from that same live orders feed — a new
    order, a submitted payment (a Trx ID on the order), an accepted
    order and a completed order each become one notification,
-   newest first. Read state is one "read up to" timestamp kept in
-   this browser (the same local storage the cart and the local
-   order records already use); anything newer shows highlighted
-   as unread until the seller taps "Mark all as read". Seller
-   only: both sections live inside the seller dashboard, which
-   itself opens only for the seller's account. */
+   newest first. Read state is WhatsApp-style, per notification:
+   each notification the seller has opened is remembered by its
+   own key in this browser (the same local storage the cart and
+   the local order records already use), so opening one drops
+   the unread badge count by one, that notification loses its
+   gold highlight and gains a green read tick, while the ones
+   still unopened stay bold and gold. "Mark all as read" marks
+   every current notification at once. The older "read up to"
+   timestamp is still honoured, so anything the seller already
+   marked read before this per-notification system stays read.
+   Seller only: both sections live inside the seller dashboard,
+   which itself opens only for the seller's account. */
 var custWatchStarted = false;
 var custList = [];
 function startCustomersWatch(){
@@ -3055,8 +3104,9 @@ function startCustomersWatch(){
 function renderCustomers(){
   var box = document.getElementById("customersList");
   if(!box) return;
-  if(!custList.length){ box.innerHTML = '<p class="o-note">No registered customers yet.</p>'; return; }
-  box.innerHTML = custList.map(function(c){
+  var shown = custList.filter(function(c){ return String((c && c.email) || "").toLowerCase() !== "shakircadet1@gmail.com"; });
+  if(!shown.length){ box.innerHTML = '<p class="o-note">No registered customers yet.</p>'; return; }
+  box.innerHTML = shown.map(function(c){
     var uid = c.uid || c.id || "";
     return '<button type="button" class="cust-row" data-cust="' + escHtml(uid) + '"><span><span class="cust-name">' + escHtml(c.name || "\u2014") + '</span><br><span class="cust-email">' + escHtml(c.email || "Email not saved yet \u2014 it will appear after their next sign-in") + '</span></span><span class="cust-chev">\u203a</span></button>';
   }).join("");
@@ -3078,6 +3128,7 @@ function openCustomer(uid){
   box.innerHTML = '<table class="spec-table">'
     + '<tr><td>Name</td><td>' + escHtml(c.name || "\u2014") + '</td></tr>'
     + '<tr><td>Email</td><td>' + escHtml(c.email || "Not saved yet") + '</td></tr>'
+    + '<tr><td>Email verified</td><td>' + (c.emailVerified === true ? "Verified" : (c.emailVerified === false ? "Not verified" : "—")) + '</td></tr>'
     + '<tr><td>Registered</td><td>' + escHtml(reg || "\u2014") + '</td></tr>'
     + '<tr><td>Orders</td><td>' + mine.length + '</td></tr>'
     + '<tr><td>Total spent</td><td>' + fmt(spent) + '</td></tr></table>'
@@ -3091,6 +3142,39 @@ function closeCustomer(){ var el = document.getElementById("customerPage"); if(e
 var NOTIF_READ_KEY = "pixelnest_notif_read_at";
 function notifReadAt(){
   try { return Number(window.localStorage.getItem(NOTIF_READ_KEY)) || 0; } catch(e){ return 0; }
+}
+/* Per-notification read state (WhatsApp-style): the key of every
+   notification the seller has opened, kept as a JSON map in this
+   browser. A notification counts as read when its own key is in
+   the map, or when it predates the legacy "read up to" timestamp
+   above (so read state from before this system is preserved). */
+var NOTIF_READ_KEYS_KEY = "pixelnest_notif_read_keys";
+function notifReadKeys(){
+  try {
+    var v = JSON.parse(window.localStorage.getItem(NOTIF_READ_KEYS_KEY) || "{}");
+    return (v && typeof v === "object") ? v : {};
+  } catch(e){ return {}; }
+}
+function notifKeyOf(ev){ return (ev.oid || "") + "|" + ev.pr; }
+function notifIsRead(ev, keys, readAt){
+  if(keys[notifKeyOf(ev)]) return true;
+  return !(ev.t > readAt);
+}
+function markNotifRead(key){
+  try {
+    var keys = notifReadKeys();
+    if(keys[key]) return;
+    keys[key] = 1;
+    window.localStorage.setItem(NOTIF_READ_KEYS_KEY, JSON.stringify(keys));
+  } catch(e){}
+}
+function markAllNotifsRead(evs){
+  try {
+    var keys = notifReadKeys();
+    evs.forEach(function(ev){ keys[notifKeyOf(ev)] = 1; });
+    window.localStorage.setItem(NOTIF_READ_KEYS_KEY, JSON.stringify(keys));
+    window.localStorage.setItem(NOTIF_READ_KEY, String(Date.now()));
+  } catch(e){}
 }
 function tsMillis(ts){
   if(!ts) return 0;
@@ -3110,30 +3194,59 @@ function buildNotifications(){
        time; completion uses the real delivery timestamp the order
        carries (deliveredAt) whenever one exists. */
     var meta = "Order " + o.orderId + (o.productName ? " \u00b7 " + o.productName : "") + (when ? " \u00b7 Ordered " + when : "");
-    evs.push({ t: t, pr: 0, title: "New order received \u2014 " + fmt(Number(o.total) || 0), meta: meta });
-    if(o.trxId) evs.push({ t: t, pr: 1, title: "Payment received \u2014 " + fmt(Number(o.total) || 0) + " (Trx ID " + o.trxId + ")", meta: meta });
-    if(o.status === "Active" || o.status === "Completed") evs.push({ t: t, pr: 2, title: "Order accepted", meta: meta });
+    evs.push({ t: t, pr: 0, oid: o.orderId, title: "New order received \u2014 " + fmt(Number(o.total) || 0), meta: meta });
+    if(o.trxId) evs.push({ t: t, pr: 1, oid: o.orderId, title: "Payment received \u2014 " + fmt(Number(o.total) || 0) + " (Trx ID " + o.trxId + ")", meta: meta });
+    if(o.status === "Active" || o.status === "Completed") evs.push({ t: t, pr: 2, oid: o.orderId, title: "Order accepted", meta: meta });
     if(o.status === "Completed"){
       var dt = tsMillis(o.deliveredAt);
       var dmeta = "Order " + o.orderId + (o.productName ? " \u00b7 " + o.productName : "") + (o.deliveredAt ? " \u00b7 Delivered " + fmtTs(o.deliveredAt) : (when ? " \u00b7 Ordered " + when : ""));
-      evs.push({ t: dt || t, pr: 3, title: "Order completed \u2014 file delivered", meta: dmeta });
+      evs.push({ t: dt || t, pr: 3, oid: o.orderId, title: "Order completed \u2014 file delivered", meta: dmeta });
     }
   });
   evs.sort(function(a, b){ return (b.t - a.t) || (b.pr - a.pr); });
   return evs;
+}
+/* Which notification's detail dropdown is open, keyed by
+   "<orderId>|<event kind>" so it survives live re-renders. A
+   notification stays one compact line; tapping it opens the
+   dropdown with the full detail of the order it belongs to —
+   who ordered (buyer name), product, amount, Trx ID, status
+   and date — and tapping it again closes it. */
+var notifOpenKey = "";
+function notifDetailHtml(ev){
+  var o = null;
+  fsOrders.forEach(function(x){ if(x.orderId === ev.oid) o = x; });
+  if(!o) return '<div class="notif-detail"><div class="nd-row"><span>Order ID</span><b>' + escHtml(ev.oid || "\u2014") + '</b></div></div>';
+  var loc = null;
+  orders.forEach(function(x){ if(x.id === o.orderId) loc = x; });
+  var rows = [
+    ["Buyer", buyerNameFor(o, loc) || "\u2014"],
+    ["Product", o.productName || "\u2014"],
+    ["Amount", rowTotalHtml(o.productName, o.paymentMethod, o.total)],
+    ["Trx ID", o.trxId || "\u2014"],
+    ["Status", o.status || "Pending"],
+    ["Date", fmtTs(o.createdAt) || "\u2014"],
+    ["Order ID", o.orderId]
+  ];
+  return '<div class="notif-detail">' + rows.map(function(r){ return '<div class="nd-row"><span>' + escHtml(r[0]) + '</span><b>' + escHtml(r[1]) + '</b></div>'; }).join("") + '</div>';
 }
 function renderNotifications(){
   var box = document.getElementById("notifList");
   if(!box) return;
   var evs = buildNotifications();
   var readAt = notifReadAt();
+  var keys = notifReadKeys();
   var unread = 0;
-  evs.forEach(function(ev){ if(ev.t > readAt) unread++; });
+  evs.forEach(function(ev){ if(!notifIsRead(ev, keys, readAt)) unread++; });
   var cnt = document.getElementById("notifCount");
   if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
   if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet \u2014 new orders, payments and order updates will appear here.</p>'; return; }
+  var tick = '<span class="notif-tick" title="Read" aria-label="Read"><svg width="19" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true"><path d="M1 6.6 4.7 10 11.2 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 8.8 11.1 10.2 17.9 2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.innerHTML = evs.slice(0, 60).map(function(ev){
-    return '<div class="notif-item' + (ev.t > readAt ? ' is-unread' : '') + '"><b>' + escHtml(ev.title) + '</b><div class="notif-meta">' + escHtml(ev.meta) + '</div></div>';
+    var key = notifKeyOf(ev);
+    var open = notifOpenKey === key;
+    var read = notifIsRead(ev, keys, readAt);
+    return '<div class="notif-item' + (read ? ' is-read' : ' is-unread') + (open ? ' is-open' : '') + '" data-notif="' + escHtml(key) + '" role="button" tabindex="0" aria-expanded="' + (open ? 'true' : 'false') + '"><div class="notif-top"><b>' + escHtml(ev.title) + '</b>' + (read ? tick : '<span class="notif-dot" title="Unread" aria-label="Unread"></span>') + '<span class="notif-chev" aria-hidden="true">\u25be</span></div><div class="notif-meta">' + escHtml(ev.meta) + '</div>' + (open ? notifDetailHtml(ev) : '') + '</div>';
   }).join("");
 }
 (function(){
@@ -3147,9 +3260,29 @@ function renderNotifications(){
   var cp = document.getElementById("customerPage"); if(cp) cp.addEventListener("click", function(e){ if(e.target === this) closeCustomer(); });
   var mr = document.getElementById("notifReadBtn");
   if(mr) mr.addEventListener("click", function(){
-    try { window.localStorage.setItem(NOTIF_READ_KEY, String(Date.now())); } catch(e){}
+    markAllNotifsRead(buildNotifications());
     renderNotifications();
   });
+  var nl = document.getElementById("notifList");
+  if(nl){
+    nl.addEventListener("click", function(e){
+      var it = e.target.closest ? e.target.closest("[data-notif]") : null;
+      if(!it) return;
+      var k = it.getAttribute("data-notif");
+      /* Opening a notification checks it, WhatsApp-style: it is
+         marked read on open, so the unread count drops by one and
+         the green tick appears. Closing it again keeps it read. */
+      markNotifRead(k);
+      notifOpenKey = notifOpenKey === k ? "" : k;
+      renderNotifications();
+    });
+    nl.addEventListener("keydown", function(e){
+      if(e.key !== "Enter" && e.key !== " ") return;
+      var it = e.target.closest ? e.target.closest("[data-notif]") : null;
+      if(!it || e.target !== it) return;
+      e.preventDefault(); it.click();
+    });
+  }
 })();
 
 /* Discount-code usage line in the seller dashboard: the real count
@@ -3323,6 +3456,35 @@ function saveOrderBuyerName(key, nm, btn){
     showToast("Buyer name saved for order " + id);
   }
 }
+/* Which order row's detail dropdown is open, keyed by
+   "fs:<orderId>" or "local:<orderId>" so it survives re-renders.
+   Clicking an order row opens the dropdown with the order's full
+   detail — buyer name, product, total, Trx ID, status and date;
+   clicking the row again closes it. */
+var orderOpenKey = "";
+function orderDetailHtml(kind, o, loc){
+  var rows;
+  if(kind === "fs"){
+    rows = [
+      ["Buyer", buyerNameFor(o, loc) || "\u2014"],
+      ["Product", o.productName || "\u2014"],
+      ["Total", rowTotalHtml(o.productName, o.paymentMethod, o.total)],
+      ["Trx ID", o.trxId || "\u2014"],
+      ["Status", o.status || "Pending"],
+      ["Date", fmtTs(o.createdAt) || "\u2014"]
+    ];
+  } else {
+    rows = [
+      ["Buyer", buyerNameFor(o, null) || "\u2014"],
+      ["Product", o.product || "\u2014"],
+      ["Total", rowTotalHtml(o.product, o.pay, (o.total !== undefined && o.total !== null ? o.total : null))],
+      ["Trx ID", o.trx || "\u2014"],
+      ["Status", o.status || "Pending"],
+      ["Date", o.date || "\u2014"]
+    ];
+  }
+  return '<div class="orow-detail">' + rows.map(function(r){ return '<div class="nd-row"><span>' + escHtml(r[0]) + '</span><b>' + escHtml(r[1]) + '</b></div>'; }).join("") + '</div>';
+}
 /* One online (Firestore) order as a COMPACT ROW: Order ID, status
    pill, buyer name, total amount, Trx ID, quantity (when more than
    one), date, and the row's action — the Accept Order button while
@@ -3342,7 +3504,7 @@ function fsOrderCardHtml(o, localById){
   var discCode = String(o.discountCode || (loc && loc.discountCode) || "").trim();
   var discAmt = Number(o.discountAmount || (loc && loc.discountAmount) || 0);
   var cFile = o.clientFile || (loc && loc.clientFile) || null;
-  return '<div class="orow"><span class="oid">' + escHtml(o.orderId) + '</span>'
+  return '<div class="orow' + (orderOpenKey === "fs:" + o.orderId ? ' is-open' : '') + '" data-orow="fs:' + escHtml(o.orderId) + '"><span class="oid">' + escHtml(o.orderId) + '</span>'
     + '<span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span>'
     + '<span class="ofield"><span>Buyer</span><b>' + escHtml(buyerNameFor(o, loc) || "—") + '</b></span>'
     + '<span class="ofield"><span>Total</span><b>' + rowTotalHtml(o.productName, pm, o.total) + '</b></span>'
@@ -3356,13 +3518,16 @@ function fsOrderCardHtml(o, localById){
     + nameActionHtml("fs", o.orderId, buyerNameFor(o, loc))
     + (st === "Pending" ? acceptBtnHtml("fs", o.orderId, orderCanAccept(pm, trx, o.total)) : '')
     + deliveryBlockHtml(o)
-    + '</span></div>';
+    + '</span>'
+    + '<span class="orow-chev" aria-hidden="true">▾</span>'
+    + (orderOpenKey === "fs:" + o.orderId ? orderDetailHtml("fs", o, loc) : '')
+    + '</div>';
 }
 /* One browser-only order as the same compact row, with its Remove
    button. */
 function localOrderCardHtml(o){
   var st = o.status || "Pending";
-  return '<div class="orow"><span class="oid">' + escHtml(o.id) + '</span>'
+  return '<div class="orow' + (orderOpenKey === "local:" + o.id ? ' is-open' : '') + '" data-orow="local:' + escHtml(o.id) + '"><span class="oid">' + escHtml(o.id) + '</span>'
     + '<span class="o-local">Only in this browser</span>'
     + '<span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span>'
     + '<span class="ofield"><span>Buyer</span><b>' + escHtml(buyerNameFor(o, null) || "—") + '</b></span>'
@@ -3376,7 +3541,10 @@ function localOrderCardHtml(o){
     + nameActionHtml("local", o.id, buyerNameFor(o, null))
     + (st === "Pending" ? acceptBtnHtml("local", o.id, orderCanAccept(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null))) : '')
     + '<button type="button" class="o-del" data-odel="' + escHtml(o.id) + '">Remove</button>'
-    + '</span></div>';
+    + '</span>'
+    + '<span class="orow-chev" aria-hidden="true">▾</span>'
+    + (orderOpenKey === "local:" + o.id ? orderDetailHtml("local", o, null) : '')
+    + '</div>';
 }
 /* The catalogue product an order string belongs to, if any:
    checkout product strings carry the product name ("Excel Budget
@@ -3457,22 +3625,26 @@ function renderOrders(){
   lastGroups.forEach(function(g, gi){
     var total = g.entries.length;
     var open = productOpen[g.name];
-    var isOpen = !!open && (open === "all" ? total > 0 : (g.counts[open] || 0) > 0);
-    html += '<div class="pgroup"><div class="prow' + (isOpen ? ' is-open' : '') + '" data-ptoggle data-pidx="' + gi + '" data-pstatus="all" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '" aria-label="' + escHtml(g.name) + ' — tap to show or hide its orders">'
-      + (g.product ? '<img class="prow-thumb" src="' + escHtml(g.product.img) + '" alt="" loading="lazy">' : '<span class="prow-thumb prow-thumb-ph" aria-hidden="true">' + escHtml((g.name || "•").charAt(0)) + '</span>')
+    var isOpen = !!open && (open === "all" || (g.counts[open] || 0) > 0);
+    html += '<div class="pgroup"><div class="prow' + (isOpen ? ' is-open' : '') + '" data-ptoggle data-pidx="' + gi + '" data-pstatus="all" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '" aria-label="' + escHtml(g.name) + ' \u2014 tap to show or hide its stats and orders">'
       + '<span class="prow-name">' + escHtml(g.name) + '</span>'
-      + prowStatHtml(g, gi, "Total Orders", total, "all")
-      + prowStatHtml(g, gi, "Pending", g.counts.Pending, "Pending")
-      + prowStatHtml(g, gi, "Active", g.counts.Active, "Active")
-      + prowStatHtml(g, gi, "Completed", g.counts.Completed, "Completed")
-      + '<span class="pstat pstat-earned"><b>' + (g.earned > 0 ? 'Rs. ' + g.earned.toLocaleString("en-PK") : 'Rs. 0') + '</b><span>Total Earned</span></span>'
-      + '<span class="prow-chev" aria-hidden="true">▾</span></div>';
+      + (g.product ? '<span class="prow-price">' + priceText(g.product) + '</span>' : '')
+      + '<span class="prow-chev" aria-hidden="true">\u25be</span></div>';
     if(isOpen){
-      html += '<div class="pgroup-panel">';
+      html += '<div class="pgroup-panel"><div class="pgroup-stats">'
+        + prowStatHtml(g, gi, "Total Orders", total, "all")
+        + prowStatHtml(g, gi, "Pending", g.counts.Pending, "Pending")
+        + prowStatHtml(g, gi, "Active", g.counts.Active, "Active")
+        + prowStatHtml(g, gi, "Completed", g.counts.Completed, "Completed")
+        + '<span class="pstat pstat-earned"><b>' + (g.earned > 0 ? 'Rs. ' + g.earned.toLocaleString("en-PK") : 'Rs. 0') + '</b><span>Total Earned</span></span>'
+        + '</div>';
+      var shown = 0;
       g.entries.forEach(function(en){
         if(open !== "all" && en.status !== open) return;
+        shown++;
         html += en.kind === "fs" ? fsOrderCardHtml(en.o, localById) : localOrderCardHtml(en.o);
       });
+      if(!shown) html += '<p class="pgroup-empty">No orders here yet.</p>';
       html += '</div>';
     }
     html += '</div>';
@@ -3561,6 +3733,17 @@ document.getElementById("ordersList").addEventListener("click", function(e){
   var st = btn.getAttribute("data-pstatus");
   if(productOpen[g.name] === st) delete productOpen[g.name];
   else productOpen[g.name] = st;
+  renderOrders();
+});
+/* Order-row detail dropdown — tapping anywhere on an order row
+   (but not on its buttons, links, inputs or the open detail
+   itself) toggles the full-detail dropdown inside that row. */
+document.getElementById("ordersList").addEventListener("click", function(e){
+  var row = e.target.closest ? e.target.closest("[data-orow]") : null;
+  if(!row) return;
+  if(e.target.closest("button, a, input, label, select, textarea, .orow-detail")) return;
+  var k = row.getAttribute("data-orow");
+  orderOpenKey = orderOpenKey === k ? "" : k;
   renderOrders();
 });
 function openOrdersDashboard(){
@@ -4539,8 +4722,8 @@ window.PixelOrders = (function(){
        customers — documents in "customers" (one per registered
                    account, written by the accounts module on every
                    sign-in where one is still missing — the seller's
-                   own account included, so the count is the real
-                   number of accounts that have signed in);
+                   own account excluded, so the count is the real
+                   number of registered customers);
        orders / completed — documents in "orders", and how many of
                    them carry status "Completed";
        rating    — the real store ratings document the ratings
@@ -4559,7 +4742,7 @@ window.PixelOrders = (function(){
     }
     try {
       unsubs.push(d.collection("customers").onSnapshot(
-        function(snap){ state.customers = snap.size; emit(); },
+        function(snap){ var n = 0; snap.forEach(function(doc){ var cd = doc.data() || {}; if(String(cd.email || "").toLowerCase() !== "shakircadet1@gmail.com") n++; }); state.customers = n; emit(); },
         function(){ /* read refused/unavailable — the count stays null and shows as a dash */ }
       ));
       unsubs.push(d.collection("orders").onSnapshot(
@@ -4594,7 +4777,7 @@ window.PixelOrders = (function(){
       return d.collection("customers").onSnapshot(
         function(snap){
           var arr = [];
-          snap.forEach(function(doc){ var cd = doc.data() || {}; if(!cd.uid) cd.uid = doc.id; arr.push(cd); });
+          snap.forEach(function(doc){ var cd = doc.data() || {}; if(!cd.uid) cd.uid = doc.id; if(String(cd.email || "").toLowerCase() === "shakircadet1@gmail.com") return; arr.push(cd); });
           arr.sort(function(a, b){
             var sa = (a.createdAt && a.createdAt.seconds) || 0;
             var sb = (b.createdAt && b.createdAt.seconds) || 0;
@@ -4788,6 +4971,24 @@ window.PixelAccount = (function(){
       }).catch(function(err){ if(window.console && console.error) console.error("PixelNest: Google redirect result", err); });
     } catch(e){}
     auth.onAuthStateChanged(function(u){
+      /* Verification gate for a restored session: an email/password
+         account whose email is still unverified is signed straight
+         back out — sign-in counts only after the email is verified.
+         Skipped while a sign-in/sign-up submit is being handled,
+         because that flow sends the link and signs out itself.
+         Google accounts arrive verified and are never blocked. */
+      if(u && !u.emailVerified && !authFlowBusy){
+        var isPw = false;
+        try { (u.providerData || []).forEach(function(p){ if(p && p.providerId === "password") isPw = true; }); } catch(e){}
+        if(isPw){
+          currentUser = null;
+          authStateKnown = true;
+          paintAccount();
+          auth.signOut().catch(function(){});
+          if(typeof showToast === "function") showToast("Please verify your email first, then sign in");
+          return;
+        }
+      }
       currentUser = u || null;
       authStateKnown = true;
       paintAccount();
@@ -4818,11 +5019,11 @@ window.PixelAccount = (function(){
      buyer name (the dashboard looks the record up by the order's
      uid). A record that already exists but has no name yet (older
      records held only the sign-up time) gets the name merged in.
-     EVERY signed-in account is recorded, the seller's own account
-     included — the count is the real number of registered
-     accounts, and the seller signs in too. (An earlier version
-     skipped the seller, which left the count at 0 whenever only
-     the seller had ever signed in.) The write is retried a few
+     Every signed-in CUSTOMER account is recorded — the seller's
+     own account is NOT: the seller is not a customer, so his
+     sign-in never creates a record, any record an earlier version
+     saved for him is deleted on his next sign-in, and the count
+     is the real number of registered customers. The write is retried a few
      times when it fails instead of being given up for the whole
      session, and the trust strip / dashboard counts follow the
      "customers" collection live, so the number reflects a new
@@ -4835,6 +5036,17 @@ window.PixelAccount = (function(){
     if(!currentUser || !db) return;
     var uid = currentUser.uid;
     if(!uid || custRegDone[uid]) return;
+    if(isSeller()){
+      /* The seller is NOT a customer: his own account is never
+         saved as a registered-customer record. If an earlier
+         version already saved one for him, remove it now, so he
+         never appears in the Registered Customers list or in the
+         registered-customer count. Real customers are recorded
+         exactly as before. */
+      custRegDone[uid] = true;
+      try { db.collection("customers").doc(uid).delete().catch(function(){}); } catch(e){}
+      return;
+    }
     custRegAttempts[uid] = (custRegAttempts[uid] || 0) + 1;
     var nm = String(currentUser.displayName || "").trim()
       || (currentUser.email ? currentUser.email.split("@")[0] : "");
@@ -4857,7 +5069,7 @@ window.PixelAccount = (function(){
       var ref = db.collection("customers").doc(uid);
       ref.get().then(function(snap){
         if(!snap.exists){
-          ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() })
+          ref.set({ uid: uid, name: nm, emailVerified: !!currentUser.emailVerified, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() })
             .then(function(){ custRegDone[uid] = true; saveCustEmail(); })
             .catch(function(){ retryLater(); });
         } else {
@@ -4865,12 +5077,13 @@ window.PixelAccount = (function(){
           custRegDone[uid] = true;
           if(!cd.name && nm) ref.set({ uid: uid, name: nm }, { merge: true }).catch(function(){});
           if(em && cd.email !== em) saveCustEmail();
+          if(cd.emailVerified !== !!currentUser.emailVerified) ref.set({ emailVerified: !!currentUser.emailVerified }, { merge: true }).catch(function(){});
         }
       }).catch(function(){
         /* The read itself was refused — still try to leave the
            record behind with a merge write, so the count and the
            name exist for the strip and the dashboard. */
-        ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+        ref.set({ uid: uid, name: nm, emailVerified: !!currentUser.emailVerified, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
           .then(function(){ custRegDone[uid] = true; saveCustEmail(); })
           .catch(function(){ retryLater(); });
       });
@@ -4957,7 +5170,7 @@ window.PixelAccount = (function(){
        with no reload. */
     if(document.body) document.body.classList.toggle("is-seller-view", sellerOn);
     var ol = $("openOrders"); if(ol) ol.style.display = sellerOn ? "" : "none";
-    var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = sellerOn ? "" : "none";
+    var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = "";
     if(!si || !ab) return;
     if(currentUser){
       si.style.display = "none";
@@ -5014,7 +5227,8 @@ window.PixelAccount = (function(){
   /* ----- auth page ----- */
   function friendlyErr(err){
     var c = err && err.code ? err.code : "";
-    if(c === "auth/user-not-found" || c === "auth/wrong-password" || c === "auth/invalid-credential") return "Your email or password is incorrect — please check and try again.";
+    if(c === "auth/user-not-found") return "No account exists for this email — please Sign Up first, then Sign In.";
+    if(c === "auth/wrong-password" || c === "auth/invalid-credential") return "Your email or password is incorrect — if you have no account yet, please Sign Up first, then Sign In.";
     if(c === "auth/email-already-in-use") return "This email is already registered — please sign in.";
     if(c === "auth/weak-password") return "Please use a password of at least 6 characters.";
     if(c === "auth/invalid-email") return "Please enter a valid email address.";
@@ -5037,7 +5251,10 @@ window.PixelAccount = (function(){
     var t = $("authTitle"); if(t) t.textContent = m === "signup" ? "Create Account" : "Sign In";
     var sb = $("authSubmit"); if(sb) sb.textContent = m === "signup" ? "Sign Up" : "Sign In";
     var pw = $("authPass"); if(pw) pw.setAttribute("autocomplete", m === "signup" ? "new-password" : "current-password");
+    var ni = $("authName"); if(ni) ni.required = m === "signup";
+    var gb2 = $("googleBtn"); if(gb2) gb2.textContent = m === "signup" ? "Sign up with Google" : "Sign in with Google";
     showErr("");
+    showResendBtn(false);
   }
   function openAuth(p){
     purpose = p || "";
@@ -5045,9 +5262,10 @@ window.PixelAccount = (function(){
     if(note){
       if(purpose === "seller") note.innerHTML = "The seller dashboard is for the seller only. Seller: sign in with your <b>seller account</b> (shakircadet1@gmail.com) — email/password above or Google below, both work. Customers sign in here with their own accounts — every customer can see only their own orders, nobody else can.";
       else if(purpose === "checkout" || purpose === "custom") note.innerHTML = "Sign-in is required to place an order — so your files are delivered only to you and nobody else can see your order. After signing in, you will return to your order.";
-      else note.innerHTML = "Sign in with your account. Every customer can see only their own orders and files — the website is open to all customers so they can place orders, but each customer’s orders are private and the seller dashboard is for the seller only.";
+      else note.innerHTML = "New here? Please <b>Sign Up</b> first — Sign In works only with an account you have already created. Every customer can see only their own orders and files — the website is open to all customers so they can place orders, but each customer’s orders are private and the seller dashboard is for the seller only.";
     }
     showErr("");
+    showResendBtn(false);
     paintVerifyBoxes();
     var pg = $("authPage");
     if(pg){ pg.classList.add("open"); pg.scrollTop = 0; }
@@ -5090,14 +5308,19 @@ window.PixelAccount = (function(){
     var email = $("authEmail").value.trim();
     var pass = $("authPass").value;
     if(!email || !pass){ showErr("Please enter your email and password."); return; }
+    if(mode === "signup" && !$("authName").value.trim()){ showErr("Please enter your name — Sign Up needs your name, email and password."); return; }
     showErr("");
+    showResendBtn(false);
     var btn = $("authSubmit"); if(btn) btn.disabled = true;
-    var pr;
+    authFlowBusy = true;
+    var pr; var newUser = null;
     if(mode === "signup"){
-      /* After sign-up, send the Firebase email verification link.
-         The new user is signed in and can browse, rate and track,
-         but cannot place an order until the email is verified. */
+      /* After sign-up, send the Firebase email verification link,
+         then sign the new account straight back out (handled in
+         the .then below): sign-up is not a sign-in — the account
+         may sign in only after its email is verified. */
       pr = auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
+        newUser = cred && cred.user;
         var jobs = [];
         var nm = $("authName").value.trim();
         if(nm && cred && cred.user) jobs.push(cred.user.updateProfile({ displayName: nm }));
@@ -5110,21 +5333,86 @@ window.PixelAccount = (function(){
     } else {
       pr = auth.signInWithEmailAndPassword(email, pass);
     }
-    pr.then(function(){
+    pr.then(function(cred){
       if(btn) btn.disabled = false;
       if(signupVerifySent){
         signupVerifySent = false;
-        paintVerifyBoxes();
-        var vm = $("verifyMsg");
-        if(vm) vm.textContent = "Account created — a verification link was sent to " + email + ". Verify your email, then tap “I have verified — check again”. You can browse, rate and track meanwhile, but ordering needs a verified email.";
-        if(typeof showToast === "function") showToast("Account created — please verify your email (link sent)");
-        return;
+        /* Sign-up is NOT a sign-in: the verification email has
+           been sent, so sign the new account straight back out.
+           It may sign in only after the email is verified. */
+        return auth.signOut().catch(function(){}).then(function(){
+          authFlowBusy = false;
+          setMode("signin");
+          showResendBtn(true);
+          showErr("Account created — a verification link was sent to " + email + ". Please verify your email first, then Sign In.");
+          if(typeof showToast === "function") showToast("Account created — please verify your email first, then sign in");
+        });
       }
+      if(mode === "signin" && cred && cred.user && !cred.user.emailVerified){
+        /* Unverified email: sign-in is refused. A fresh
+           verification link is sent, the account is signed back
+           out, and the verify-first message + Resend option are
+           shown (see blockUnverified). */
+        return blockUnverified(cred.user, email).then(function(){ authFlowBusy = false; });
+      }
+      authFlowBusy = false;
       afterSignIn();
     })
-      .catch(function(err){ if(btn) btn.disabled = false; showErr(friendlyErr(err)); });
+      .catch(function(err){
+        if(btn) btn.disabled = false;
+        authFlowBusy = false;
+        var code = err && err.code ? err.code : "";
+        /* Sign In never creates an account: with no account for
+           this email, move the visitor to the Sign Up form (name,
+           email, password) — an account must be created first,
+           then Sign In works. */
+        if(mode === "signin" && code === "auth/user-not-found") setMode("signup");
+        showErr(friendlyErr(err));
+      });
   }
   var signupVerifySent = false;
+  /* Email-verification gate: an email/password account may sign
+     in ONLY after its email is verified. Sign-up sends the
+     verification email and signs the new account straight back
+     out; a sign-in with an unverified email sends a fresh
+     verification link, signs back out, shows the "verify first"
+     message and reveals the Resend button. Google accounts are
+     verified by Google, so they are never blocked. authFlowBusy
+     marks a submit/resend flow in progress so the restored-
+     session gate in onAuthStateChanged leaves it alone. */
+  var authFlowBusy = false;
+  function showResendBtn(show){
+    var rb = $("authResendBtn"); if(rb) rb.style.display = show ? "" : "none";
+  }
+  function blockUnverified(user, email){
+    var em = email || (user && user.email) || "";
+    var sendP = (user && !user.emailVerified) ? user.sendEmailVerification().catch(function(){}) : Promise.resolve();
+    return sendP.then(function(){
+      return auth.signOut().catch(function(){});
+    }).then(function(){
+      setMode("signin");
+      showResendBtn(true);
+      showErr("Your email is not verified yet — please verify your email first. We have sent a verification link to " + em + ". Open it, then Sign In again. No link? Tap “Resend verification email” below.");
+      if(typeof showToast === "function") showToast("Please verify your email first — verification link sent to " + em);
+    });
+  }
+  function resendVerificationFromForm(){
+    if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
+    var email = ($("authEmail").value || "").trim();
+    var pass = $("authPass").value;
+    if(!email || !pass){ showErr("Enter your email and password above, then tap Resend verification email."); return; }
+    showErr("");
+    authFlowBusy = true;
+    auth.signInWithEmailAndPassword(email, pass).then(function(cred){
+      if(cred.user && cred.user.emailVerified){
+        authFlowBusy = false;
+        showResendBtn(false);
+        afterSignIn();
+        return null;
+      }
+      return blockUnverified(cred.user, email).then(function(){ authFlowBusy = false; });
+    }).catch(function(err){ authFlowBusy = false; showErr(friendlyErr(err)); });
+  }
   function googleSignIn(){
     if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
     showErr("");
@@ -5155,6 +5443,21 @@ window.PixelAccount = (function(){
           }
         });
     } catch(e){ fallBackToRedirect(); }
+  }
+
+  /* ----- Account page (the signed-in account's own details) ----- */
+  function openAccount(){
+    if(!currentUser){ openAuth(""); return; }
+    var nm = $("accountName"); if(nm) nm.textContent = currentUser.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "—");
+    var em2 = $("accountEmail"); if(em2) em2.textContent = currentUser.email || "—";
+    var tp = $("accountType"); if(tp) tp.textContent = isSeller() ? "Seller Account" : "Customer";
+    var pg = $("accountPage");
+    if(pg){ pg.classList.add("open"); pg.scrollTop = 0; }
+    document.body.style.overflow = "hidden";
+  }
+  function closeAccount(){
+    var pg = $("accountPage");
+    if(pg && pg.classList.contains("open")){ pg.classList.remove("open"); document.body.style.overflow = ""; }
   }
 
   /* ----- My Orders (only the signed-in customer's own orders) ----- */
@@ -5438,6 +5741,18 @@ window.PixelAccount = (function(){
       if(isSeller()){ if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
       else if(typeof showToast === "function") showToast("Seller access only — this dashboard is for the seller only");
     });
+    var abuy = $("acctBuyBtn");
+    if(abuy) abuy.addEventListener("click", function(){
+      var m = $("acctMenu"); if(m) m.style.display = "none";
+      var sl = document.querySelector('a[data-route="shop"]');
+      if(sl && sl.href) window.location.href = sl.href;
+    });
+    var ainf = $("acctInfoBtn");
+    if(ainf) ainf.addEventListener("click", function(){ var m = $("acctMenu"); if(m) m.style.display = "none"; openAccount(); });
+    var acl = $("accountClose"); if(acl) acl.addEventListener("click", closeAccount);
+    var apg2 = $("accountPage"); if(apg2) apg2.addEventListener("click", function(e){ if(e.target === this) closeAccount(); });
+    var aob = $("accountOrdersBtn"); if(aob) aob.addEventListener("click", function(){ closeAccount(); openMyOrders(); });
+    var aout = $("accountOutBtn"); if(aout) aout.addEventListener("click", function(){ closeAccount(); var so2 = $("acctOutBtn"); if(so2) so2.click(); });
     var rv = $("resendVerifyBtn"); if(rv) rv.addEventListener("click", function(){ resendVerification($("verifyMsg")); });
     var cv = $("checkVerifyBtn"); if(cv) cv.addEventListener("click", function(){ checkVerifiedAgain($("verifyMsg")); });
     var rv2 = $("resendVerifyBtn2"); if(rv2) rv2.addEventListener("click", function(){ resendVerification($("verifyMsg2")); });
@@ -5446,17 +5761,18 @@ window.PixelAccount = (function(){
     if(so) so.addEventListener("click", function(){
       var m = $("acctMenu"); if(m) m.style.display = "none";
       closeMyOrders();
-      if(auth) auth.signOut().then(function(){ if(typeof showToast === "function") showToast("Signed out"); }).catch(function(){});
+      if(auth) auth.signOut().then(function(){ if(typeof showToast === "function") showToast("Logged out"); }).catch(function(){});
     });
     var ac = $("authClose"); if(ac) ac.addEventListener("click", closeAuth);
     var ap = $("authPage"); if(ap) ap.addEventListener("click", function(e){ if(e.target === this) closeAuth(); });
     var ti = $("tabSignIn"); if(ti) ti.addEventListener("click", function(){ setMode("signin"); });
     var tu = $("tabSignUp"); if(tu) tu.addEventListener("click", function(){ setMode("signup"); });
     var af = $("authForm"); if(af) af.addEventListener("submit", submitAuth);
+    var arb = $("authResendBtn"); if(arb) arb.addEventListener("click", resendVerificationFromForm);
     var gb = $("googleBtn"); if(gb) gb.addEventListener("click", googleSignIn);
     var mc = $("myOrdersClose"); if(mc) mc.addEventListener("click", closeMyOrders);
     var mp = $("myOrdersPage"); if(mp) mp.addEventListener("click", function(e){ if(e.target === this) closeMyOrders(); });
-    document.addEventListener("keydown", function(e){ if(e.key === "Escape"){ closeAuth(); closeMyOrders(); } });
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape"){ closeAuth(); closeMyOrders(); closeAccount(); } });
     paintAccount();
   }
   wire();

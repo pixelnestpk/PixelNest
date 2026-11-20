@@ -8,13 +8,16 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v12: shop free-sample band (.shop-free-note) hidden in seller view,
-   matching the home page band. Same Fiverr-style seller/buyer view,
-   dashboard notifications, registered customers and sign-in gate fix
-   as v11. OneSignal push (Web SDK v16) — the worker imports the
-   OneSignal worker code first, so pushes arrive even when the app is
-   fully closed. Same shell, new cache version so phones pick up the
-   new build.
+   v13: seller excluded from Registered Customers; sign-up requires
+   a name, sign-in never creates an account (Sign Up first); account
+   menu Seller Account / Buy / Account / Log Out / My Orders; email
+   verification mandatory before sign-in; OneSignal REST key restored
+   so new-order pushes work again; WhatsApp-style notification
+   read/unread. Same Fiverr-style seller/buyer view, dashboard
+   notifications and sign-in gate fix as v12. OneSignal push (Web
+   SDK v16) — the worker imports the OneSignal worker code first, so
+   pushes arrive even when the app is fully closed. Same shell, new
+   cache version so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
    cached fallback), so the store opens fast on repeat visits and
@@ -37,7 +40,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v12";
+var CACHE_VERSION = "pixelnest-shell-v13";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
