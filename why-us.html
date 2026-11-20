@@ -337,16 +337,17 @@ footer a:hover{color:var(--teal)}
 /* ---------- Cart drawer ---------- */
 .overlay{position:fixed;inset:0;background:rgba(13,20,34,.55);z-index:60;display:none}
 .overlay.open{display:block}
-.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(480px,100vw);background:#fff;z-index:70;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.2)}
+.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(480px,100vw);max-width:100vw;background:#fff;z-index:70;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.2);overflow:hidden}
 .drawer.open{display:flex;animation:slideIn .22s ease-out}
 @keyframes slideIn{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
 .drawer-head h2{font-size:1.3rem}
 .icon-btn{width:44px;height:44px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:17px;display:grid;place-items:center}
-.drawer-body{flex:1;overflow:auto;padding:16px 18px calc(76px + env(safe-area-inset-bottom,0px))}
-.cart-item{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.drawer-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 18px calc(76px + env(safe-area-inset-bottom,0px))}
+.drawer-body>*{min-width:0;max-width:100%}
+.cart-item{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;max-width:100%}
 .cart-item img{width:64px;height:64px;flex:none;border-radius:10px;object-fit:cover}
-.cart-item h4{margin:0 0 2px;font-size:.95rem;color:var(--navy)}
+.cart-item h4{margin:0 0 2px;font-size:.95rem;color:var(--navy);overflow-wrap:break-word}
 .cart-item .cp{font-weight:800;color:var(--teal)}
 .qty{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
 .qty button{width:36px;height:36px;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800}
@@ -689,6 +690,17 @@ select option{color:#111827;background-color:#ffffff}
 .acct{position:relative;flex:none}
 /* Sign In is the FIRST, most prominent header control for signed-out
    visitors — a solid gold button that cannot be missed. */
+/* While Firebase auth is still resolving on page load, the header
+   account area shows as a dimmed, pulsing LOADING state - a
+   signed-in (seller) user must never see a normal, ready-looking
+   signed-out "Sign In" button flash on screen before the saved
+   session restores. The PixelAccount module removes the
+   auth-pending class from <body> the moment the auth state is
+   known (and a safety timer removes it even if Firebase never
+   answers, so the loading state can never get stuck). */
+body.auth-pending #acctArea{opacity:.55}
+body.auth-pending #signInBtn{animation:authPulse .9s ease-in-out infinite alternate}
+@keyframes authPulse{from{filter:brightness(1)}to{filter:brightness(1.15)}}
 #signInBtn{background:var(--gold);color:#17130A;border:1.5px solid var(--gold);border-radius:999px;padding:0 24px;font-weight:800;min-height:48px;font-size:1rem;cursor:pointer;box-shadow:0 6px 18px rgba(201,162,39,.35);white-space:nowrap}
 #signInBtn:hover{background:#B8931F;border-color:#B8931F}
 .acct-btn{background:transparent;color:#EAC95C;border:1.5px solid rgba(201,162,39,.7);border-radius:999px;padding:0 18px;font-weight:800;min-height:46px;font-size:.93rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
@@ -827,17 +839,18 @@ select option{color:#111827;background-color:#ffffff}
 @media (max-width:560px){ #ordersPage .pcount{flex:1 1 0;justify-content:center;padding:0 8px;font-size:.8rem} }
 </style>
 <style>
-/* ================= SELLER DASHBOARD — FULL RTL PROFESSIONAL GRID =================
+/* ================= SELLER DASHBOARD — FULL LTR PROFESSIONAL GRID =================
    No text at the top: the dashboard opens directly on the totals row.
-   The whole card runs right-to-left — the totals read TOTAL / PENDING /
-   ACTIVE / COMPLETED starting from the right edge, and the product
-   blocks fill a clean full-width grid in the same direction: the first
-   product sits at the top-right, the next one to its left, wrapping
-   onto the next row, with tight even gaps and no wasted space. A
-   product whose status dropdown is open spans the full row, so its
-   order rows (buyer name, total, Trx ID, delivery upload) stay wide
-   and readable. The manual-order form sits compactly below the grid. */
-#ordersPage .o-card{max-width:1180px;direction:rtl}
+   The whole card runs left-to-right, exactly like the rest of the
+   site — the totals read TOTAL / PENDING / ACTIVE / COMPLETED from
+   the left edge, all notification and order-detail text is
+   left-aligned, and the product blocks fill a clean full-width grid
+   in the same direction, wrapping onto the next row with tight even
+   gaps and no wasted space. A product whose status dropdown is open
+   spans the full row, so its order rows (buyer name, total, Trx ID,
+   delivery upload) stay wide and readable. The manual-order form
+   sits compactly below the grid. */
+#ordersPage .o-card{max-width:1180px;direction:ltr;text-align:left}
 #ordersPage .o-body{padding:16px 18px 24px}
 #ordersPage .o-stats{gap:10px}
 #ordersPage .o-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;box-shadow:var(--shadow-sm)}
@@ -1349,7 +1362,7 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
 #ordersPage .nd-row>b{color:var(--navy);font-weight:700;font-size:.86rem;word-break:break-word}
 </style>
 </head>
-<body id="top">
+<body id="top" class="auth-pending">
 <header>
   <div class="wrap">
     <div class="header-in">
@@ -1874,18 +1887,17 @@ document.addEventListener("click", function(e){
    with EmailJS (free tier), because this store is a static page with
    no paid backend.
 
-   >>> TO SWITCH THIS ON, fill in the three placeholders below <<<
-   1. Create a free account at https://www.emailjs.com and connect the
-      store's email service (Email Services → copy the Service ID).
-   2. Create an email template (Email Templates → copy the Template ID)
-      that uses these variables:
+   STATUS: LIVE — EMAILJS_CONFIG below holds the store's real values
+   (public key, service ID and both template IDs: the order
+   confirmation template, plus the delivery-ready template
+   template_8bmn0gq used when the seller delivers a file), so the
+   emails are sent for real orders. Both templates use these
+   variables:
         {{to_name}} {{order_id}} {{product_name}} {{order_total}}
         {{delivery_time}} {{payment_note}} {{store_name}}
-      and set the template's "To Email" field to {{to_email}} so the
-      email goes to the CUSTOMER's email address from their checkout.
-   3. Copy the Public Key from Account → General.
-   Until all three placeholders are replaced with real values, NO email
-   is attempted. The send is best-effort and fully guarded: if EmailJS
+   and their "To Email" field is {{to_email}}, so each email goes
+   to the CUSTOMER's email address from their checkout.
+   The send is best-effort and fully guarded: if EmailJS
    is not configured, fails to load, or the send fails, the order still
    places and the on-screen confirmation still shows — the failure is
    ignored silently and checkout NEVER breaks because of email. */
@@ -2050,7 +2062,17 @@ function saveDiscount(){
     else window.localStorage.removeItem(DISCOUNT_KEY);
   } catch(e){}
 }
-function clearDiscount(){ appliedDiscount = null; saveDiscount(); }
+function clearDiscount(){
+  appliedDiscount = null; saveDiscount();
+  /* The "Code applied" text and the typed code must never outlive
+     the discount itself: when the discount goes away (the cart
+     emptied, the code was removed, or it failed its checkout
+     re-check), the drawer returns to the exact no-code state, so
+     an item added afterwards is never shown as discounted while
+     the full price is charged. */
+  var dci = document.getElementById("discountCodeInput"); if(dci) dci.value = "";
+  setDiscountFeedback("");
+}
 function discountAmount(){
   if(!appliedDiscount) return 0;
   var s = cartSum();
@@ -2460,12 +2482,12 @@ function buildOrderText(){
   var closing = cartSum()===0
     ? "This order is the FREE sample pack — no payment needed."
     : (trx
-      ? "Payment sent to 03361520429 via "+pay+" — Trx ID: "+trx+". Please deliver my file "+cartDeliveryText()+". Thank you!"
+      ? "Payment sent to 03361520429 via "+pay+" — Trx ID: "+trx+". Please deliver my file within 1–3 days after payment is confirmed, depending on the product. Thank you!"
       : "Payment pending — I will pay "+fmt(payableTotal())+" to 03361520429 via "+pay+".");
   var cvDetEl=document.getElementById("fCvDetails");
   var cvDet=(cart["cv"] && cvDetEl) ? cvDetEl.value.trim() : "";
   if(appliedDiscount && discountAmount() > 0) lines.push("","Discount ("+appliedDiscount.code+"): −"+fmt(discountAmount()));
-  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(payableTotal()))+"*","Payment method: "+pay,"Payment number: 03361520429","Trx ID: "+(trx || "not submitted"),"Delivery: "+cartDeliveryText(),"","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"");
+  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(payableTotal()))+"*","Payment method: "+pay,"Payment number: 03361520429","Trx ID: "+(trx || "not submitted"),"Delivery: within 1–3 days, depending on the product","","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"");
   if(cvDet) lines.push("CV details (for my Europass CV):", cvDet, "");
   lines.push(closing,"Store: https://aloneboy5186khan-creator.github.io/PixelNest/");
   return lines.join("\n");
@@ -2560,7 +2582,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
      panel shows — see the end of this handler). */
   var orderEmail = document.getElementById("fEmail").value.trim();
   var orderName = document.getElementById("fName").value.trim();
-  var orderDelivery = cartDeliveryText();
+  var orderDelivery = (orderTotal === 0) ? "within 1 day" : "within 1–3 days, depending on the product";
   var usedDiscountCode = appliedDiscount ? appliedDiscount.code : "";
   var usedDiscountAmount = discountAmount();
   lastOrderWasFree = orderTotal === 0 && !!cart["free-sample"];
@@ -2598,10 +2620,10 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
      shown to the customer. */
   var thenStatus = "";
   var deliveryNote = lastOrderWasFree
-    ? "FREE Starter Sample Pack — no payment needed. Your order is Pending until the seller accepts it; then the sample files will be uploaded in the app " + cartDeliveryText() + " — download them from My Orders or the Track Order page"
+    ? "FREE Starter Sample Pack — no payment needed. Your order is Pending until the seller accepts it; then the sample files will be uploaded in the app within 1 day — download them from My Orders or the Track Order page"
     : (trxId
-      ? "Payment received via " + payMethod + " (Trx ID submitted) — your order is Pending until the seller accepts it; then your file will be uploaded in the app " + cartDeliveryText() + "; download it from My Orders or the Track Order page"
-      : "Payment pending — pay " + fmt(orderTotal) + " via " + payMethod + " to 03361520429, then share the Trx ID with the seller on chat. Your file will be uploaded in the app " + cartDeliveryText() + " after payment");
+      ? "Payment received via " + payMethod + " (Trx ID submitted) — your order is Pending until the seller accepts it; then your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product; download it from My Orders or the Track Order page"
+      : "Payment pending — pay " + fmt(orderTotal) + " via " + payMethod + " to 03361520429, then share the Trx ID with the seller on chat. Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product");
   var trackPromise = null;
   if(window.PixelOrders) trackPromise = window.PixelOrders.createTracking({
     orderId: currentOrderId,
@@ -2638,11 +2660,11 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   var payInfo = document.getElementById("successPayInfo");
   if(payInfo){
     if(lastOrderWasFree){
-      payInfo.innerHTML = "This order is <b>Pending</b> — the FREE sample pack needs no payment. The seller will accept your order and upload the sample files in the app " + cartDeliveryText() + " — download them from My Orders or track the order any time with your Order ID.";
+      payInfo.innerHTML = "This order is <b>Pending</b> — the FREE sample pack needs no payment. The seller will accept your order and upload the sample files in the app within 1 day — download them from My Orders or track the order any time with your Order ID.";
     } else if(trxId){
-      payInfo.innerHTML = "Payment received via <b>" + escHtml(payMethod) + "</b> — Trx ID: <b>" + escHtml(trxId) + "</b>. Your order is now <b>Pending</b> — the seller will accept it shortly, and your file will then be delivered in the app " + cartDeliveryText() + " — download it from My Orders or track it live with your Order ID.";
+      payInfo.innerHTML = "Payment received via <b>" + escHtml(payMethod) + "</b> — Trx ID: <b>" + escHtml(trxId) + "</b>. Your order is now <b>Pending</b> — the seller will accept it shortly, and your file will then be delivered in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or track it live with your Order ID.";
     } else {
-      payInfo.innerHTML = "Your order is <b>Pending — payment pending</b>. Pay <b>" + fmt(orderTotal) + "</b> via " + escHtml(payMethod) + " to <b>03361520429</b> in your payment app, then share the Trx ID with the seller on chat (button below). Your file is delivered " + cartDeliveryText() + " after payment.";
+      payInfo.innerHTML = "Your order is <b>Pending — payment pending</b>. Pay <b>" + fmt(orderTotal) + "</b> via " + escHtml(payMethod) + " to <b>03361520429</b> in your payment app, then share the Trx ID with the seller on chat (button below). Your file is delivered within 1–3 days after payment is confirmed, depending on the product.";
     }
   }
   var chatLink = document.getElementById("successChatLink");
@@ -4870,6 +4892,7 @@ window.PixelAccount = (function(){
     function acceptUser(u){
       currentUser = u || null;
       authStateKnown = true;
+      if(document.body) document.body.classList.remove("auth-pending");
       paintAccount();
       if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else stopOrderNotify();
       paintVerifyBoxes();
@@ -4880,6 +4903,7 @@ window.PixelAccount = (function(){
     function rejectUnverified(){
       currentUser = null;
       authStateKnown = true;
+      if(document.body) document.body.classList.remove("auth-pending");
       paintAccount();
       auth.signOut().catch(function(){});
       if(typeof showToast === "function") showToast("Please verify your email first, then sign in");
@@ -5144,6 +5168,11 @@ window.PixelAccount = (function(){
   }
   function openAuth(p){
     purpose = p || "";
+    /* The dialog ALWAYS opens on the Sign In tab - including when a
+       signed-out visitor taps Place Order. (A failed sign-in then
+       auto-switches to the Sign Up form by itself; see the submit
+       handler.) */
+    setMode("signin");
     var note = $("authNote");
     if(note){
       if(purpose === "seller") note.innerHTML = "The seller dashboard is for the seller only. Seller: sign in with your <b>seller account</b> (shakircadet1@gmail.com) — email/password above or Google below, both work. Customers sign in here with their own accounts — every customer can see only their own orders, nobody else can.";
@@ -5248,11 +5277,13 @@ window.PixelAccount = (function(){
         if(btn) btn.disabled = false;
         authFlowBusy = false;
         var code = err && err.code ? err.code : "";
-        /* Sign In never creates an account: with no account for
-           this email, move the visitor to the Sign Up form (name,
-           email, password) — an account must be created first,
-           then Sign In works. */
-        if(mode === "signin" && code === "auth/user-not-found") setMode("signup");
+        /* Sign In never creates an account: on ANY sign-in error,
+           move the visitor to the Sign Up form automatically
+           (name, email, password stay filled in) — an account must
+           be created first, then Sign In works. The error message
+           is shown after the switch (setMode clears it), so it
+           stays readable on the Sign Up form. */
+        if(mode === "signin") setMode("signup");
         showErr(friendlyErr(err));
       });
   }
@@ -5297,7 +5328,7 @@ window.PixelAccount = (function(){
         return null;
       }
       return blockUnverified(cred.user, email).then(function(){ authFlowBusy = false; });
-    }).catch(function(err){ authFlowBusy = false; showErr(friendlyErr(err)); });
+    }).catch(function(err){ authFlowBusy = false; if(mode === "signin") setMode("signup"); showErr(friendlyErr(err)); });
   }
   function googleSignIn(){
     if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
@@ -5693,6 +5724,10 @@ window.PixelAccount = (function(){
   }
   wire();
   init();
+  /* Safety net for the header auth-pending state: if Firebase auth
+     somehow never resolves, reveal the header buttons anyway after
+     a few seconds rather than leaving them hidden for good. */
+  setTimeout(function(){ if(document.body) document.body.classList.remove("auth-pending"); }, 2500);
 
   return {
     user: function(){ return currentUser; },
