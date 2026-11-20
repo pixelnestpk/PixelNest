@@ -1,6 +1,6 @@
 {
   "background_color": "#101318",
-  "description": "Digital products delivered right in the app \u2014 wall art, colouring packs, planners, Excel templates, CVs and Canva templates, made by a working freelancer in Pakistan.",
+  "description": "Digital products delivered right in the app — wall art, colouring packs, planners, Excel templates, CVs and thumbnails, made by a working freelancer in Pakistan.",
   "display": "standalone",
   "display_override": [
     "standalone",
@@ -28,7 +28,7 @@
   ],
   "id": "../index.html",
   "lang": "en",
-  "name": "PixelNest \u2014 Digital Products Store",
+  "name": "PixelNest — Digital Products Store",
   "orientation": "portrait",
   "prefer_related_applications": false,
   "scope": "../",
