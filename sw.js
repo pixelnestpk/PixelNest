@@ -1,5 +1,5 @@
 /* PixelNest service worker — app-shell caching.
-   v5: related-products + bundle + EmailJS + Easypaisa guide release — same shell, new cache version
+   v6: EmailJS real values release — same shell, new cache version
    so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
@@ -23,7 +23,7 @@
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v5";
+var CACHE_VERSION = "pixelnest-shell-v6";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
