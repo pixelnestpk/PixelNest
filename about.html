@@ -3829,20 +3829,26 @@ function renderTrackResult(id, data){
   if(status === "Completed"){
     deliveryHtml = '<div class="track-delivered">Delivered — your file has been delivered.</div>' + filesHtml + ownerFilesNote;
   } else {
-    /* Per-order delivery message — one wording everywhere: paid
-       orders are delivered within 1–3 days after payment is
-       confirmed, depending on the product; the FREE sample and
-       other 1-day orders are delivered within 1 day. Orders placed
-       earlier carry a saved deliveryNote — when it still uses the
-       old short wording it is upgraded here, so the customer always
-       sees the current wording. Custom orders keep their own
-       2–3 day note. */
+    /* Per-order delivery message — one wording everywhere: a paid
+       1-day product is delivered within 1 day after payment is
+       confirmed; every other paid order within 1–3 days after
+       payment is confirmed, depending on the product; the FREE
+       sample and other no-payment orders are delivered within
+       1 day. Orders placed earlier carry a saved deliveryNote —
+       when it still uses the old short wording (e.g. “within
+       1 day after payment” without “is confirmed”) it is upgraded
+       here, so the customer always sees the current wording.
+       Custom orders keep their own 2–3 day note, and the FREE
+       sample keeps its “no payment needed” note. */
     var trackMsg = data.deliveryNote || "";
     var oneDayOrder = free || Number(data.total) === 0 || /within 1 day/i.test(trackMsg);
-    if(!trackMsg || (trackMsg.indexOf("after payment is confirmed") === -1 && !oneDayOrder && trackMsg.indexOf("2–3 days") === -1)){
-      trackMsg = oneDayOrder
-        ? "Your file will be uploaded in the app within 1 day — download it from My Orders or here on the Track Order page"
-        : "Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or here on the Track Order page";
+    var stdTrackMsg = oneDayOrder
+      ? (free || Number(data.total) === 0
+          ? "Your file will be uploaded in the app within 1 day — download it from My Orders or here on the Track Order page"
+          : "Your file will be uploaded in the app within 1 day after payment is confirmed — download it from My Orders or here on the Track Order page")
+      : "Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or here on the Track Order page";
+    if(!trackMsg || (trackMsg.indexOf("after payment is confirmed") === -1 && trackMsg.indexOf("2–3 days") === -1 && !(free && trackMsg.indexOf("no payment needed") !== -1))){
+      trackMsg = stdTrackMsg;
     }
     deliveryHtml = '<div class="track-note">' + escHtml(trackMsg) + '</div>'
       + filesHtml
@@ -5288,11 +5294,13 @@ window.PixelAccount = (function(){
         /* Sign In never creates an account: on ANY sign-in error,
            move the visitor to the Sign Up form automatically
            (name, email, password stay filled in) — an account must
-           be created first, then Sign In works. The error message
-           is shown after the switch (setMode clears it), so it
-           stays readable on the Sign Up form. */
-        if(mode === "signin") setMode("signup");
-        showErr(friendlyErr(err));
+           be created first, then Sign In works. After the switch,
+           the Sign Up form shows a “No account found for this
+           email” message instead of the old sign-in error (setMode
+           clears the error box, so the message is set after it). */
+        var wasSignIn = mode === "signin";
+        if(wasSignIn) setMode("signup");
+        showErr(wasSignIn ? "No account found for this email. Create your account below." : friendlyErr(err));
       });
   }
   var signupVerifySent = false;
@@ -5336,7 +5344,7 @@ window.PixelAccount = (function(){
         return null;
       }
       return blockUnverified(cred.user, email).then(function(){ authFlowBusy = false; });
-    }).catch(function(err){ authFlowBusy = false; if(mode === "signin") setMode("signup"); showErr(friendlyErr(err)); });
+    }).catch(function(err){ authFlowBusy = false; var wasSignIn = mode === "signin"; if(wasSignIn) setMode("signup"); showErr(wasSignIn ? "No account found for this email. Create your account below." : friendlyErr(err)); });
   }
   function googleSignIn(){
     if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }

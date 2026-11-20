@@ -8,18 +8,21 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v17: 3 re-fixes from the #51 live check — cart drawer Remove
-   button fully visible (36px circle now only on +/- buttons,
-   drawer 440px), header loading state in the HTML itself
-   (auth-pending on <body> + first-paint Loading pill, no
-   signed-out flash), delivery wording unified (1-3 days after
-   payment, depending on the product; within 1 day for FREE
-   sample / 1-day orders). Same auto-switch on ANY sign-in error,
-   LAUNCH10 stale state fix, checkout gate on Sign In, banner
-   typo fixed, EmailJS comment LIVE, seller dashboard LTR,
-   delivery email (template_8bmn0gq), persistent sign-in, seller
-   exclusion, sign-up name, email verification, WhatsApp-style
-   notification read/unread and OneSignal REST key as v16.
+   v18: 2 small fixes vs live #52 — auto-switch now shows a clear
+   "No account found for this email. Create your account below."
+   message on the Sign Up form (instead of repeating the old
+   sign-in error), and the Track Order per-order message now says
+   "within 1 day after payment is confirmed" for paid 1-day
+   products (rest: "within 1–3 days after payment is confirmed,
+   depending on the product"). OneSignal REST key restored
+   verbatim (sendNewOrder works again). Same cart drawer 440px
+   Remove fix, header loading state in the HTML itself, footer
+   delivery wording, auto-switch on ANY sign-in error, LAUNCH10
+   stale state fix, checkout gate on Sign In, banner typo fixed,
+   EmailJS comment LIVE, seller dashboard LTR, delivery email
+   (template_8bmn0gq), persistent sign-in, seller exclusion,
+   sign-up name, email verification, WhatsApp-style notification
+   read/unread as v17.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first, so pushes arrive even when the app is fully
    closed. Same shell, new cache version so phones pick up the new
@@ -46,7 +49,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v17";
+var CACHE_VERSION = "pixelnest-shell-v18";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
