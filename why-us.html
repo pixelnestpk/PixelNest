@@ -657,6 +657,23 @@ select option{color:#111827;background-color:#ffffff}
 .pay-num-row b{display:block;font-size:1.12rem;color:var(--navy);letter-spacing:.02em}
 .pay-num-row button{flex:none;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:9px 16px;font-weight:800;min-height:42px;cursor:pointer}
 .pay-num-row button:hover{background:#232833}
+/* Easypaisa 3-step visual guide inside the payment box — clean
+   numbered step cards (no app screenshots). */
+.pay-steps{display:grid;gap:8px;margin-top:10px}
+.pay-step{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--gold-line);border-radius:10px;padding:9px 12px}
+.pay-step .ps-num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center;line-height:1}
+.pay-step p{margin:0;font-size:.85rem;line-height:1.45}
+/* "Customers also bought" row inside each shop card */
+.also{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.also-label{font-size:.7rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.also-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.also-item{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;font:inherit}
+.also-item:hover{border-color:var(--navy)}
+.also-item img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:6px;display:block}
+.also-name{font-size:.72rem;font-weight:700;color:var(--navy);line-height:1.25}
+.also-price{font-size:.72rem;font-weight:800;color:var(--teal)}
+/* Struck-through regular total shown next to a bundle price */
+.price .was-price{font-size:1rem;color:var(--muted);font-weight:600}
 .success .chat-btn{display:flex;width:100%;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:12px;min-height:50px;height:auto;padding:11px 14px;line-height:1.3;text-align:center;white-space:normal;margin-top:10px;font-weight:800;text-decoration:none;align-items:center;justify-content:center}
 .success .chat-btn:hover{background:var(--soft)}
 .custom-success{background:#F8F1DC;color:#1E222B;border-radius:12px;padding:14px 16px}
@@ -1343,6 +1360,11 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
             <span>Send Easypaisa payment to this number<b>03361520429</b></span>
             <button type="button" id="copyPayNum">Copy Number</button>
           </div>
+          <div class="pay-steps" aria-label="How to pay with Easypaisa — 3 steps">
+            <div class="pay-step"><span class="ps-num">1</span><p><b>Open your Easypaisa app</b> on your phone.</p></div>
+            <div class="pay-step"><span class="ps-num">2</span><p><b>Send the exact amount</b> shown above to <b>03361520429</b>.</p></div>
+            <div class="pay-step"><span class="ps-num">3</span><p><b>Copy the Trx ID</b> from Easypaisa and paste it in the field below.</p></div>
+          </div>
           <p>Pay in your Easypaisa app <b>first</b>, then paste the Transaction ID below and tap “Place Order”. A paid order <b>cannot be placed without a Trx ID</b> — your order completes right here, no WhatsApp step.</p>
         </div>
         <label style="margin-top:10px">Transaction ID (Trx ID) — <span style="color:#B91C1C">required for paid orders</span> <input id="fTrx" placeholder="e.g. 12345678901 — from your payment app" autocomplete="off"><span class="field-hint">Pay first via <b>Easypaisa to 03361520429</b>, then paste the Trx ID here — your order is placed as <b>Pending</b>, and the seller accepts it once your payment is confirmed. <b>Without a Trx ID, a paid order will not be placed.</b> Only the FREE sample (Rs. 0) needs no Trx ID.</span></label>
@@ -1427,7 +1449,7 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       </div>
     </div>
     <div class="related">
-      <h3>You may also like</h3>
+      <h3>Customers also bought</h3>
       <div class="rel-grid" id="relGrid"></div>
     </div>
   </div>
@@ -1581,18 +1603,89 @@ document.addEventListener("click", function(e){
   if(a) armWebFallback(a.getAttribute("data-wa-web") || waWebUrl());
 });
 
+/* ================= ORDER CONFIRMATION EMAIL (EmailJS) =================
+   After a shop order is placed, the customer is emailed their Order ID,
+   product name, total (the discounted total when a code was used),
+   delivery time and the Easypaisa payment note — sent from the browser
+   with EmailJS (free tier), because this store is a static page with
+   no paid backend.
+
+   >>> TO SWITCH THIS ON, fill in the three placeholders below <<<
+   1. Create a free account at https://www.emailjs.com and connect the
+      store's email service (Email Services → copy the Service ID).
+   2. Create an email template (Email Templates → copy the Template ID)
+      that uses these variables:
+        {{to_name}} {{order_id}} {{product_name}} {{order_total}}
+        {{delivery_time}} {{payment_note}} {{store_name}}
+      and set the template's "To Email" field to {{to_email}} so the
+      email goes to the CUSTOMER's email address from their checkout.
+   3. Copy the Public Key from Account → General.
+   Until all three placeholders are replaced with real values, NO email
+   is attempted. The send is best-effort and fully guarded: if EmailJS
+   is not configured, fails to load, or the send fails, the order still
+   places and the on-screen confirmation still shows — the failure is
+   ignored silently and checkout NEVER breaks because of email. */
+var EMAILJS_CONFIG = {
+  publicKey: "YOUR_EMAILJS_PUBLIC_KEY",
+  serviceId: "YOUR_EMAILJS_SERVICE_ID",
+  templateId: "YOUR_EMAILJS_TEMPLATE_ID"
+};
+function emailJsConfigured(){
+  return EMAILJS_CONFIG.publicKey.indexOf("YOUR_") !== 0
+      && EMAILJS_CONFIG.serviceId.indexOf("YOUR_") !== 0
+      && EMAILJS_CONFIG.templateId.indexOf("YOUR_") !== 0;
+}
+function sendOrderConfirmationEmail(d){
+  try {
+    if(!emailJsConfigured()) return;
+    if(typeof emailjs === "undefined" || !emailjs.send) return;
+    if(!d || !d.toEmail) return;
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    var sent = emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+      to_email: d.toEmail,
+      to_name: d.toName || "",
+      order_id: d.orderId || "",
+      product_name: d.productName || "",
+      order_total: d.totalText || "",
+      delivery_time: d.deliveryText || "",
+      payment_note: d.paymentNote || "",
+      store_name: "PixelNest"
+    });
+    if(sent && sent.catch) sent.catch(function(){ /* ignored — email is best-effort only */ });
+  } catch(e){ /* ignored — email must never break checkout */ }
+}
+
 var PRODUCTS = [
   { id:"free-sample", cat:"printable", badge:"100% Free", name:"FREE Starter Sample Pack", desc:"Try the quality before you buy — sample pages from the wall art, colouring, planner and Excel packs, free to order right here on the website. No payment needed.", price:0, delivery:"within 1 day", dmax:1, img:"assets/free-sample.webp", img2:"assets/colouring.webp", style1:"What's Inside — All 4 Packs", style2:"Colouring Samples", alt:"Free sample pack collage — a wall art poster, a kids colouring page, a planner page and an Excel budget sheet", format:"Sample files", contents:"Sample pages from 4 packs", includes:["2 printable wall art posters (sample set)","5 kids colouring pages (PNG)","1 planner page + 1 Excel budget sheet sample","Delivered in the app like every order — no payment needed"] },
   { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/wall-art.webp", img2:"assets/wall-art-2.webp", img3:"assets/wall-art-3.webp", style1:"Calligraphy & Art Set", style2:"Mosque Sunset", style3:"Ayatul Kursi Calligraphy", alt:"Two posters from the Wall Art Pack — Ayatul Kursi calligraphy in gold on green, and a mosque silhouette at sunset", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
   { id:"colouring", cat:"printable", badge:"For Kids", name:"Kids Colouring Pack — 50 Pages", desc:"Cute animals, flowers, cars and cartoon characters. Print at home and keep the kids busy and happy for hours.", price:490, delivery:"within 1 day", dmax:1, img:"assets/colouring.webp", img2:"assets/colouring-2.webp", img3:"assets/colouring-3.webp", style1:"Cute Puppy", style2:"Bunny Page", style3:"Aeroplane Page", alt:"Children's colouring pages from the new 50-page pack — a cute puppy, a bunny and an aeroplane in bold black-and-white line art", format:"PNG", contents:"50 colouring pages · PNG files", includes:["50 colouring pages (PNG files)","Easy and hard levels included","Print as many copies as you like"] },
+  { id:"wall-art-colouring-bundle", cat:"design", badge:"Bundle · Save Rs. 190", name:"Wall Art + Colouring Bundle", desc:"Two best-selling packs in one order: the Islamic Wall Art Pack (20 posters) plus the Kids Colouring Pack (50 pages) — together for Rs. 1,290 instead of Rs. 1,480 when bought separately.", price:1290, was:1480, delivery:"within 1 day", dmax:1, img:"assets/wall-art.webp", img2:"assets/colouring.webp", style1:"Wall Art Pack — 20 Posters", style2:"Colouring Pack — 50 Pages", alt:"The Wall Art + Colouring Bundle — an Ayatul Kursi calligraphy poster from the Wall Art Pack and a cute puppy colouring page from the Colouring Pack", format:"PNG files", contents:"20 posters + 50 colouring pages", includes:["Islamic Wall Art Pack — all 20 posters (PNG files), exactly as sold separately","Kids Colouring Pack — all 50 pages (PNG files), exactly as sold separately","Both complete packs delivered together in the app for this one order","You save Rs. 190 compared with buying the two packs separately"] },
   { id:"planner", cat:"printable", badge:"Printable", name:"Ultimate Planner Bundle 2026", desc:"Daily, weekly and monthly planner plus habit tracker and journal pages — a full-year system in one PDF.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/planner.webp", img2:"assets/planner-2.webp", img3:"assets/planner-3.webp", style1:"Planner Pages", style2:"Weekly Spread View", style3:"Weekly + Habit Tracker", alt:"Printable daily planner and journal pages on a desk", format:"PDF", contents:"120+ pages", includes:["Daily + Weekly + Monthly planner","Habit tracker and goal pages","Journal / diary pages included free"] },
   { id:"budget", cat:"excel", badge:"Excel · Formulas Ready", name:"Excel Budget Tracker", desc:"Household expenses, salary and savings — all auto-calculated, with charts. Just type the amount; the maths is done for you.", price:790, delivery:"in 2 days", dmax:2, img:"assets/excel.webp", img2:"assets/budget-2.webp", img3:"assets/excel-3.webp", style1:"Budget Dashboard", style2:"Charts — Laptop & Phone", style3:"Inventory & Sales Sheet", alt:"Laptop showing an Excel budget tracker with charts", format:"XLSX (Excel + Google Sheets)", contents:"Monthly + yearly sheets with charts", includes:["Monthly and yearly budget sheets","Automatic charts and totals","Works in Excel and Google Sheets"] },
   { id:"invoice-bundle", cat:"excel", badge:"Excel · For Shops", name:"Invoice + Attendance + Salary Bundle", desc:"A 3-in-1 pack for small shops and offices: professional invoice, staff attendance and salary sheet — all with formulas.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/invoice.webp", img2:"assets/invoice-2.webp", style1:"Shop Counter Set", style2:"Invoice & Salary Sheet", alt:"Shop counter with invoice bills, attendance register and laptop showing salary sheet", format:"XLSX (Excel + Google Sheets)", contents:"3 templates in one bundle", includes:["Invoice template (add your own logo)","Attendance sheet (automatic present count)","Salary sheet (automatic totals)"] },
-  { id:"social", cat:"design", badge:"100 Designs", name:"Social Media Templates — 100 Posts", desc:"100 ready-made posts for Instagram and Facebook — finished JPG images, ready to post. Business, quotes and sale styles. Just add your caption and post.", price:990, delivery:"in 2 days", dmax:2, img:"assets/social.webp", img2:"assets/social-2.webp", style1:"Bold Business Posts", style2:"Pastel Style Pack", alt:"Phones showing colourful social media post templates", format:"JPG images", contents:"100 designs · square post size", includes:["100 ready-made post designs (JPG images)","Square post size (1080×1080) — ready for Instagram & Facebook","Just add your caption and post — no editing needed"] },
+  { id:"social", cat:"design", badge:"100 Designs", name:"Social Media Templates — 100 Posts", desc:"100 ready-made posts for Instagram and Facebook — finished JPG images, ready to post. Business, quotes and sale styles. Just add your caption and post.", price:990, delivery:"in 2 days", dmax:2, img:"assets/social-2.webp", img2:"assets/photo-social.jpg", style1:"Pastel Style Pack", style2:"Posts on Your Phone", alt:"Pastel social media post template cards arranged around a smartphone", format:"JPG images", contents:"100 designs · square post size", includes:["100 ready-made post designs (JPG images)","Square post size (1080×1080) — ready for Instagram & Facebook","Just add your caption and post — no editing needed"] },
   { id:"cv", cat:"business", badge:"Europass Format", name:"Professional Europass CV", desc:"One professional Europass-format CV, made for you by the seller. Share your details and receive a finished, ready-to-submit CV — delivered as a file in the app.", price:500, delivery:"in 1–2 days", dmax:2, img:"assets/cv.webp", img2:"assets/cv-2.webp", style1:"Europass Layout", style2:"Sample CV Page", alt:"Professional Europass CV samples laid out on a desk", format:"PDF + DOCX", contents:"1 Europass CV — made for you", includes:["One Europass-format CV, professionally made for you","Finished file delivered in the app (PDF + DOCX)","Your details and experience formatted to the Europass standard","One free correction if a detail needs fixing"] },
   { id:"ebook-guide", cat:"business", badge:"Ebook", name:"Ebook: Start Freelancing — Urdu Guide", desc:"A step-by-step Urdu guide to starting with Fiverr, data entry and digital products. Written in simple language for beginners.", price:990, delivery:"within 1 day", dmax:1, img:"assets/ebook.webp", img2:"assets/ebook-2.webp", style1:"Reading on Tablet", style2:"Cover & Desk View", alt:"Tablet showing a freelancing ebook guide on a freelancer's desk", format:"PDF", contents:"60+ pages", includes:["60+ pages in simple Urdu","Step-by-step guidance with diagrams and checklists","List of common beginner mistakes"] },
   { id:"thumbnail", cat:"design", badge:"For YouTubers", name:"YouTube Thumbnail Pack — 30 Templates", desc:"30 ready-made YouTube thumbnails (PNG, 1280×720), designed to earn clicks. Add your own text in any free photo editor and put it on your video.", price:790, delivery:"within 1 day", dmax:1, img:"assets/thumbnails.webp", img2:"assets/thumbnails-2.webp", style1:"Template Grid", style2:"Gaming, Food & Travel", alt:"Monitor showing a grid of bold colourful YouTube thumbnails", format:"PNG images", contents:"30 designs + font & colour guide", includes:["30 ready-made thumbnails (PNG, 1280×720)","Vlog, tech, cooking and Islamic styles","Font and colour guide included"] }
 ];
+
+/* "Customers also bought" — hand-picked related products for every
+   catalogue item, always from OTHER categories, shown under each
+   product on its detail page and as a compact row on its shop card.
+   Keys and values are product ids from PRODUCTS above. */
+var RELATED = {
+  "free-sample": ["wall-art", "colouring", "planner"],
+  "wall-art": ["colouring", "planner", "ebook-guide"],
+  "colouring": ["wall-art", "social", "thumbnail"],
+  "wall-art-colouring-bundle": ["planner", "ebook-guide", "thumbnail"],
+  "planner": ["budget", "invoice-bundle", "cv"],
+  "budget": ["invoice-bundle", "cv", "planner"],
+  "invoice-bundle": ["budget", "cv", "planner"],
+  "social": ["thumbnail", "wall-art", "colouring"],
+  "cv": ["budget", "invoice-bundle", "planner"],
+  "ebook-guide": ["wall-art", "planner", "thumbnail"],
+  "thumbnail": ["social", "wall-art", "ebook-guide"]
+};
 
 /* Cart persistence: the cart is saved in this browser (same storage
    the page already uses for its local order records and ratings),
@@ -1658,6 +1751,20 @@ function priceText(p){ return p.price===0 ? "FREE" : fmt(p.price); }
 function byId(id){ return PRODUCTS.find(function(x){ return x.id===id; }); }
 function starLine(p){ return '<span class="stars" data-rate-line="'+p.id+'"><span class="row">★★★★★</span> No reviews yet</span>'; }
 
+/* Compact "Customers also bought" row rendered at the foot of each
+   shop card — the same RELATED picks the product detail page shows.
+   Each item is a button with data-sample, so the page's delegated
+   click handler opens that product, exactly like a card tap. */
+function alsoBoughtHtml(p){
+  var items = ((typeof RELATED !== "undefined" && RELATED[p.id]) || []).map(function(rid){ return byId(rid); }).filter(Boolean).slice(0, 3);
+  if(!items.length) return "";
+  return '<div class="also"><span class="also-label">Customers also bought</span><div class="also-row">'
+    + items.map(function(r){
+        return '<button type="button" class="also-item" data-sample="'+r.id+'" aria-label="View product: '+r.name+'"><img src="'+r.img+'" alt="" loading="lazy"><span class="also-name">'+r.name+'</span><span class="also-price">'+priceText(r)+'</span></button>';
+      }).join("")
+    + '</div></div>';
+}
+
 function renderSamples(){ if(!document.getElementById("sampleGrid")) return;
   document.getElementById("sampleGrid").innerHTML = PRODUCTS.map(function(p){
     /* Second picture: the newest third style when the product has one,
@@ -1704,11 +1811,15 @@ function openProduct(id){
   document.getElementById("ppContents").textContent = p.contents;
   var pd = document.getElementById("ppDelivery"); if(pd) pd.textContent = p.price===0 ? "In the app — My Orders / Track Order download, delivered " + p.delivery + " — no payment needed" : "In the app — My Orders / Track Order download, delivered " + p.delivery + " after payment";
   var pdb = document.getElementById("ppDeliveryBadge"); if(pdb) pdb.textContent = "✓ Delivered " + p.delivery;
-  document.getElementById("ppPrice").innerHTML = priceText(p) + '<small>'+(p.price===0 ? "Free sample · no payment needed — order it like any product; the seller accepts it and delivers it in the app" : "One-time payment · no monthly fee")+'</small>';
-  var rel = PRODUCTS.filter(function(x){ return x.id !== id; });
-  var sameCat = rel.filter(function(x){ return x.cat === p.cat; });
-  var others = rel.filter(function(x){ return x.cat !== p.cat; });
-  var picks = sameCat.concat(others).slice(0,3);
+  document.getElementById("ppPrice").innerHTML = (p.was ? '<s class="was-price">'+fmt(p.was)+'</s> ' : '') + priceText(p) + '<small>'+(p.price===0 ? "Free sample · no payment needed — order it like any product; the seller accepts it and delivers it in the app" : (p.was ? "Bundle price — you save "+fmt(p.was - p.price)+" compared with buying both packs separately" : "One-time payment · no monthly fee"))+'</small>';
+  /* "Customers also bought": the hand-picked cross-category picks in
+     RELATED, topped up from the rest of the catalogue only if a
+     product ever has fewer than three picks. */
+  var picks = (RELATED[id] || []).map(function(rid){ return byId(rid); }).filter(Boolean);
+  if(picks.length < 3){
+    PRODUCTS.forEach(function(x){ if(picks.length < 3 && x.id !== id && picks.indexOf(x) < 0) picks.push(x); });
+  }
+
   document.getElementById("relGrid").innerHTML = picks.map(function(r){
     return '<button class="rel-card" data-sample="'+r.id+'"><img src="'+r.img+'" alt="'+r.alt+'" loading="lazy"><span class="rb" style="display:block"><h4>'+r.name+'</h4><span class="rp">'+priceText(r)+'</span></span></button>';
   }).join("");
@@ -1767,10 +1878,11 @@ function renderProducts(){ if(!document.getElementById("productGrid")) return;
       + starLine(p)
       + '<p class="desc">'+p.desc+'</p>'
       + '<div class="meta">'+meta+'</div>'
-      + '<div class="price-row"><div class="price">'+priceText(p)+'<small>'+(p.price===0?"Free sample · no payment needed":"One-time payment · no monthly fee")+'</small></div>'
+      + '<div class="price-row"><div class="price">'+(p.was?'<s class="was-price">'+fmt(p.was)+'</s> ':"")+priceText(p)+'<small>'+(p.price===0?"Free sample · no payment needed":(p.was?"Bundle — you save "+fmt(p.was-p.price):"One-time payment · no monthly fee"))+'</small></div>'
       + '<div class="card-rate" data-card-rate="'+p.id+'"></div>'
       + '<div class="card-btns"><button class="add-btn" data-add="'+p.id+'">Add to Cart'+inCart+'</button>'
       + '<button class="buy-btn" data-buynow="'+p.id+'">Buy Now</button></div></div>'
+      + alsoBoughtHtml(p)
       + '</div></article>';
   }).join("");
   if(window.PixelRatings) window.PixelRatings.repaint();
@@ -1816,6 +1928,18 @@ function cartDeliveryText(){
   return best ? best.delivery : "within 1 day";
 }
 
+/* Keep EVERY "Add to Cart" button's label in step with the cart —
+   including the cloned cards on the Home and Categories pages, which
+   renderProducts() does not rebuild. Called at the end of renderCart(),
+   so removing an item in the drawer clears its "In cart (1)" label
+   immediately, with no reload. */
+function syncAddButtons(){
+  document.querySelectorAll("[data-add]").forEach(function(b){
+    var n = cart[b.getAttribute("data-add")] || 0;
+    b.textContent = "Add to Cart" + (n ? " · In cart (" + n + ")" : "");
+  });
+}
+
 function renderCart(){
   saveCart();
   document.getElementById("cartCount").textContent = cartCountTotal();
@@ -1847,6 +1971,7 @@ function renderCart(){
   document.getElementById("cartTotal").textContent = (ids.length && cartSum()===0) ? "FREE" : fmt(payableTotal());
   paintDiscountUI();
   updatePayBox();
+  syncAddButtons();
 }
 
 /* Payment box in checkout: shows the exact amount to pay to the one
@@ -2108,6 +2233,11 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   var orderProductStr = Object.keys(cart).map(function(k){ var pp = byId(k); return pp ? pp.name + " x" + cart[k] : k; }).join(", ");
   var orderQty = cartCountTotal();
   var orderTotal = payableTotal();
+  /* Captured for the order confirmation email (sent after the success
+     panel shows — see the end of this handler). */
+  var orderEmail = document.getElementById("fEmail").value.trim();
+  var orderName = document.getElementById("fName").value.trim();
+  var orderDelivery = cartDeliveryText();
   var usedDiscountCode = appliedDiscount ? appliedDiscount.code : "";
   var usedDiscountAmount = discountAmount();
   lastOrderWasFree = orderTotal === 0 && !!cart["free-sample"];
@@ -2212,6 +2342,23 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   sb.classList.add("show");
   sb.scrollIntoView({behavior:"smooth", block:"center"});
   showToast("Order " + currentOrderId + " placed on the website" + (lastOrderWasFree ? " — Pending, no payment needed" : (trxId ? " — Pending, payment received" : " — Pending, payment pending")));
+  /* Order confirmation email to the customer (EmailJS, best-effort —
+     see EMAILJS_CONFIG at the top of this script). The total sent is
+     the amount actually charged, i.e. the discounted total when a
+     code was used. If EmailJS is not configured yet or the send
+     fails, this silently does nothing — the order above is already
+     placed and confirmed on screen either way. */
+  sendOrderConfirmationEmail({
+    toEmail: orderEmail,
+    toName: orderName,
+    orderId: currentOrderId,
+    productName: orderProductStr,
+    totalText: orderTotal === 0 ? "FREE" : fmt(orderTotal),
+    deliveryText: orderDelivery,
+    paymentNote: lastOrderWasFree
+      ? "No payment is needed for this order — it is the FREE Starter Sample Pack. Your order is Pending until the seller accepts it; the sample files are then delivered in the app, ready to download from My Orders or the Track Order page."
+      : "Payment is by Easypaisa only: pay the exact amount to 03361520429 in your Easypaisa app, and keep your Transaction ID (Trx ID) for verification. Your order is Pending until the seller confirms your payment; your file is then delivered in the app, ready to download from My Orders or the Track Order page."
+  });
 });
 
 document.getElementById("trackThisOrder").addEventListener("click", function(){
@@ -2272,7 +2419,30 @@ var _ct=document.getElementById("customTrackBtn"); if(_ct) _ct.addEventListener(
   if(customLastOid) openTrackPage(customLastOid);
 });
 
-/* ---------- Review popup (once per visit, after ~10 seconds) ---------- */
+/* ---------- Picture strip: pause the auto-scroll on hover ----------
+   The CSS rule (.strip:hover .strip-track) already pauses it; this
+   also drives the same pause from the pointer and keyboard focus, so
+   a customer can always stop the strip to tap a tile, and it resumes
+   as soon as the pointer leaves. */
+(function(){
+  var strip = document.querySelector(".strip");
+  var track = document.querySelector(".strip-track");
+  if(!strip || !track) return;
+  function pauseStrip(){ track.style.animationPlayState = "paused"; }
+  function resumeStrip(){ track.style.animationPlayState = ""; }
+  strip.addEventListener("mouseenter", pauseStrip);
+  strip.addEventListener("mouseleave", resumeStrip);
+  strip.addEventListener("focusin", pauseStrip);
+  strip.addEventListener("focusout", resumeStrip);
+})();
+
+/* ---------- Review popup (shown ONCE only, after ~10 seconds) ----------
+   Once the popup has been shown — or dismissed — a flag in this
+   browser's localStorage keeps it from ever appearing again on later
+   page loads. It is a one-time popup, not an every-visit one. */
+var REVPOP_KEY = "pixelnest_revpop_seen_v1";
+function revPopSeen(){ try { return !!window.localStorage.getItem(REVPOP_KEY); } catch(e){ return false; } }
+function markRevPopSeen(){ try { window.localStorage.setItem(REVPOP_KEY, "1"); } catch(e){} }
 var revShown = false;
 var revRating = 0;
 function paintRevStars(){
@@ -2283,18 +2453,20 @@ function paintRevStars(){
 function hideRevPop(){ document.getElementById("revPop").classList.remove("show"); }
 function maybeShowReview(){
   if(revShown) return;
+  if(revPopSeen()) return;
   if(window.PixelRatings && window.PixelRatings.storeRated()) return;
   if(document.getElementById("ppage").classList.contains("open") || document.getElementById("drawer").classList.contains("open")){
     setTimeout(maybeShowReview, 4000);
     return;
   }
   revShown = true;
+  markRevPopSeen();
   document.getElementById("revPop").classList.add("show");
   if(window.PixelRatings) window.PixelRatings.storePopupShown();
 }
 setTimeout(maybeShowReview, 10000);
-document.getElementById("revClose").addEventListener("click", hideRevPop);
-document.getElementById("revLater").addEventListener("click", hideRevPop);
+document.getElementById("revClose").addEventListener("click", function(){ markRevPopSeen(); hideRevPop(); });
+document.getElementById("revLater").addEventListener("click", function(){ markRevPopSeen(); hideRevPop(); });
 document.getElementById("revStars").addEventListener("click", function(e){
   var b = e.target.closest("[data-rstar]"); if(!b) return;
   revRating = parseInt(b.getAttribute("data-rstar"),10); paintRevStars();
@@ -3039,6 +3211,10 @@ renderCart();
 <!-- Firebase v10 (compat builds — classic scripts exposing the global
      "firebase" namespace, with the same Firestore database, increment()
      transforms and merge writes as the modular SDK). -->
+<!-- EmailJS browser SDK — used only for the order confirmation email
+     (see EMAILJS_CONFIG in the main script). If it fails to load, the
+     send function simply does nothing and checkout is unaffected. -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
