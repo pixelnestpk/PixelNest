@@ -12,13 +12,7 @@
    404 on some hosts, which is what the installed app used to
    open to. Navigations that come back 404 (or fail outright)
    now fall back to the cached store page instead of showing
-   the host's error page.
-
-   Deployment note: this file MUST live at the site root (sw.js),
-   not under assets/ — a worker under assets/ can only control
-   assets/*, so it could never control the store page and the
-   install prompt would never fire. Its asset paths below are
-   therefore root-relative (assets/...). */
+   the host's error page. */
 var CACHE_VERSION = "pixelnest-shell-v2";
 var SHELL_URLS = [
   "index.html",
