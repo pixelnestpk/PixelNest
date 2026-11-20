@@ -1273,6 +1273,59 @@ window.PixelPush = (function(){
 @keyframes launchGlow{0%,100%{box-shadow:0 8px 22px rgba(11,14,19,.28),0 0 0 0 rgba(201,162,39,0)}50%{box-shadow:0 8px 22px rgba(11,14,19,.28),0 0 20px 5px rgba(201,162,39,.5)}}
 @media (max-width:560px){.launch-badge{max-width:126px;padding:8px 8px 7px 7px;gap:5px}.launch-badge .lb-code{font-size:.66rem}.launch-badge .lb-price{font-size:.63rem}}
 </style>
+
+<style>
+/* ================= SELLER VIEW — Fiverr-style (seller account only) =================
+   While the SELLER (shakircadet1@gmail.com) is signed in, the store
+   switches to a clean seller view: the dashboard and the listed
+   products, nothing to buy. Add to Cart / Buy Now (product cards,
+   the product popup, the bundle card, the free sample card, the
+   hero), the rating sections, the LAUNCH10
+   buyer promo badge, the free-sample order band and the custom
+   order form all hide. The class sits on <body> and is toggled by
+   the accounts module on every sign-in / sign-out, so the view
+   switches instantly with no reload, and cards rendered later
+   (search, filters, cloned page grids) follow the same rule.
+   Buyers and signed-out visitors never get the class — their
+   store is completely unchanged. */
+body.is-seller-view .card-btns,
+body.is-seller-view .pp-actions,
+body.is-seller-view [data-add],
+body.is-seller-view [data-buynow],
+body.is-seller-view #ppAdd,
+body.is-seller-view #ppBuy,
+body.is-seller-view .hero-cta [data-sample],
+body.is-seller-view .rate-box,
+body.is-seller-view .rev-pop,
+body.is-seller-view #reviews,
+body.is-seller-view .card .stars,
+body.is-seller-view .card-rate,
+body.is-seller-view #ppStarsLine,
+body.is-seller-view .launch-badge,
+body.is-seller-view .free-band,
+body.is-seller-view #custom{display:none!important}
+body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
+/* Seller dashboard — registered customers list + detail page */
+#ordersPage .cust-list{display:grid;gap:8px;margin-top:4px}
+#ordersPage .cust-row{display:flex;align-items:center;gap:10px;width:100%;direction:ltr;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;font:inherit;box-shadow:var(--shadow-sm)}
+#ordersPage .cust-row:hover{border-color:var(--gold)}
+#ordersPage .cust-name{font-weight:800;color:var(--navy);font-size:.95rem}
+#ordersPage .cust-email{color:var(--muted);font-size:.85rem;word-break:break-all}
+#ordersPage .cust-chev{margin-inline-start:auto;color:var(--muted);flex:none;font-size:1.1rem}
+#customerPage .o-card{max-width:880px}
+/* Seller dashboard — notifications list */
+#ordersPage .notif-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+#ordersPage .notif-head h3{margin:0}
+#ordersPage .notif-count{background:var(--coral);color:#fff;min-width:23px;height:23px;border-radius:999px;display:inline-grid;place-items:center;font-size:.78rem;padding:0 6px;font-weight:800}
+#ordersPage .notif-read-btn{margin-inline-start:auto;background:none;border:1.5px solid var(--line);border-radius:999px;padding:0 14px;min-height:36px;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--navy);font:inherit}
+#ordersPage .notif-read-btn:hover{border-color:var(--gold)}
+#ordersPage .notif-list{display:grid;gap:8px;margin-top:8px}
+#ordersPage .notif-item{border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:#fff}
+#ordersPage .notif-item.is-unread{background:var(--gold-soft);border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+#ordersPage .notif-item b{color:var(--navy);font-size:.92rem}
+#ordersPage .notif-item .notif-meta{color:var(--muted);font-size:.8rem;margin-top:1px}
+#ordersPage .notif-item.is-unread .notif-meta{color:#7C6213}
+</style>
 </head>
 <body id="top">
 <header>
@@ -1628,6 +1681,10 @@ window.PixelPush = (function(){
         <span class="notify-note" id="notifyNote">Get a WhatsApp-style alert with sound whenever a new order arrives — it stays in your notification tray until you dismiss it.</span>
       </div>
       <div id="ordersList"></div>
+      <div class="notif-head"><h3>Notifications</h3><span class="notif-count" id="notifCount" style="display:none">0</span><button type="button" class="notif-read-btn" id="notifReadBtn">Mark all as read</button></div>
+      <div class="notif-list" id="notifList"><p class="o-note">Loading notifications…</p></div>
+      <h3>Registered Customers</h3>
+      <div class="cust-list" id="customersList"><p class="o-note">Loading customers…</p></div>
       <h3>Add an order manually</h3>
       <form class="o-form" id="manualOrderForm">
         <input required id="mOid" placeholder="Order ID (e.g. DS-ABC123)" aria-label="Order ID">
@@ -1639,6 +1696,16 @@ window.PixelPush = (function(){
         <button class="btn btn-primary" type="submit">Add Order</button>
       </form>
     </div>
+  </div>
+</div>
+
+<!-- CUSTOMER DETAIL (seller only — opened from the dashboard's
+     Registered Customers list; shows the customer's name, email,
+     registration date, their orders and their total spent) -->
+<div class="ppage opage" id="customerPage" role="dialog" aria-modal="true" aria-label="Customer details">
+  <div class="pp-card o-card">
+    <div class="pp-top"><button class="back" id="customerBack" type="button">← Back</button><span class="o-top-title">Customer Details</span><button class="icon-btn" id="customerClose" aria-label="Close customer details">✕</button></div>
+    <div class="o-body" id="customerDetail"><p class="o-note">Loading…</p></div>
   </div>
 </div>
 
@@ -2066,7 +2133,7 @@ document.addEventListener("click", function(e){
   if(a){ addToCart(a.getAttribute("data-add")); a.classList.add("added"); }
 });
 document.addEventListener("keydown", function(e){
-  if(e.key==="Escape"){ closeProduct(); closeCart(); closeOrdersDashboard(); closeTrackPage(); closePolicyPage(); }
+  if(e.key==="Escape"){ closeProduct(); closeCart(); closeOrdersDashboard(); closeTrackPage(); closePolicyPage(); closeCustomer(); }
   if((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("thumb")){
     e.preventDefault(); openProduct(e.target.getAttribute("data-sample"));
   }
@@ -2208,6 +2275,10 @@ function paintDiscountUI(){
 })();
 
 function addToCart(id, silent){
+  /* Seller view: the seller never buys from his own store — every
+     Add to Cart / Buy Now path funnels through here, so this guard
+     backs up the hidden buttons. */
+  if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller()) return;
   cart[id] = (cart[id]||0)+1;
   renderCart(); renderProducts();
   if(!silent) showToast("Added to cart — total " + fmt(cartSum()));
@@ -2752,8 +2823,134 @@ var fsWatchStarted = false;
 function startFsWatch(){
   if(fsWatchStarted) return;
   fsWatchStarted = true;
-  if(window.PixelOrders) window.PixelOrders.watchAll(function(arr){ fsOrders = arr || []; renderOrders(); });
+  if(window.PixelOrders) window.PixelOrders.watchAll(function(arr){ fsOrders = arr || []; renderOrders(); renderNotifications(); });
 }
+/* ================= SELLER DASHBOARD — REGISTERED CUSTOMERS + NOTIFICATIONS =================
+   Customers: PixelOrders.watchCustomers streams every document in
+   "customers" (name + email + registration time — the accounts
+   module saves the email on every sign-in, so customers who
+   registered earlier gain theirs on their next sign-in). The
+   dashboard lists one row per customer (name + email); tapping a
+   row opens the customer detail page with the registration date,
+   every order that customer placed (from the same live fsOrders
+   feed the dashboard already uses) and their total spent.
+   Notifications: built from that same live orders feed — a new
+   order, a submitted payment (a Trx ID on the order), an accepted
+   order and a completed order each become one notification,
+   newest first. Read state is one "read up to" timestamp kept in
+   this browser (the same local storage the cart and the local
+   order records already use); anything newer shows highlighted
+   as unread until the seller taps "Mark all as read". Seller
+   only: both sections live inside the seller dashboard, which
+   itself opens only for the seller's account. */
+var custWatchStarted = false;
+var custList = [];
+function startCustomersWatch(){
+  if(custWatchStarted) return;
+  if(!window.PixelOrders || !window.PixelOrders.watchCustomers) return;
+  custWatchStarted = true;
+  window.PixelOrders.watchCustomers(function(arr){ custList = arr || []; renderCustomers(); });
+}
+function renderCustomers(){
+  var box = document.getElementById("customersList");
+  if(!box) return;
+  if(!custList.length){ box.innerHTML = '<p class="o-note">No registered customers yet.</p>'; return; }
+  box.innerHTML = custList.map(function(c){
+    var uid = c.uid || c.id || "";
+    return '<button type="button" class="cust-row" data-cust="' + escHtml(uid) + '"><span><span class="cust-name">' + escHtml(c.name || "\u2014") + '</span><br><span class="cust-email">' + escHtml(c.email || "Email not saved yet \u2014 it will appear after their next sign-in") + '</span></span><span class="cust-chev">\u203a</span></button>';
+  }).join("");
+}
+function openCustomer(uid){
+  var c = null;
+  custList.forEach(function(x){ if((x.uid || x.id) === uid) c = x; });
+  if(!c) return;
+  startFsWatch();
+  var mine = fsOrders.filter(function(o){ return o && o.uid === uid; });
+  var spent = 0;
+  mine.forEach(function(o){ spent += Number(o.total) || 0; });
+  var reg = c.createdAt ? fmtTs(c.createdAt) : "";
+  var ordersHtml = mine.length ? mine.map(function(o){
+    return '<div class="o-item"><div class="o-item-top"><span class="oid">' + escHtml(o.orderId || "") + '</span><span class="o-pill pill-' + escHtml(o.status || "Pending") + '">' + escHtml(o.status || "Pending") + '</span></div><div class="o-meta">' + escHtml(o.productName || "\u2014") + ' \u00b7 ' + fmt(Number(o.total) || 0) + (o.createdAt ? ' \u00b7 ' + escHtml(fmtTs(o.createdAt)) : '') + '</div></div>';
+  }).join("") : '<p class="o-note">This customer has not placed any orders yet.</p>';
+  var box = document.getElementById("customerDetail");
+  if(!box) return;
+  box.innerHTML = '<table class="spec-table">'
+    + '<tr><td>Name</td><td>' + escHtml(c.name || "\u2014") + '</td></tr>'
+    + '<tr><td>Email</td><td>' + escHtml(c.email || "Not saved yet") + '</td></tr>'
+    + '<tr><td>Registered</td><td>' + escHtml(reg || "\u2014") + '</td></tr>'
+    + '<tr><td>Orders</td><td>' + mine.length + '</td></tr>'
+    + '<tr><td>Total spent</td><td>' + fmt(spent) + '</td></tr></table>'
+    + '<h3>Orders (' + mine.length + ')</h3>' + ordersHtml;
+  var pg = document.getElementById("customerPage");
+  if(pg){ pg.classList.add("open"); pg.scrollTop = 0; }
+}
+function closeCustomer(){ var el = document.getElementById("customerPage"); if(el) el.classList.remove("open"); }
+
+/* ----- notifications ----- */
+var NOTIF_READ_KEY = "pixelnest_notif_read_at";
+function notifReadAt(){
+  try { return Number(window.localStorage.getItem(NOTIF_READ_KEY)) || 0; } catch(e){ return 0; }
+}
+function tsMillis(ts){
+  if(!ts) return 0;
+  if(typeof ts.toDate === "function"){ try { return ts.toDate().getTime(); } catch(e){ return 0; } }
+  if(ts.seconds) return ts.seconds * 1000;
+  if(typeof ts === "number") return ts;
+  return 0;
+}
+function buildNotifications(){
+  var evs = [];
+  fsOrders.forEach(function(o){
+    if(!o || !o.orderId) return;
+    var t = tsMillis(o.createdAt);
+    var when = o.createdAt ? fmtTs(o.createdAt) : "";
+    /* Only the order's own creation time is recorded for the new /
+       payment / accepted events, so it is labelled as the order
+       time; completion uses the real delivery timestamp the order
+       carries (deliveredAt) whenever one exists. */
+    var meta = "Order " + o.orderId + (o.productName ? " \u00b7 " + o.productName : "") + (when ? " \u00b7 Ordered " + when : "");
+    evs.push({ t: t, pr: 0, title: "New order received \u2014 " + fmt(Number(o.total) || 0), meta: meta });
+    if(o.trxId) evs.push({ t: t, pr: 1, title: "Payment received \u2014 " + fmt(Number(o.total) || 0) + " (Trx ID " + o.trxId + ")", meta: meta });
+    if(o.status === "Active" || o.status === "Completed") evs.push({ t: t, pr: 2, title: "Order accepted", meta: meta });
+    if(o.status === "Completed"){
+      var dt = tsMillis(o.deliveredAt);
+      var dmeta = "Order " + o.orderId + (o.productName ? " \u00b7 " + o.productName : "") + (o.deliveredAt ? " \u00b7 Delivered " + fmtTs(o.deliveredAt) : (when ? " \u00b7 Ordered " + when : ""));
+      evs.push({ t: dt || t, pr: 3, title: "Order completed \u2014 file delivered", meta: dmeta });
+    }
+  });
+  evs.sort(function(a, b){ return (b.t - a.t) || (b.pr - a.pr); });
+  return evs;
+}
+function renderNotifications(){
+  var box = document.getElementById("notifList");
+  if(!box) return;
+  var evs = buildNotifications();
+  var readAt = notifReadAt();
+  var unread = 0;
+  evs.forEach(function(ev){ if(ev.t > readAt) unread++; });
+  var cnt = document.getElementById("notifCount");
+  if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
+  if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet \u2014 new orders, payments and order updates will appear here.</p>'; return; }
+  box.innerHTML = evs.slice(0, 60).map(function(ev){
+    return '<div class="notif-item' + (ev.t > readAt ? ' is-unread' : '') + '"><b>' + escHtml(ev.title) + '</b><div class="notif-meta">' + escHtml(ev.meta) + '</div></div>';
+  }).join("");
+}
+(function(){
+  var cl = document.getElementById("customersList");
+  if(cl) cl.addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest("[data-cust]") : null;
+    if(b) openCustomer(b.getAttribute("data-cust"));
+  });
+  var cb = document.getElementById("customerBack"); if(cb) cb.addEventListener("click", closeCustomer);
+  var cc = document.getElementById("customerClose"); if(cc) cc.addEventListener("click", closeCustomer);
+  var cp = document.getElementById("customerPage"); if(cp) cp.addEventListener("click", function(e){ if(e.target === this) closeCustomer(); });
+  var mr = document.getElementById("notifReadBtn");
+  if(mr) mr.addEventListener("click", function(){
+    try { window.localStorage.setItem(NOTIF_READ_KEY, String(Date.now())); } catch(e){}
+    renderNotifications();
+  });
+})();
+
 /* Discount-code usage line in the seller dashboard: the real count
    from "discountCodes/LAUNCH10", live. A document that does not
    exist yet is seeded (create-if-missing) and reads as 0/20. */
@@ -3173,7 +3370,7 @@ function openOrdersDashboard(){
     else { window.PixelAccount.openAuth("seller"); }
     return;
   }
-  startFsWatch(); startDiscountWatch(); renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
+  startFsWatch(); startDiscountWatch(); startCustomersWatch(); renderOrders(); renderNotifications(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
   if(window.SellerNotify) window.SellerNotify.refreshBtn();
 }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
@@ -4186,6 +4383,29 @@ window.PixelOrders = (function(){
     return function(){ unsubs.forEach(function(u){ try { u(); } catch(e){} }); };
   }
 
+  /* Every registered-customer record (name, email, registration
+     time) — the seller dashboard's customer list and detail page.
+     Sorted newest registration first. */
+  function watchCustomers(cb){
+    var d = getDb();
+    if(!d){ cb([]); return function(){}; }
+    try {
+      return d.collection("customers").onSnapshot(
+        function(snap){
+          var arr = [];
+          snap.forEach(function(doc){ var cd = doc.data() || {}; if(!cd.uid) cd.uid = doc.id; arr.push(cd); });
+          arr.sort(function(a, b){
+            var sa = (a.createdAt && a.createdAt.seconds) || 0;
+            var sb = (b.createdAt && b.createdAt.seconds) || 0;
+            return sb - sa;
+          });
+          cb(arr);
+        },
+        function(){ /* customer records unavailable — the list shows its empty state */ }
+      );
+    } catch(e){ cb([]); return function(){}; }
+  }
+
   return {
     createTracking: createTracking,
     setStatus: setStatus,
@@ -4194,6 +4414,7 @@ window.PixelOrders = (function(){
     watchAll: watchAll,
     watchPrivate: watchPrivate,
     watchSiteStats: watchSiteStats,
+    watchCustomers: watchCustomers,
     ensureDiscountCode: ensureDiscountCode,
     validateDiscountCode: validateDiscountCode,
     watchDiscountCode: watchDiscountCode
@@ -4280,6 +4501,11 @@ window.PixelAccount = (function(){
   var auth = null, db = null, storage = null;
   var currentUser = null;
   var readyFlag = false;
+  /* True only after the FIRST onAuthStateChanged callback. Before
+     that, a saved session may still be restoring and currentUser
+     can read null for a user who IS signed in — the sign-in gate
+     must never act on that unknown state. */
+  var authStateKnown = false;
   var mode = "signin";
   var purpose = "";
   var tries = 0;
@@ -4362,6 +4588,7 @@ window.PixelAccount = (function(){
     } catch(e){}
     auth.onAuthStateChanged(function(u){
       currentUser = u || null;
+      authStateKnown = true;
       paintAccount();
       if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else stopOrderNotify();
       paintVerifyBoxes();
@@ -4379,7 +4606,7 @@ window.PixelAccount = (function(){
   /* Registered-customer record — on every sign-in (email/password
      OR Google; both arrive through onAuthStateChanged), if this
      account has no record yet, one document is written to
-     "customers/<uid>" holding { uid, name, createdAt }: the uid,
+     "customers/<uid>" holding { uid, name, email, createdAt }: the uid,
      the account's display name (typed at sign-up, or provided by
      Google; the part of the email before the @ when no name is
      set) and the sign-up time. The store's real registered-customer
@@ -4410,27 +4637,40 @@ window.PixelAccount = (function(){
     custRegAttempts[uid] = (custRegAttempts[uid] || 0) + 1;
     var nm = String(currentUser.displayName || "").trim()
       || (currentUser.email ? currentUser.email.split("@")[0] : "");
+    var em = String(currentUser.email || "").trim();
     function retryLater(){
       if(custRegAttempts[uid] < 4) setTimeout(function(){ registerCustomer(); }, 3000);
+    }
+    /* The customer's email is saved in a SEPARATE merge write
+       (the same pattern the checkout uses for extra order fields),
+       so a refusal can never disturb the main record. It runs once
+       the record exists, whenever the saved email is missing or
+       different — which is also how customers who registered
+       before emails were saved get theirs added on their next
+       sign-in. The seller dashboard's customer list reads it. */
+    function saveCustEmail(){
+      if(!em) return;
+      try { ref.set({ email: em }, { merge: true }).catch(function(){}); } catch(e){}
     }
     try {
       var ref = db.collection("customers").doc(uid);
       ref.get().then(function(snap){
         if(!snap.exists){
           ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() })
-            .then(function(){ custRegDone[uid] = true; })
+            .then(function(){ custRegDone[uid] = true; saveCustEmail(); })
             .catch(function(){ retryLater(); });
         } else {
           var cd = snap.data() || {};
           custRegDone[uid] = true;
           if(!cd.name && nm) ref.set({ uid: uid, name: nm }, { merge: true }).catch(function(){});
+          if(em && cd.email !== em) saveCustEmail();
         }
       }).catch(function(){
         /* The read itself was refused — still try to leave the
            record behind with a merge write, so the count and the
            name exist for the strip and the dashboard. */
         ref.set({ uid: uid, name: nm, createdAt: window.firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-          .then(function(){ custRegDone[uid] = true; })
+          .then(function(){ custRegDone[uid] = true; saveCustEmail(); })
           .catch(function(){ retryLater(); });
       });
     } catch(e){ retryLater(); }
@@ -4509,6 +4749,12 @@ window.PixelAccount = (function(){
        link + account-menu button) exist ONLY for the signed-in seller.
        Signed-out visitors and customers never see them anywhere. */
     var sellerOn = isSeller();
+    /* Fiverr-style seller view: while the seller is signed in the
+       whole store switches (see the SELLER VIEW styles) — buying
+       buttons, ratings and every purchase control hide; signing
+       out or in as a customer removes the class again, instantly,
+       with no reload. */
+    if(document.body) document.body.classList.toggle("is-seller-view", sellerOn);
     var ol = $("openOrders"); if(ol) ol.style.display = sellerOn ? "" : "none";
     var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = sellerOn ? "" : "none";
     if(!si || !ab) return;
@@ -5035,7 +5281,7 @@ window.PixelAccount = (function(){
         }
         return true;
       }
-      if(!readyFlag) return true; /* auth unavailable — store keeps working as before */
+      if(!readyFlag || !authStateKnown) return true; /* auth unavailable, or the saved session is still restoring — a signed-in user is never asked to sign in again on an unknown state; once the state settles, later checks use it */
       openAuth(p || "");
       if(typeof showToast === "function") showToast("Please sign in first to place your order");
       return false;
