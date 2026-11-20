@@ -352,6 +352,13 @@ footer a:hover{color:var(--teal)}
 .qty button{width:36px;height:36px;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800}
 .remove{margin-left:auto;background:none;border:0;color:var(--coral);font-weight:700;min-height:36px}
 .total-row{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800;padding:14px 0;border-top:2px dashed var(--line);margin-top:8px;color:var(--navy)}
+.discount-line{display:flex;justify-content:space-between;font-size:.98rem;font-weight:800;padding:0 0 10px;color:var(--green)}
+.discount-form{display:flex;gap:8px;margin:2px 0 4px}
+.discount-form input{flex:1;min-width:0;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:0 14px}
+.discount-apply-btn{flex:none;border-radius:12px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);padding:0 20px;font-weight:800;min-height:48px}
+.discount-feedback{margin:2px 0 8px;font-size:.86rem;font-weight:700;color:var(--navy)}
+.discount-feedback:empty{display:none}
+.discount-remove{background:none;border:0;color:var(--coral);font-weight:800;text-decoration:underline;padding:0;margin-left:6px;font-size:.86rem;min-height:32px}
 .checkout-form{display:grid;gap:10px;margin-top:6px}
 .checkout-form label{font-weight:700;font-size:.88rem;display:grid;gap:6px}
 .checkout-form input,.checkout-form select{width:100%;min-height:48px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:0 14px}
@@ -927,6 +934,7 @@ select option{color:#111827;background-color:#ffffff}
 .ts-stat small{display:block;margin-top:2px;font-size:.8rem;color:#EDEAE2;opacity:.75}
 @media (max-width:560px){ .ts-stat{flex:1 1 40%} .ts-stat b{font-size:1.45rem} .stats-in{padding:18px 16px} }
 #ordersPage .t-stats{margin-top:10px}
+#ordersPage .discount-usage{margin:10px 2px 0;font-size:.88rem;font-weight:700;color:var(--navy)}
 </style>
 <style>
 /* ================= INSTALL APP BUTTON =================
@@ -1299,6 +1307,12 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   <div class="drawer-body">
     <div id="cartItems"></div>
     <div class="total-row"><span>Total</span><span id="cartTotal">Rs. 0</span></div>
+    <div class="discount-line" id="discountLine" style="display:none"><span id="discountLineLabel">Discount</span><span id="discountLineAmt"></span></div>
+    <div class="discount-form">
+      <input type="text" id="discountCodeInput" placeholder="Discount code, e.g. LAUNCH10" autocomplete="off" aria-label="Discount code">
+      <button type="button" class="discount-apply-btn" id="discountApplyBtn">Apply</button>
+    </div>
+    <p class="discount-feedback"><span id="discountFeedbackText"></span><button type="button" class="discount-remove" id="discountRemoveBtn" style="display:none">Remove</button></p>
     <form class="checkout-form" id="checkoutForm">
       <label>Full Name <input required id="fName" placeholder="e.g. Ahmed Khan" autocomplete="name"></label>
       <label>Your Mobile / WhatsApp Number <input required id="fPhone" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="tel"><span class="field-hint">This is YOUR number — the seller may contact you on it if needed. Your file itself is delivered in the app (My Orders / Track Order); ordering happens right here on the website, and WhatsApp is only for chat if you have a question.</span></label>
@@ -1424,6 +1438,7 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
         <div class="o-stat"><b id="dCompleted">—</b><span>Orders Completed</span></div>
         <div class="o-stat"><b id="dRating">—</b><span>Store Rating</span></div>
       </div>
+      <p class="discount-usage" id="discountUsage" style="display:none"></p>
       <div id="ordersList"></div>
       <h3>Add an order manually</h3>
       <form class="o-form" id="manualOrderForm">
@@ -1588,6 +1603,37 @@ function loadCart(){
   } catch(e){ return {}; }
 }
 var cart = loadCart();
+/* Discount code — one code (LAUNCH10, 10% off, first 20 orders),
+   validated against Firestore ("discountCodes/LAUNCH10") and kept
+   in this browser so it survives a reload and moving between the
+   store's pages. The shared use count lives only in Firestore and
+   goes up by one ONLY when an order is actually placed with the
+   code (inside PixelOrders.createTracking) — merely applying the
+   code at checkout never uses up a use. */
+var DISCOUNT_KEY = "pixelnest_discount_v1";
+function loadDiscount(){
+  try {
+    var raw = window.localStorage.getItem(DISCOUNT_KEY);
+    var d = raw ? JSON.parse(raw) : null;
+    if(d && d.code) return { code: String(d.code), percentOff: Number(d.percentOff) || 10 };
+  } catch(e){}
+  return null;
+}
+var appliedDiscount = loadDiscount();
+function saveDiscount(){
+  try {
+    if(appliedDiscount) window.localStorage.setItem(DISCOUNT_KEY, JSON.stringify(appliedDiscount));
+    else window.localStorage.removeItem(DISCOUNT_KEY);
+  } catch(e){}
+}
+function clearDiscount(){ appliedDiscount = null; saveDiscount(); }
+function discountAmount(){
+  if(!appliedDiscount) return 0;
+  var s = cartSum();
+  return s > 0 ? Math.round(s * appliedDiscount.percentOff / 100) : 0;
+}
+function payableTotal(){ return cartSum() - discountAmount(); }
+var discountGatePassed = false;
 var activeFilter = "all";
 var sortMode = "featured";
 var currentOrderId = "";
@@ -1764,13 +1810,14 @@ function renderCart(){
   /* Header cart button also shows the running total, so the customer
      always knows what they are about to pay before opening the cart. */
   var cbt = document.getElementById("cartBtnTotal");
-  if(cbt) cbt.textContent = cartSum() > 0 ? "· " + fmt(cartSum()) : "";
+  if(cbt) cbt.textContent = payableTotal() > 0 ? "· " + fmt(payableTotal()) : "";
   /* The CV-details box appears only while the Europass CV is in the
      cart — the seller needs those details to make the CV. */
   var cvw = document.getElementById("cvDetailsWrap");
   if(cvw) cvw.style.display = cart["cv"] ? "" : "none";
   var box = document.getElementById("cartItems");
   var ids = Object.keys(cart);
+  if(!ids.length && appliedDiscount) clearDiscount();
   if(!ids.length){
     box.innerHTML = '<div class="empty">Your cart is empty.<br>Tap “Add to Cart” on any product.</div>';
   } else {
@@ -1785,7 +1832,8 @@ function renderCart(){
     box.querySelectorAll("[data-dec]").forEach(function(b){ b.addEventListener("click", function(){ var id=b.getAttribute("data-dec"); cart[id]--; if(cart[id]<=0) delete cart[id]; renderCart(); renderProducts(); }); });
     box.querySelectorAll("[data-remove]").forEach(function(b){ b.addEventListener("click", function(){ delete cart[b.getAttribute("data-remove")]; renderCart(); renderProducts(); }); });
   }
-  document.getElementById("cartTotal").textContent = (ids.length && cartSum()===0) ? "FREE" : fmt(cartSum());
+  document.getElementById("cartTotal").textContent = (ids.length && cartSum()===0) ? "FREE" : fmt(payableTotal());
+  paintDiscountUI();
   updatePayBox();
 }
 
@@ -1799,8 +1847,74 @@ function updatePayBox(){
   var ids = Object.keys(cart);
   var freeMode = ids.length > 0 && cartSum() === 0;
   sec.style.display = freeMode ? "none" : "";
-  amt.textContent = "Amount to pay: " + fmt(cartSum());
+  amt.textContent = "Amount to pay: " + fmt(payableTotal());
 }
+
+/* Discount row in the drawer — the applied-code line, the feedback
+   text and the Remove link all derive from appliedDiscount, so a
+   discount saved in this browser shows correctly on every page. */
+function setDiscountFeedback(msg){ var el = document.getElementById("discountFeedbackText"); if(el) el.textContent = msg || ""; }
+function paintDiscountUI(){
+  var line = document.getElementById("discountLine");
+  var lbl = document.getElementById("discountLineLabel");
+  var amtEl = document.getElementById("discountLineAmt");
+  var rm = document.getElementById("discountRemoveBtn");
+  var inp = document.getElementById("discountCodeInput");
+  if(appliedDiscount){
+    if(line) line.style.display = "";
+    if(lbl) lbl.textContent = "Discount (" + appliedDiscount.code + ")";
+    if(amtEl) amtEl.textContent = "−" + fmt(discountAmount());
+    if(rm) rm.style.display = "";
+    if(inp && document.activeElement !== inp) inp.value = appliedDiscount.code;
+    setDiscountFeedback("Code applied — " + appliedDiscount.percentOff + "% off your order");
+  } else {
+    if(line) line.style.display = "none";
+    if(rm) rm.style.display = "none";
+  }
+}
+(function(){
+  var btn = document.getElementById("discountApplyBtn");
+  var inp = document.getElementById("discountCodeInput");
+  var rm = document.getElementById("discountRemoveBtn");
+  if(rm) rm.addEventListener("click", function(){
+    clearDiscount();
+    if(inp) inp.value = "";
+    setDiscountFeedback("");
+    renderCart();
+  });
+  if(!btn || !inp) return;
+  btn.addEventListener("click", function(){
+    var code = inp.value.trim().toUpperCase();
+    if(!code){ setDiscountFeedback("Please enter a discount code."); return; }
+    if(!window.PixelOrders || !window.PixelOrders.validateDiscountCode){ setDiscountFeedback("This code is not valid"); return; }
+    btn.disabled = true;
+    setDiscountFeedback("Checking your code…");
+    var seedFirst = window.PixelOrders.ensureDiscountCode ? window.PixelOrders.ensureDiscountCode() : Promise.resolve(false);
+    Promise.resolve(seedFirst).then(function(){ return window.PixelOrders.validateDiscountCode(code); }).then(function(res){
+      btn.disabled = false;
+      if(res && res.ok){
+        appliedDiscount = { code: res.code || code, percentOff: res.percentOff || 10 };
+        saveDiscount();
+        renderCart();
+      } else {
+        setDiscountFeedback(res && res.reason === "limit" ? "This code has reached its limit" : "This code is not valid");
+      }
+    });
+  });
+})();
+/* Seed the LAUNCH10 document once per page load (create-if-missing
+   only — an existing use count is never touched). The orders module
+   loads after this script, so wait until it is ready; any failure
+   is silent and never blocks the page or checkout. */
+(function(){
+  var tries = 0;
+  function seed(){
+    if(window.PixelOrders && window.PixelOrders.ensureDiscountCode){ window.PixelOrders.ensureDiscountCode(); return; }
+    if(++tries < 40) setTimeout(seed, 250);
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(seed, 300); });
+  else setTimeout(seed, 300);
+})();
 
 function addToCart(id, silent){
   cart[id] = (cart[id]||0)+1;
@@ -1887,10 +2001,11 @@ function buildOrderText(){
     ? "This order is the FREE sample pack — no payment needed."
     : (trx
       ? "Payment sent to 03361520429 via "+pay+" — Trx ID: "+trx+". Please deliver my file "+cartDeliveryText()+". Thank you!"
-      : "Payment pending — I will pay "+fmt(cartSum())+" to 03361520429 via "+pay+".");
+      : "Payment pending — I will pay "+fmt(payableTotal())+" to 03361520429 via "+pay+".");
   var cvDetEl=document.getElementById("fCvDetails");
   var cvDet=(cart["cv"] && cvDetEl) ? cvDetEl.value.trim() : "";
-  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(cartSum()))+"*","Payment method: "+pay,"Payment number: 03361520429","Trx ID: "+(trx || "not submitted"),"Delivery: "+cartDeliveryText(),"","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"");
+  if(appliedDiscount && discountAmount() > 0) lines.push("","Discount ("+appliedDiscount.code+"): −"+fmt(discountAmount()));
+  lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(payableTotal()))+"*","Payment method: "+pay,"Payment number: 03361520429","Trx ID: "+(trx || "not submitted"),"Delivery: "+cartDeliveryText(),"","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"");
   if(cvDet) lines.push("CV details (for my Europass CV):", cvDet, "");
   lines.push(closing,"Store: https://aloneboy5186khan-creator.github.io/PixelNest/");
   return lines.join("\n");
@@ -1915,6 +2030,33 @@ document.getElementById("copyPayNum").addEventListener("click", function(){
 document.getElementById("checkoutForm").addEventListener("submit", function(e){
   e.preventDefault();
   if(!Object.keys(cart).length){ showToast("Add a product to the cart first"); return; }
+  /* Placement-time revalidation: a discount saved in this browser
+     is checked against Firestore once more before the order goes
+     ahead, so a code whose 20-order limit has been reached since
+     it was applied no longer gives a discount. If it is no longer
+     usable, the saved discount is cleared, the customer is told,
+     and this tap places NO order — the drawer now shows the full
+     total, and the customer chooses whether to order at that
+     price. A still-valid code passes straight through. */
+  if(appliedDiscount && !discountGatePassed && window.PixelOrders && window.PixelOrders.validateDiscountCode){
+    var gateCode = appliedDiscount.code;
+    window.PixelOrders.validateDiscountCode(gateCode).then(function(res){
+      if(res && res.ok){
+        appliedDiscount = { code: res.code || gateCode, percentOff: res.percentOff || appliedDiscount.percentOff };
+        saveDiscount();
+        discountGatePassed = true;
+        document.getElementById("checkoutForm").dispatchEvent(new Event("submit", { cancelable: true }));
+      } else {
+        clearDiscount();
+        var dci2 = document.getElementById("discountCodeInput"); if(dci2) dci2.value = "";
+        renderCart();
+        setDiscountFeedback(res && res.reason === "limit" ? "This code has reached its limit" : "This code is not valid");
+        showToast(res && res.reason === "limit" ? "This code has reached its limit — the full total now applies" : "This code is not valid — the full total now applies");
+      }
+    });
+    return;
+  }
+  discountGatePassed = false;
   /* Ordering requires sign-in — so the order carries the customer's uid
      and only that customer can see it and download its files. An
      unverified email also blocks ordering (only ordering — browsing,
@@ -1937,7 +2079,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
      FREE sample pack — are exempt and need no Trx ID. Custom orders
      are a separate form and follow the same accept flow (placed as
      Pending; the seller accepts them once paid). */
-  var checkoutTotalEarly = cartSum();
+  var checkoutTotalEarly = payableTotal();
   var checkoutTrxEarlyEl = document.getElementById("fTrx");
   var checkoutTrxEarly = checkoutTrxEarlyEl ? checkoutTrxEarlyEl.value.trim() : "";
   var trxErrBox = document.getElementById("trxError");
@@ -1953,7 +2095,9 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   document.getElementById("orderIdText").textContent = currentOrderId;
   var orderProductStr = Object.keys(cart).map(function(k){ var pp = byId(k); return pp ? pp.name + " x" + cart[k] : k; }).join(", ");
   var orderQty = cartCountTotal();
-  var orderTotal = cartSum();
+  var orderTotal = payableTotal();
+  var usedDiscountCode = appliedDiscount ? appliedDiscount.code : "";
+  var usedDiscountAmount = discountAmount();
   lastOrderWasFree = orderTotal === 0 && !!cart["free-sample"];
   /* Payment is Easypaisa ONLY — 03361520429 is an Easypaisa number, so
      paymentMethod is always "Easypaisa" for paid orders. */
@@ -1970,7 +2114,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
      without chasing the customer for details. */
   var cvDetailsEl = document.getElementById("fCvDetails");
   var cvDetails = (cart["cv"] && cvDetailsEl) ? cvDetailsEl.value.trim() : "";
-  recordOrder({ id: currentOrderId, product: orderProductStr, name: document.getElementById("fName").value.trim(), phone: document.getElementById("fPhone").value.trim(), status: "Pending", pay: payMethod, trx: trxId, cvDetails: cvDetails });
+  recordOrder({ id: currentOrderId, product: orderProductStr, name: document.getElementById("fName").value.trim(), phone: document.getElementById("fPhone").value.trim(), status: "Pending", pay: payMethod, trx: trxId, cvDetails: cvDetails, discountCode: usedDiscountCode, discountAmount: usedDiscountAmount });
   /* Public tracking copy in Firestore ("orders") — ONLY orderId,
      productName, quantity, total, status, createdAt, deliveryNote and
      the customer's uid. The payment method, Trx ID and delivery files
@@ -2003,6 +2147,8 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     paymentMethod: payMethod,
     trxId: trxId,
     cvDetails: cvDetails,
+    discountCode: usedDiscountCode,
+    discountAmount: usedDiscountAmount,
     buyerName: document.getElementById("fName").value.trim(),
     uid: (window.PixelAccount ? window.PixelAccount.uid() : ""),
     thenStatus: thenStatus
@@ -2039,6 +2185,16 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     var chatText = "Hello! I have a question about my PixelNest order " + currentOrderId + ".";
     chatLink.href = waAppUrl(chatText);
     chatLink.setAttribute("data-wa-web", waWebUrl(chatText));
+  }
+  /* The order is placed, so the applied discount is finished with:
+     the next order starts fresh. (The shared use count itself was
+     incremented inside createTracking, only because this order was
+     really created.) */
+  if(appliedDiscount){
+    clearDiscount();
+    var dci = document.getElementById("discountCodeInput"); if(dci) dci.value = "";
+    setDiscountFeedback("");
+    renderCart();
   }
   var sb = document.getElementById("successBox");
   sb.classList.add("show");
@@ -2178,7 +2334,7 @@ function fmtTs(ts){
 function recordOrder(o){
   if(!o || !o.id) return;
   if(orders.some(function(x){ return x.id === o.id; })) return;
-  orders.unshift({ id:o.id, product:o.product || "—", name:o.name || "—", phone:o.phone || "", date: todayStr(), status:o.status || "Pending", pay:o.pay || "", trx:o.trx || "", cvDetails:o.cvDetails || "" });
+  orders.unshift({ id:o.id, product:o.product || "—", name:o.name || "—", phone:o.phone || "", date: todayStr(), status:o.status || "Pending", pay:o.pay || "", trx:o.trx || "", cvDetails:o.cvDetails || "", discountCode:o.discountCode || "", discountAmount:Number(o.discountAmount) || 0 });
   saveOrders(); renderOrders();
 }
 var fsOrders = [];
@@ -2187,6 +2343,26 @@ function startFsWatch(){
   if(fsWatchStarted) return;
   fsWatchStarted = true;
   if(window.PixelOrders) window.PixelOrders.watchAll(function(arr){ fsOrders = arr || []; renderOrders(); });
+}
+/* Discount-code usage line in the seller dashboard: the real count
+   from "discountCodes/LAUNCH10", live. A document that does not
+   exist yet is seeded (create-if-missing) and reads as 0/20. */
+var discountWatchStarted = false;
+function startDiscountWatch(){
+  if(discountWatchStarted) return;
+  if(!window.PixelOrders || !window.PixelOrders.watchDiscountCode) return;
+  discountWatchStarted = true;
+  if(window.PixelOrders.ensureDiscountCode) window.PixelOrders.ensureDiscountCode();
+  window.PixelOrders.watchDiscountCode(function(data){
+    var el = document.getElementById("discountUsage");
+    if(!el) return;
+    var used = data ? (Number(data.usedCount) || 0) : 0;
+    var max = data ? (Number(data.maxUses) || 20) : 20;
+    el.style.display = "";
+    el.textContent = used >= max
+      ? "Discount code LAUNCH10 — Expired (" + max + "/" + max + " used)"
+      : "Discount code LAUNCH10 — used " + used + "/" + max;
+  });
 }
 /* In-app delivery control for one online order's compact row in the
    seller dashboard: the files already delivered (as small chips) and
@@ -2355,6 +2531,8 @@ function fsOrderCardHtml(o, localById){
   var pm = o.paymentMethod || "";
   var trx = o.trxId || "";
   var cvDet = String(o.cvDetails || (loc && loc.cvDetails) || "").trim();
+  var discCode = String(o.discountCode || (loc && loc.discountCode) || "").trim();
+  var discAmt = Number(o.discountAmount || (loc && loc.discountAmount) || 0);
   return '<div class="orow"><span class="oid">' + escHtml(o.orderId) + '</span>'
     + '<span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span>'
     + '<span class="ofield"><span>Buyer</span><b>' + escHtml(buyerNameFor(o, loc) || "—") + '</b></span>'
@@ -2363,6 +2541,7 @@ function fsOrderCardHtml(o, localById){
     + (Number(o.quantity) > 1 ? '<span class="ofield"><span>Qty</span><b>' + escHtml(o.quantity) + '</b></span>' : '')
     + (fmtTs(o.createdAt) ? '<span class="orow-date">' + fmtTs(o.createdAt) + '</span>' : '')
     + (cvDet ? '<span class="cv-details"><span>CV details from the customer</span><b>' + escHtml(cvDet) + '</b></span>' : '')
+    + (discCode && discAmt > 0 ? '<span class="cv-details"><span>Discount</span><b>' + escHtml(discCode) + ': −Rs. ' + discAmt.toLocaleString("en-PK") + '</b></span>' : '')
     + '<span class="orow-actions">'
     + nameActionHtml("fs", o.orderId, buyerNameFor(o, loc))
     + (st === "Pending" ? acceptBtnHtml("fs", o.orderId, orderCanAccept(pm, trx, o.total)) : '')
@@ -2381,6 +2560,7 @@ function localOrderCardHtml(o){
     + '<span class="ofield"><span>Trx ID</span><b>' + escHtml(o.trx || "—") + '</b></span>'
     + '<span class="orow-date">' + escHtml(o.date) + '</span>'
     + (String(o.cvDetails || "").trim() ? '<span class="cv-details"><span>CV details from the customer</span><b>' + escHtml(o.cvDetails) + '</b></span>' : '')
+    + (String(o.discountCode || "").trim() && Number(o.discountAmount) > 0 ? '<span class="cv-details"><span>Discount</span><b>' + escHtml(o.discountCode) + ': −Rs. ' + Number(o.discountAmount).toLocaleString("en-PK") + '</b></span>' : '')
     + '<span class="orow-actions">'
     + nameActionHtml("local", o.id, buyerNameFor(o, null))
     + (st === "Pending" ? acceptBtnHtml("local", o.id, orderCanAccept(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null))) : '')
@@ -2580,7 +2760,7 @@ function openOrdersDashboard(){
     else { window.PixelAccount.openAuth("seller"); }
     return;
   }
-  startFsWatch(); renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
+  startFsWatch(); startDiscountWatch(); renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
 }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
 document.getElementById("openOrders").addEventListener("click", openOrdersDashboard);
@@ -3234,6 +3414,99 @@ window.PixelOrders = (function(){
     } catch(e){}
   }
 
+  /* ---- Discount code LAUNCH10 ------------------------------------
+     One code, kept in "discountCodes/LAUNCH10": 10% off, at most 20
+     orders. The document is seeded create-if-missing (the seed
+     never carries usedCount, so an existing count is never reset),
+     read for validation when a customer applies the code, and its
+     usedCount goes up by exactly 1 only when an order placed with
+     the code has really been created (see createTracking below) —
+     applying a code without ordering never uses up a use. Every
+     discount write here is best-effort with a silent catch:
+     checkout never waits on it and never fails because of it. */
+  var DISCOUNT_CODE = "LAUNCH10";
+  function ensureDiscountCode(){
+    var d = getDb();
+    if(!d) return Promise.resolve(false);
+    try {
+      var ref = d.collection("discountCodes").doc(DISCOUNT_CODE);
+      return ref.get().then(function(snap){
+        if(snap.exists) return true;
+        return ref.set({ code: DISCOUNT_CODE, percentOff: 10, maxUses: 20, active: true })
+          .then(function(){ return true; })
+          .catch(function(){ return false; });
+      }).catch(function(){ return false; });
+    } catch(e){ return Promise.resolve(false); }
+  }
+  function validateDiscountCode(code){
+    var c = String(code || "").trim().toUpperCase();
+    if(!c) return Promise.resolve({ ok: false, reason: "invalid" });
+    return ensureDiscountCode().then(function(){
+      var d = getDb();
+      if(!d) return { ok: false, reason: "invalid" };
+      return d.collection("discountCodes").doc(c).get().then(function(snap){
+        if(!snap.exists) return { ok: false, reason: "invalid" };
+        var data = snap.data() || {};
+        if(data.active === false) return { ok: false, reason: "invalid" };
+        var used = Number(data.usedCount) || 0;
+        var max = Number(data.maxUses) || 0;
+        if(max > 0 && used >= max) return { ok: false, reason: "limit" };
+        return { ok: true, code: c, percentOff: Number(data.percentOff) || 10 };
+      }).catch(function(){ return { ok: false, reason: "invalid" }; });
+    });
+  }
+  function watchDiscountCode(cb){
+    var d = getDb();
+    if(!d){ cb(null); return function(){}; }
+    try {
+      return d.collection("discountCodes").doc(DISCOUNT_CODE).onSnapshot(
+        function(snap){ cb(snap.exists ? snap.data() : null); },
+        function(){ cb(null); }
+      );
+    } catch(e){ cb(null); return function(){}; }
+  }
+  /* The code + amount an order used, saved into the PRIVATE
+     document only — never the public "orders" document — in the
+     same separate merge-write pattern as the buyer name, so the
+     seller dashboard can show the discount on the order row. */
+  function saveDiscountDetails(d, orderId, discountCode, discountAmount){
+    var c = String(discountCode || "").trim().toUpperCase();
+    if(!c) return;
+    try {
+      d.collection("orderPrivate").doc(String(orderId)).set({ discountCode: c, discountAmount: Number(discountAmount) || 0 }, { merge: true })
+        .catch(function(){ /* seller display only — never block checkout */ });
+    } catch(e){}
+  }
+  /* Placement-time guard for the count itself: re-read the code
+     document and increment only while a use remains, so usedCount
+     can never be pushed past maxUses by a stale saved discount. */
+  function incrementDiscountUseChecked(d, discountCode){
+    var c = String(discountCode || "").trim().toUpperCase();
+    if(!c) return;
+    try {
+      d.collection("discountCodes").doc(c).get().then(function(snap){
+        if(!snap.exists) return;
+        var data = snap.data() || {};
+        if(data.active === false) return;
+        var used = Number(data.usedCount) || 0;
+        var max = Number(data.maxUses) || 0;
+        if(max > 0 && used >= max) return;
+        incrementDiscountUse(d, c);
+      }).catch(function(){ /* best-effort — never block checkout */ });
+    } catch(e){}
+  }
+  /* One real use of the code: usedCount +1, exactly once per order
+     actually placed with it. */
+  function incrementDiscountUse(d, discountCode){
+    var c = String(discountCode || "").trim().toUpperCase();
+    if(!c) return;
+    try {
+      var FV = window.firebase.firestore.FieldValue;
+      d.collection("discountCodes").doc(c).update({ usedCount: FV.increment(1) })
+        .catch(function(){ /* best-effort — never block checkout */ });
+    } catch(e){}
+  }
+
   /* Seller dashboard "Set name": the seller types the buyer name
      for an order whose name was never recorded (orders placed
      before the checkout saved buyerName, whose buyer has not
@@ -3297,6 +3570,13 @@ window.PixelOrders = (function(){
         return writePrivate(d, o, finalStatus).then(function(pv){
           saveBuyerName(d, doc.orderId, o.buyerName);
           saveCvDetails(d, doc.orderId, o.cvDetails);
+          /* The public order document really exists now — and only
+             now: count this use of the discount code (+1) and save
+             the code + amount on the order's private document.
+             Both are best-effort and never block checkout, and
+             neither runs at all when the checkout failed. */
+          saveDiscountDetails(d, doc.orderId, o.discountCode, o.discountAmount);
+          incrementDiscountUseChecked(d, o.discountCode);
           var chain = (o.thenStatus && o.thenStatus !== "Pending")
             ? setStatus(doc.orderId, o.thenStatus)
             : Promise.resolve(true);
@@ -3348,6 +3628,10 @@ window.PixelOrders = (function(){
         /* CV details (checkout box) — shown on the order row in the
            seller dashboard so the CV can be made straight away. */
         if(p.cvDetails) m.cvDetails = p.cvDetails;
+        /* Discount code + amount (from the private document) —
+           shown on the order row in the seller dashboard. */
+        if(p.discountCode) m.discountCode = p.discountCode;
+        if(p.discountAmount !== undefined) m.discountAmount = p.discountAmount;
         /* Last resort for orders placed before buyerName was ever
            saved (their private document holds no name at all):
            resolve the name from the buyer's registered-customer
@@ -3470,7 +3754,10 @@ window.PixelOrders = (function(){
     watchOrder: watchOrder,
     watchAll: watchAll,
     watchPrivate: watchPrivate,
-    watchSiteStats: watchSiteStats
+    watchSiteStats: watchSiteStats,
+    ensureDiscountCode: ensureDiscountCode,
+    validateDiscountCode: validateDiscountCode,
+    watchDiscountCode: watchDiscountCode
   };
 })();
 

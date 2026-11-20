@@ -1,4 +1,6 @@
 /* PixelNest service worker — app-shell caching.
+   v4: discount release (LAUNCH10) — same shell, new cache version
+   so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
    cached fallback), so the store opens fast on repeat visits and
@@ -21,7 +23,7 @@
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v3";
+var CACHE_VERSION = "pixelnest-shell-v4";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
