@@ -8,14 +8,28 @@
    stay live. Bump CACHE_VERSION whenever the shell changes.
 
    v2 fix: the app shell is the explicit file "index.html",
-   never the bare directory "../" — a directory URL can answer
+   never the bare directory "index.html" — a directory URL can answer
    404 on some hosts, which is what the installed app used to
    open to. Navigations that come back 404 (or fail outright)
    now fall back to the cached store page instead of showing
-   the host's error page. */
-var CACHE_VERSION = "pixelnest-shell-v2";
+   the host's error page.
+
+   v3: the store is split into separate pages (Home at
+   "index.html", the other pages beside this worker:
+   shop.html, categories.html, why-us.html, about.html,
+   contact.html, track-order.html). Every page is cached under
+   its own URL — a navigation is stored and served by the exact
+   address it was requested with, falling back to the cached
+   copy of that same page, then to the Home page. */
+var CACHE_VERSION = "pixelnest-shell-v3";
 var SHELL_URLS = [
   "index.html",
+  "shop.html",
+  "categories.html",
+  "why-us.html",
+  "about.html",
+  "contact.html",
+  "track-order.html",
   "assets/manifest.webmanifest",
   "assets/icon-192.png",
   "assets/icon-512.png",
@@ -59,15 +73,15 @@ self.addEventListener("fetch", function(event){
       fetch(req).then(function(res){
         if(res && res.ok){
           var copy = res.clone();
-          caches.open(CACHE_VERSION).then(function(cache){ cache.put("index.html", copy); });
+          caches.open(CACHE_VERSION).then(function(cache){ cache.put(req, copy); });
           return res;
         }
-        return caches.match("index.html").then(function(hit){
-          return hit || res;
+        return caches.match(req).then(function(hit){
+          return hit || caches.match("index.html").then(function(h2){ return h2 || res; });
         });
       }).catch(function(){
-        return caches.match("index.html").then(function(hit){
-          return hit || Response.error();
+        return caches.match(req).then(function(hit){
+          return hit || caches.match("index.html").then(function(h2){ return h2 || Response.error(); });
         });
       })
     );
