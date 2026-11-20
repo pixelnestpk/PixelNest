@@ -1123,6 +1123,37 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .faq-contact{font-weight:700;margin-top:4px}
 @media (max-width:700px){ .contact-grid{grid-template-columns:1fr} .shop-free-note{margin-bottom:52px} }
 </style>
+<style>
+/* ============ CUSTOM ORDER FILE ATTACHMENT + SELLER ORDER ALERTS ============
+   The custom order form can carry ONE customer file (uploaded to the
+   free file host; only its download link is saved with the order),
+   and the seller dashboard carries the order-notification bar. */
+/* Custom form (dark section): the attach-a-file box */
+.cfile{border:1.5px dashed rgba(255,255,255,.4);border-radius:12px;padding:14px;display:grid;gap:8px;background:rgba(255,255,255,.05)}
+.cfile-title{font-weight:800;font-size:.95rem}
+.cfile-hint{font-size:.83rem;opacity:.8;margin:0}
+.cfile-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cfile-btn{background:#fff;color:var(--navy);font-weight:800;border-radius:10px;padding:11px 18px;min-height:48px;display:inline-flex;align-items:center;cursor:pointer;font-size:.92rem;position:relative}
+.cfile-btn:hover{background:var(--gold-soft)}
+.cfile-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.cfile-name{font-size:.88rem;opacity:.9;word-break:break-all}
+.cfile-remove{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:7px 14px;font-weight:700;cursor:pointer;min-height:40px}
+.cfile-status{font-size:.86rem;font-weight:700;margin:0;color:#FFE9A8}
+.cfile-status.err{color:#FFB4B4}
+/* Seller dashboard: the customer's file download link on an order row */
+.cfile-link{color:var(--navy);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+/* Seller dashboard: order-notification bar */
+.notify-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:12px;padding:12px 14px;margin-top:12px}
+.notify-btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:11px 18px;font-weight:800;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:.92rem}
+.notify-btn:hover{background:#1E3350}
+.notify-btn svg{flex:none}
+.notify-btn.is-on{background:#166534}
+.notify-btn.is-on:hover{background:#14532D}
+.notify-btn.is-blocked{background:#991B1B}
+.notify-btn.is-blocked:hover{background:#7F1D1D}
+.notify-btn:disabled{opacity:.6;cursor:default}
+.notify-note{font-size:.85rem;color:var(--muted);flex:1;min-width:200px}
+</style>
 </head>
 <body id="top">
 <header>
@@ -1226,9 +1257,9 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
         <a class="strip-card" href="shop.html" data-sample="planner"><img src="assets/strip-planner.jpg" alt="Real open paper planner with handwritten monthly goals beside a cup of coffee" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail"><img src="assets/strip-thumbnail.jpg" alt="Real video editing timeline on a computer screen" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="social"><img src="assets/strip-social-desk.jpg" alt="Real designer desk with a laptop and desktop monitor, plants and a desk lamp" loading="lazy"><span>Design Templates · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="ebook-guide"><img src="assets/strip-ebook.jpg" alt="Real stack of printed books on a table" loading="lazy"><span>Ebooks &amp; Guides · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="ebook-guide"><img src="assets/strip-ebook.jpg" alt="Real stack of printed books on a table" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring"><img src="assets/strip-colouring.jpg" alt="Real coloured pencils resting on a real colouring book page" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
-        <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/strip-cv.jpg" alt="Real people reviewing printed documents at a desk with laptops" loading="lazy"><span>Professional CVs · Rs. 500</span></a>
+        <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/strip-cv.jpg" alt="Real people reviewing printed documents at a desk with laptops" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
         <a class="strip-card" href="shop.html" data-sample="social"><img src="assets/strip-social-phone.jpg" alt="Real smartphone showing social media app icons" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
         <a class="strip-card" href="#custom"><img src="assets/strip-custom.jpg" alt="Real art studio with printed posters on a table and framed prints on the walls" loading="lazy"><span>Custom Art Prints · Made for you</span></a>
       </div>
@@ -1238,9 +1269,9 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
         <a class="strip-card" href="shop.html" data-sample="planner" tabindex="-1"><img src="assets/strip-planner.jpg" alt="" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail" tabindex="-1"><img src="assets/strip-thumbnail.jpg" alt="" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="social" tabindex="-1"><img src="assets/strip-social-desk.jpg" alt="" loading="lazy"><span>Design Templates · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="ebook-guide" tabindex="-1"><img src="assets/strip-ebook.jpg" alt="" loading="lazy"><span>Ebooks &amp; Guides · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="ebook-guide" tabindex="-1"><img src="assets/strip-ebook.jpg" alt="" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring" tabindex="-1"><img src="assets/strip-colouring.jpg" alt="" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
-        <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/strip-cv.jpg" alt="" loading="lazy"><span>Professional CVs · Rs. 500</span></a>
+        <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/strip-cv.jpg" alt="" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
         <a class="strip-card" href="shop.html" data-sample="social" tabindex="-1"><img src="assets/strip-social-phone.jpg" alt="" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
         <a class="strip-card" href="#custom" tabindex="-1"><img src="assets/strip-custom.jpg" alt="" loading="lazy"><span>Custom Art Prints · Made for you</span></a>
       </div>
@@ -1393,6 +1424,16 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
           <option>Something else</option>
         </select>
         <textarea required id="cDetail" placeholder="Describe it — what you need, who it is for, any colours or style?"></textarea>
+        <div class="cfile">
+          <span class="cfile-title">Attach a file (optional)</span>
+          <p class="cfile-hint">Send the seller a file with your order — a PDF, a photo, a ZIP, anything: your photo for a poster, your old CV, your data file. It is uploaded with your order and the seller downloads it from your order in his dashboard.</p>
+          <div class="cfile-row">
+            <label class="cfile-btn">Choose file<input type="file" id="cFile" class="cfile-input" aria-label="Attach a file to your custom order"></label>
+            <span class="cfile-name" id="cFileName">No file chosen</span>
+            <button type="button" class="cfile-remove" id="cFileRemove" style="display:none">Remove</button>
+          </div>
+          <p class="cfile-status" id="cFileStatus" style="display:none"></p>
+        </div>
         <div class="pay-box">
           <span class="pay-amt">Payment — Easypaisa only, same as a regular order</span>
           <div class="pay-num-row">
@@ -1424,7 +1465,7 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       <details><summary>Are the social media templates editable?</summary><p>They are <b>finished, ready-to-post JPG images</b> (square post size, 1080×1080) — there is no Canva link, because none is needed: just add your caption and post. If you want your own business name, logo or text on the designs, place a <b>Custom Order</b> below and they will be made with your details.</p></details>
       <details><summary>What happens after I place my order?</summary><p>Your order starts as <b>Pending</b>. The seller checks your payment (Easypaisa Trx ID), accepts the order — it becomes <b>Active</b> — and uploads your file within the delivery time shown on the product (1–3 days). The order then shows <b>Completed</b> and your download button appears in <b>My Orders</b> and on the Track Order page. You can watch every step live with your Order ID — no need to message anyone.</p></details>
       <details><summary>Can I get a refund?</summary><p>Yes, when it is our side that failed: if your file is <b>not delivered</b> within the promised time, or the delivered file is <b>wrong and cannot be fixed</b>, you get a <b>full refund</b> of what you paid, sent back by Easypaisa. Mistakes in a file are always fixed free first. Because digital files can be copied, a correctly delivered file cannot be returned — so please try the <b>FREE Sample Pack</b> first to check the quality before buying. The full Refund Policy is linked in the footer.</p></details>
-      <details><summary>I ordered a CV — how do I send my details?</summary><p>When the Professional Europass CV is in your cart, the checkout form shows a <b>“Your CV details”</b> box — write your name, city, education, work experience, skills and languages there, and the seller makes your CV from exactly those details. If you missed the box, you can also send the details on WhatsApp chat after ordering, quoting your Order ID.</p></details>
+      <details><summary>I ordered a CV — how do I send my details?</summary><p>When the Professional Europass CV is in your cart, the checkout form shows a <b>“Your CV details”</b> box — write your name, city, education, work experience, skills and languages there, and the seller makes both your CV templates from exactly those details. If you missed the box, you can also send the details on WhatsApp chat after ordering, quoting your Order ID.</p></details>
       <details><summary>I live outside Pakistan — can I order?</summary><p>Payment on this store is by <b>Easypaisa only</b>, which needs a Pakistani mobile wallet. If you cannot pay by Easypaisa, message the seller on WhatsApp before ordering and he will tell you honestly whether another arrangement is possible for your order — please do not place a paid order you cannot pay for, as it cannot be accepted without payment.</p></details>
       <details><summary>How do ratings work on this store?</summary><p>Every product starts with “No reviews yet”. After buying, open the product page and tap the stars under “Rate this product” — your rating is saved on the website itself and counted in the product's average, with the total number of ratings shown next to it, just like the Play Store. One rating per product per browser. Only real ratings are ever shown — nothing is made up.</p></details>
       <details><summary>What if the file is wrong or I don't like it?</summary><p>Message on WhatsApp — if the file has a mistake, it will be fixed and re-sent. For custom orders, a preview is shown before final delivery.</p></details>
@@ -1530,7 +1571,7 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       <label>Your Mobile / WhatsApp Number <input required id="fPhone" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="tel"><span class="field-hint">This is YOUR number — the seller may contact you on it if needed. Your file itself is delivered in the app (My Orders / Track Order); ordering happens right here on the website, and WhatsApp is only for chat if you have a question.</span></label>
       <label>Email <input required type="email" id="fEmail" placeholder="you@email.com" autocomplete="email"></label>
       <div id="cvDetailsWrap" style="display:none">
-        <label>Your CV details <textarea id="fCvDetails" placeholder="Your full name, city, education, work experience, skills, languages — and the kind of job you want. The seller makes your Europass CV from exactly these details."></textarea><span class="field-hint">You are ordering the <b>Professional Europass CV</b> — the seller needs these details to make it. Write them here, or send them on WhatsApp chat after ordering, quoting your Order ID.</span></label>
+        <label>Your CV details <textarea id="fCvDetails" placeholder="Your full name, city, education, work experience, skills, languages — and the kind of job you want. The seller makes both your Europass CV templates from exactly these details."></textarea><span class="field-hint">You are ordering the <b>Professional Europass CV — 2 Templates</b> — the seller needs these details to make both templates. Write them here, or send them on WhatsApp chat after ordering, quoting your Order ID.</span></label>
       </div>
       <div id="paySection">
         <p style="font-weight:700;font-size:.88rem;margin:4px 0 8px">Payment Method — pay right here</p>
@@ -1656,6 +1697,10 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
         <div class="o-stat"><b id="dRating">—</b><span>Store Rating</span></div>
       </div>
       <p class="discount-usage" id="discountUsage" style="display:none"></p>
+      <div class="notify-bar">
+        <button type="button" class="notify-btn" id="notifyBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="notify-btn-txt">Enable order notifications</span></button>
+        <span class="notify-note" id="notifyNote">Get a WhatsApp-style alert with sound whenever a new order arrives — it stays in your notification tray until you dismiss it.</span>
+      </div>
       <div id="ordersList"></div>
       <h3>Add an order manually</h3>
       <form class="o-form" id="manualOrderForm">
@@ -1847,8 +1892,8 @@ var PRODUCTS = [
   { id:"budget", cat:"excel", badge:"Excel · Formulas Ready", name:"Excel Budget Tracker", desc:"Household expenses, salary and savings — all auto-calculated, with charts. Just type the amount; the maths is done for you.", price:790, delivery:"in 2 days", dmax:2, img:"assets/excel.webp", img2:"assets/budget-2.webp", img3:"assets/excel-3.webp", style1:"Budget Dashboard", style2:"Charts — Laptop & Phone", style3:"Inventory & Sales Sheet", alt:"Laptop showing an Excel budget tracker with charts", format:"XLSX (Excel + Google Sheets)", contents:"Monthly + yearly sheets with charts", includes:["Monthly and yearly budget sheets","Automatic charts and totals","Works in Excel and Google Sheets"] },
   { id:"invoice-bundle", cat:"excel", badge:"Excel · For Shops", name:"Invoice + Attendance + Salary Bundle", desc:"A 3-in-1 pack for small shops and offices: professional invoice, staff attendance and salary sheet — all with formulas.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/invoice.webp", img2:"assets/invoice-2.webp", style1:"Shop Counter Set", style2:"Invoice & Salary Sheet", alt:"Shop counter with invoice bills, attendance register and laptop showing salary sheet", format:"XLSX (Excel + Google Sheets)", contents:"3 templates in one bundle", includes:["Invoice template (add your own logo)","Attendance sheet (automatic present count)","Salary sheet (automatic totals)"] },
   { id:"social", cat:"design", badge:"100 Designs", name:"Social Media Templates — 100 Posts", desc:"100 ready-made posts for Instagram and Facebook — finished JPG images, ready to post. Business, quotes and sale styles. Just add your caption and post.", price:990, delivery:"in 2 days", dmax:2, img:"assets/social-2.webp", img2:"assets/strip-social-phone.jpg", style1:"Pastel Style Pack", style2:"Posts on Your Phone", alt:"Pastel social media post template cards arranged around a smartphone", format:"JPG images", contents:"100 designs · square post size", includes:["100 ready-made post designs (JPG images)","Square post size (1080×1080) — ready for Instagram & Facebook","Just add your caption and post — no editing needed"] },
-  { id:"cv", cat:"business", badge:"Europass Format", name:"Professional Europass CV", desc:"One professional Europass-format CV, made for you by the seller. Share your details and receive a finished, ready-to-submit CV — delivered as a file in the app.", price:500, delivery:"in 1–2 days", dmax:2, img:"assets/cv.webp", img2:"assets/cv-2.webp", style1:"Europass Layout", style2:"Sample CV Page", alt:"Professional Europass CV samples laid out on a desk", format:"PDF + DOCX", contents:"1 Europass CV — made for you", includes:["One Europass-format CV, professionally made for you","Finished file delivered in the app (PDF + DOCX)","Your details and experience formatted to the Europass standard","One free correction if a detail needs fixing"] },
-  { id:"ebook-guide", cat:"business", badge:"Ebook", name:"Ebook: Start Freelancing — Urdu Guide", desc:"A step-by-step Urdu guide to starting with Fiverr, data entry and digital products. Written in simple language for beginners.", price:990, delivery:"within 1 day", dmax:1, img:"assets/ebook.webp", img2:"assets/ebook-2.webp", style1:"Reading on Tablet", style2:"Cover & Desk View", alt:"Tablet showing a freelancing ebook guide on a freelancer's desk", format:"PDF", contents:"60+ pages", includes:["60+ pages in simple Urdu","Step-by-step guidance with diagrams and checklists","List of common beginner mistakes"] },
+  { id:"cv", cat:"business", badge:"2 Europass Templates", name:"Professional Europass CV — 2 Templates", desc:"Two professional Europass-style CV templates, both made for you by the seller. Share your details once and receive your finished CV in both Europass styles — ready to submit, delivered as files in the app.", price:400, delivery:"in 1–2 days", dmax:2, img:"assets/cv.webp", img2:"assets/cv-2.webp", style1:"Europass Style 1", style2:"Europass Style 2", alt:"Professional Europass CV samples laid out on a desk", format:"PDF + DOCX", contents:"2 Europass CV templates — made for you", includes:["Two professional Europass-style CV templates, both made for you","Both templates delivered in the app (PDF + DOCX)","Your details and experience formatted to the Europass standard","One free correction if a detail needs fixing"] },
+  { id:"ebook-guide", cat:"business", badge:"Ebook", name:"Ebook: Start Freelancing — Urdu Guide", desc:"A step-by-step Urdu guide to starting with Fiverr, data entry and digital products. Written in simple language for beginners.", price:1200, delivery:"within 1 day", dmax:1, img:"assets/ebook.webp", img2:"assets/ebook-2.webp", style1:"Reading on Tablet", style2:"Cover & Desk View", alt:"Tablet showing a freelancing ebook guide on a freelancer's desk", format:"PDF", contents:"60+ pages", includes:["60+ pages in simple Urdu","Step-by-step guidance with diagrams and checklists","List of common beginner mistakes"] },
   { id:"thumbnail", cat:"design", badge:"For YouTubers", name:"YouTube Thumbnail Pack — 30 Templates", desc:"30 ready-made YouTube thumbnails (PNG, 1280×720), designed to earn clicks. Add your own text in any free photo editor and put it on your video.", price:790, delivery:"within 1 day", dmax:1, img:"assets/thumbnails.webp", img2:"assets/thumbnails-2.webp", style1:"Template Grid", style2:"Gaming, Food & Travel", alt:"Monitor showing a grid of bold colourful YouTube thumbnails", format:"PNG images", contents:"30 designs + font & colour guide", includes:["30 ready-made thumbnails (PNG, 1280×720)","Vlog, tech, cooking and Islamic styles","Font and colour guide included"] }
 ];
 
@@ -2565,6 +2610,50 @@ document.getElementById("downloadOrder").addEventListener("click", function(){
 });
 
 var customLastOid = "";
+/* Optional file attachment on the custom order: the customer can
+   send the seller ONE file (a PDF, a photo, a ZIP — anything) with
+   the order. On submit the file is uploaded FIRST to gofile.io
+   (window.PixelFiles — gofile only, no other host), and only its
+   download link travels with the order: it is saved on the order's
+   private document and the seller sees a download link on the order
+   in his dashboard.
+   If the upload fails, the order is NOT placed — the customer is
+   told plainly and can retry, or remove the file and order without
+   it. No file chosen: the order is placed exactly as before. */
+var customFile = null;
+function fmtFileSize(n){
+  if(n === null || n === undefined || isNaN(n)) return "";
+  if(n < 1024) return n + " B";
+  if(n < 1048576) return Math.round(n / 1024) + " KB";
+  return (Math.round(n / 104857.6) / 10) + " MB";
+}
+function paintCustomFile(){
+  var nm = document.getElementById("cFileName");
+  var rm = document.getElementById("cFileRemove");
+  if(nm) nm.textContent = customFile ? (customFile.name + (customFile.size ? " (" + fmtFileSize(customFile.size) + ")" : "")) : "No file chosen";
+  if(rm) rm.style.display = customFile ? "" : "none";
+}
+function setCustomFileStatus(txt, isErr){
+  var st = document.getElementById("cFileStatus");
+  if(!st) return;
+  st.textContent = txt || "";
+  st.style.display = txt ? "" : "none";
+  st.classList.toggle("err", !!isErr);
+}
+var _cfi = document.getElementById("cFile");
+if(_cfi) _cfi.addEventListener("change", function(){
+  customFile = (_cfi.files && _cfi.files.length) ? _cfi.files[0] : null;
+  setCustomFileStatus("", false);
+  paintCustomFile();
+});
+var _cfr = document.getElementById("cFileRemove");
+if(_cfr) _cfr.addEventListener("click", function(){
+  customFile = null;
+  if(_cfi) _cfi.value = "";
+  setCustomFileStatus("", false);
+  paintCustomFile();
+});
+paintCustomFile();
 var _cf=document.getElementById("customForm"); if(_cf) _cf.addEventListener("submit", function(e){
   e.preventDefault();
   if(window.PixelAccount && !window.PixelAccount.requireSignIn("custom")) return;
@@ -2573,29 +2662,54 @@ var _cf=document.getElementById("customForm"); if(_cf) _cf.addEventListener("sub
   var detail=document.getElementById("cDetail").value.trim();
   var pay="Easypaisa"; /* Easypaisa only — the custom form offers no other method */
   var trx=document.getElementById("cTrx").value.trim();
-  var oid=makeOrderId();
-  customLastOid = oid;
-  /* Custom orders follow the SAME flow as regular orders: they are
-     placed as Pending and become Active only when the seller accepts
-     them in his dashboard — for a paid custom order, only once its
-     Trx ID has been submitted (payment sent). No WhatsApp step;
-     WhatsApp is only the optional chat link in the success panel.
-     The description stays in this browser's flow only — tracking
-     keeps the standard fields. */
-  var customStatus = "Pending";
-  recordOrder({ id: oid, product: "Custom — " + type, name: name, phone: "", status: customStatus, pay: pay, trx: trx });
-  if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: "Custom — " + type, quantity: 1, total: 0, deliveryNote: "Custom order — your file will be uploaded in the app (download from My Orders or the Track Order page), within 2–3 days", paymentMethod: pay, trxId: trx, buyerName: name, uid: (window.PixelAccount ? window.PixelAccount.uid() : ""), thenStatus: "" });
-  var cs = document.getElementById("customSuccess");
-  if(cs){
-    document.getElementById("customOid").textContent = oid;
-    var css = document.getElementById("customSuccessStatus");
-    if(css) css.innerHTML = trx
-      ? "Your order is saved on the website and is <b>Pending</b> — payment received (Trx ID: <b>" + escHtml(trx) + "</b>). The seller will accept your order, confirm the price and deliver within 2–3 days — the file will appear in the app (My Orders / Track Order). Track it any time with your Order ID."
-      : "Your order is saved on the website and is <b>Pending — payment pending</b>. Pay the price the seller confirms via <b>Easypaisa to 03361520429</b>, then share the Trx ID with the seller on WhatsApp chat — the seller can then accept your order and it becomes <b>Active</b>. Delivery within 2–3 days after that — the file will appear in the app (My Orders / Track Order). Track it any time with your Order ID.";
-    cs.style.display = "block";
-    cs.scrollIntoView({behavior:"smooth", block:"center"});
+  var submitBtn = _cf.querySelector('button[type="submit"]');
+  function placeCustomOrder(clientFile){
+    var oid=makeOrderId();
+    customLastOid = oid;
+    /* Custom orders follow the SAME flow as regular orders: they are
+       placed as Pending and become Active only when the seller accepts
+       them in his dashboard — for a paid custom order, only once its
+       Trx ID has been submitted (payment sent). No WhatsApp step;
+       WhatsApp is only the optional chat link in the success panel.
+       The description stays in this browser's flow only — tracking
+       keeps the standard fields. */
+    var customStatus = "Pending";
+    recordOrder({ id: oid, product: "Custom — " + type, name: name, phone: "", status: customStatus, pay: pay, trx: trx, clientFile: clientFile || null });
+    if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: "Custom — " + type, quantity: 1, total: 0, deliveryNote: "Custom order — your file will be uploaded in the app (download from My Orders or the Track Order page), within 2–3 days", paymentMethod: pay, trxId: trx, buyerName: name, uid: (window.PixelAccount ? window.PixelAccount.uid() : ""), thenStatus: "", clientFile: clientFile || null });
+    var cs = document.getElementById("customSuccess");
+    if(cs){
+      document.getElementById("customOid").textContent = oid;
+      var css = document.getElementById("customSuccessStatus");
+      if(css) css.innerHTML = (trx
+        ? "Your order is saved on the website and is <b>Pending</b> — payment received (Trx ID: <b>" + escHtml(trx) + "</b>). The seller will accept your order, confirm the price and deliver within 2–3 days — the file will appear in the app (My Orders / Track Order). Track it any time with your Order ID."
+        : "Your order is saved on the website and is <b>Pending — payment pending</b>. Pay the price the seller confirms via <b>Easypaisa to 03361520429</b>, then share the Trx ID with the seller on WhatsApp chat — the seller can then accept your order and it becomes <b>Active</b>. Delivery within 2–3 days after that — the file will appear in the app (My Orders / Track Order). Track it any time with your Order ID.")
+        + (clientFile ? " <b>Your file (“" + escHtml(clientFile.name || "attached file") + "”) was sent to the seller with this order.</b>" : "");
+      cs.style.display = "block";
+      cs.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+    showToast("Custom order placed on the website — Order ID: " + oid + (trx ? " — Pending, payment received" : " — Pending, payment pending"));
   }
-  showToast("Custom order placed on the website — Order ID: " + oid + (trx ? " — Pending, payment received" : " — Pending, payment pending"));
+  if(customFile){
+    if(!window.PixelFiles || !window.PixelFiles.uploadOne){
+      setCustomFileStatus("File upload is not available at this moment — remove the file to place your order without it, or try again shortly.", true);
+      return;
+    }
+    if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = "Uploading your file…"; }
+    setCustomFileStatus("Uploading your file… 0%", false);
+    window.PixelFiles.uploadOne(customFile, function(frac){
+      setCustomFileStatus("Uploading your file… " + Math.round(frac * 100) + "%", false);
+    }).then(function(url){
+      setCustomFileStatus("File uploaded — placing your order…", false);
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = "Place Custom Order →"; }
+      placeCustomOrder({ name: customFile.name, url: url });
+    }).catch(function(){
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = "Place Custom Order →"; }
+      setCustomFileStatus("Your file could not be uploaded — check your connection and tap “Place Custom Order” again to retry, or remove the file to place the order without it. Your order has NOT been placed yet.", true);
+      showToast("File upload failed — your custom order was not placed yet");
+    });
+    return;
+  }
+  placeCustomOrder(null);
 });
 var _ct=document.getElementById("customTrackBtn"); if(_ct) _ct.addEventListener("click", function(){
   if(customLastOid) openTrackPage(customLastOid);
@@ -2700,7 +2814,7 @@ function fmtTs(ts){
 function recordOrder(o){
   if(!o || !o.id) return;
   if(orders.some(function(x){ return x.id === o.id; })) return;
-  orders.unshift({ id:o.id, product:o.product || "—", name:o.name || "—", phone:o.phone || "", date: todayStr(), status:o.status || "Pending", pay:o.pay || "", trx:o.trx || "", cvDetails:o.cvDetails || "", discountCode:o.discountCode || "", discountAmount:Number(o.discountAmount) || 0 });
+  orders.unshift({ id:o.id, product:o.product || "—", name:o.name || "—", phone:o.phone || "", date: todayStr(), status:o.status || "Pending", pay:o.pay || "", trx:o.trx || "", cvDetails:o.cvDetails || "", discountCode:o.discountCode || "", discountAmount:Number(o.discountAmount) || 0, clientFile:o.clientFile || null });
   saveOrders(); renderOrders();
 }
 var fsOrders = [];
@@ -2899,6 +3013,7 @@ function fsOrderCardHtml(o, localById){
   var cvDet = String(o.cvDetails || (loc && loc.cvDetails) || "").trim();
   var discCode = String(o.discountCode || (loc && loc.discountCode) || "").trim();
   var discAmt = Number(o.discountAmount || (loc && loc.discountAmount) || 0);
+  var cFile = o.clientFile || (loc && loc.clientFile) || null;
   return '<div class="orow"><span class="oid">' + escHtml(o.orderId) + '</span>'
     + '<span class="o-pill pill-' + escHtml(st) + '">' + escHtml(st) + '</span>'
     + '<span class="ofield"><span>Buyer</span><b>' + escHtml(buyerNameFor(o, loc) || "—") + '</b></span>'
@@ -2908,6 +3023,7 @@ function fsOrderCardHtml(o, localById){
     + (fmtTs(o.createdAt) ? '<span class="orow-date">' + fmtTs(o.createdAt) + '</span>' : '')
     + (cvDet ? '<span class="cv-details"><span>CV details from the customer</span><b>' + escHtml(cvDet) + '</b></span>' : '')
     + (discCode && discAmt > 0 ? '<span class="cv-details"><span>Discount</span><b>' + escHtml(discCode) + ': −Rs. ' + discAmt.toLocaleString("en-PK") + '</b></span>' : '')
+    + (cFile && cFile.url ? '<span class="cv-details"><span>File from the customer</span><b><a class="cfile-link" href="' + escHtml(cFile.url) + '" target="_blank" rel="noopener">Download — ' + escHtml(cFile.name || "customer file") + '</a></b></span>' : '')
     + '<span class="orow-actions">'
     + nameActionHtml("fs", o.orderId, buyerNameFor(o, loc))
     + (st === "Pending" ? acceptBtnHtml("fs", o.orderId, orderCanAccept(pm, trx, o.total)) : '')
@@ -2927,6 +3043,7 @@ function localOrderCardHtml(o){
     + '<span class="orow-date">' + escHtml(o.date) + '</span>'
     + (String(o.cvDetails || "").trim() ? '<span class="cv-details"><span>CV details from the customer</span><b>' + escHtml(o.cvDetails) + '</b></span>' : '')
     + (String(o.discountCode || "").trim() && Number(o.discountAmount) > 0 ? '<span class="cv-details"><span>Discount</span><b>' + escHtml(o.discountCode) + ': −Rs. ' + Number(o.discountAmount).toLocaleString("en-PK") + '</b></span>' : '')
+    + (o.clientFile && o.clientFile.url ? '<span class="cv-details"><span>File from the customer</span><b><a class="cfile-link" href="' + escHtml(o.clientFile.url) + '" target="_blank" rel="noopener">Download — ' + escHtml(o.clientFile.name || "customer file") + '</a></b></span>' : '')
     + '<span class="orow-actions">'
     + nameActionHtml("local", o.id, buyerNameFor(o, null))
     + (st === "Pending" ? acceptBtnHtml("local", o.id, orderCanAccept(o.pay, o.trx, (o.total !== undefined && o.total !== null ? o.total : null))) : '')
@@ -3127,6 +3244,7 @@ function openOrdersDashboard(){
     return;
   }
   startFsWatch(); startDiscountWatch(); renderOrders(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
+  if(window.SellerNotify) window.SellerNotify.refreshBtn();
 }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
 document.getElementById("openOrders").addEventListener("click", openOrdersDashboard);
@@ -3784,6 +3902,21 @@ window.PixelOrders = (function(){
     } catch(e){}
   }
 
+  /* The file a customer attached to a custom order (uploaded to the
+     free file host before the order was placed — only its name and
+     download link are stored) is saved into the PRIVATE document
+     only, in the same separate merge-write pattern as the buyer
+     name and CV details: the seller dashboard shows a download link
+     on the order row so he can fetch the customer's file. A failure
+     is silent — the order itself is never blocked. */
+  function saveClientFile(d, orderId, clientFile){
+    if(!clientFile || !clientFile.url) return;
+    try {
+      d.collection("orderPrivate").doc(String(orderId)).set({ clientFile: { name: String(clientFile.name || "Customer file"), url: String(clientFile.url) } }, { merge: true })
+        .catch(function(){ /* seller convenience only — never block the order */ });
+    } catch(e){}
+  }
+
   /* ---- Discount code LAUNCH10 ------------------------------------
      One code, kept in "discountCodes/LAUNCH10": 10% off, at most 20
      orders. The document is seeded create-if-missing (the seed
@@ -3931,6 +4064,7 @@ window.PixelOrders = (function(){
         var cur = snap.data() || {};
         saveBuyerName(d, doc.orderId, o.buyerName);
         saveCvDetails(d, doc.orderId, o.cvDetails);
+        saveClientFile(d, doc.orderId, o.clientFile);
         if(o.thenStatus) setStatus(doc.orderId, o.thenStatus);
         return { ok: true, privateOk: true, existed: true, status: cur.status || finalStatus };
       }
@@ -3940,6 +4074,7 @@ window.PixelOrders = (function(){
         return writePrivate(d, o, finalStatus).then(function(pv){
           saveBuyerName(d, doc.orderId, o.buyerName);
           saveCvDetails(d, doc.orderId, o.cvDetails);
+          saveClientFile(d, doc.orderId, o.clientFile);
           /* The public order document really exists now — and only
              now: count this use of the discount code (+1) and save
              the code + amount on the order's private document.
@@ -3998,6 +4133,10 @@ window.PixelOrders = (function(){
         /* CV details (checkout box) — shown on the order row in the
            seller dashboard so the CV can be made straight away. */
         if(p.cvDetails) m.cvDetails = p.cvDetails;
+        /* File the customer attached to a custom order (only its
+           download link is stored, on the private document) — the
+           seller dashboard shows a download link on the order row. */
+        if(p.clientFile && p.clientFile.url) m.clientFile = p.clientFile;
         /* Discount code + amount (from the private document) —
            shown on the order row in the seller dashboard. */
         if(p.discountCode) m.discountCode = p.discountCode;
@@ -4216,6 +4355,47 @@ window.PixelAccount = (function(){
   var tries = 0;
   var myUnsub = null;
   var myPrivUnsub = null;
+  /* Seller new-order alerts: while the SELLER is signed in, a live
+     listener on the public "orders" collection watches for orders
+     that were not there before. The FIRST snapshot only sets the
+     baseline (every order that already exists), so signing in never
+     fires alerts for old orders; every order appearing after that
+     is genuinely new and raises ONE alert through window.SellerNotify
+     (a WhatsApp-style chime + a service-worker notification that
+     stays in the tray until the seller dismisses it). The listener
+     runs on any store page while the seller stays signed in — the
+     dashboard does not need to be open — and stops on sign-out. */
+  var orderNotifyUnsub = null;
+  var orderNotifySeen = null;
+  function startOrderNotify(){
+    if(orderNotifyUnsub || !db) return;
+    orderNotifySeen = null;
+    try {
+      orderNotifyUnsub = db.collection("orders").orderBy("createdAt", "desc").limit(100).onSnapshot(function(snap){
+        var rows = [];
+        snap.forEach(function(doc){ rows.push({ id: doc.id, data: doc.data() || {} }); });
+        if(orderNotifySeen === null){
+          orderNotifySeen = {};
+          rows.forEach(function(r){ orderNotifySeen[r.id] = true; });
+          return;
+        }
+        rows.forEach(function(r){
+          if(orderNotifySeen[r.id]) return;
+          orderNotifySeen[r.id] = true;
+          var o = r.data;
+          var total = Number(o.total) || 0;
+          var body = String(o.productName || "New order")
+            + (total > 0 ? " · Rs. " + total.toLocaleString("en-PK") : "")
+            + " · Order " + String(o.orderId || r.id);
+          if(window.SellerNotify) window.SellerNotify.alert("New order — PixelNest", body, "pixelnest-order-" + String(o.orderId || r.id));
+        });
+      }, function(){ /* listener refused/unavailable — alerts simply stay off */ });
+    } catch(e){}
+  }
+  function stopOrderNotify(){
+    if(orderNotifyUnsub){ try { orderNotifyUnsub(); } catch(e){} orderNotifyUnsub = null; }
+    orderNotifySeen = null;
+  }
   var myOrdersArr = null;
   var myPrivMap = {};
 
@@ -4253,6 +4433,7 @@ window.PixelAccount = (function(){
     auth.onAuthStateChanged(function(u){
       currentUser = u || null;
       paintAccount();
+      if(isSeller()) startOrderNotify(); else stopOrderNotify();
       paintVerifyBoxes();
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
@@ -4838,6 +5019,20 @@ window.PixelAccount = (function(){
     }
   };
 
+  /* One-file upload for the CUSTOM ORDER form, exposed so a
+     customer can attach one file to a custom order. This path uses
+     gofile.io ONLY — the one host the customer-facing feature was
+     asked for: if gofile fails, the upload fails (the customer is
+     told and the order is not placed) rather than the customer's
+     personal file being sent to any other host. The file itself
+     goes to gofile and only the returned download link is saved
+     with the order (on its private document), where the seller
+     downloads it from his dashboard. */
+  window.PixelFiles = {
+    uploadOne: function(file, onFrac){ return uploadOneFileGoFile(file, onFrac); },
+    isUploadFailedError: isUploadFailedError
+  };
+
   /* ----- wiring ----- */
   function wire(){
     var si = $("signInBtn");
@@ -5155,6 +5350,150 @@ function closePolicyPage(){
     tmp.remove();
     if(window.PixelRatings && window.PixelRatings.repaint) window.PixelRatings.repaint();
   }
+})();
+</script>
+
+<script>
+/* =====================================================================
+   Seller order alerts — sound + tray notifications (WhatsApp-style).
+
+   - window.SellerNotify.alert(title, body, tag) is called by the
+     accounts module the moment a genuinely NEW order appears while
+     the seller is signed in. It plays a short two-note chime and
+     shows the notification through the SERVICE WORKER
+     (registration.showNotification) with requireInteraction, so the
+     alert stays in the phone's notification tray until the seller
+     dismisses it himself — it never auto-disappears. Where the
+     worker is unavailable it falls back to a plain Notification.
+   - The "Enable order notifications" button in the seller dashboard
+     asks for the notification permission (and unlocks the sound —
+     browsers only allow audio after a tap). Once granted, tapping
+     it again sends a test alert so the seller can hear and see
+     exactly what a new order will look like.
+   - Notifications can only fire while the store is open in the
+     browser (or installed as the app) with the seller signed in —
+     a fully closed app cannot be woken without a push server, and
+     nothing here pretends otherwise.
+   ===================================================================== */
+window.SellerNotify = (function(){
+  var audioCtx = null;
+  function unlockAudio(){
+    try {
+      if(!audioCtx){
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if(AC) audioCtx = new AC();
+      }
+      if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    } catch(e){}
+    return audioCtx;
+  }
+  /* Two-note chime, synthesised with WebAudio — no audio file to
+     host, and it works offline once the page has loaded. */
+  function chime(){
+    var ctx = unlockAudio();
+    if(!ctx) return;
+    try {
+      var t0 = ctx.currentTime + 0.02;
+      [[1318.5, 0], [1760, 0.16]].forEach(function(n){
+        var osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, t0 + n[1]);
+        g.gain.exponentialRampToValueAtTime(0.22, t0 + n[1] + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + n[1] + 0.34);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(t0 + n[1]); osc.stop(t0 + n[1] + 0.4);
+      });
+    } catch(e){}
+  }
+  function iconUrl(){
+    try { return new URL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAD2klEQVR4nO3dUWoUQRSF4Y7kXUUfdEWux5W4HlfkiyDuwIeCJBAZeuZ037o1+b4NzIH8VA09Yj98+PRlg1u9mz2AtQmIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiDzOHrBt2/bzx/uyz/r2/e/ZH/Hn96+zP+LJx89fyz7rvx4m/gdTld28dnhJld28NqukOQHNTeelQzKam85L9RlN+A7Up57tiDF96tlmjKkOqFU9QzKpVT1D8aTSgBrWM9w2rGE9Q+WwuoDa1jNcO69tPUPZvKKAmtcz7B/ZvJ6hZqQHiUQqAlri+Bn2TF3i+BkKpjqBiAiIyOkBLXR/DZcHL3R/DWcPdgIRERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBETk9oIL3cx3r8uDp7+e61tmDnUBEBESkIqCFbrE9Uxe6xQqmOoGeLRT6HjWhFwXkb3Ov6k6g5g1dO695Q2XzSq+wtg3dNqxtQ5XDqr8DNWwomdSwoeJJb/q130fV3OQNLFNqnhPQMDejw8/CuRnNOgtnBvSksqSCO7SypOl3aIuAWJcHiUQERERARAREREBEBEREQEQERORx9oBtu7tHt3f2YP2ymU+i7+zHozv7aW+nOQE1+fl6OyijJv+4YJuR0YTvQH3q2Y4Y06eebcaY6oBa1TMkk1rVMxRPKg2oYT3DbcMa1jNUDqsLqG09w7Xz2tYzlM0rCqh5PcP+kc3rGWpGepBIpCKgJY6fYc/UJY6foWCqE4iIgIicHtBC99dwefBC99dw9mAnEBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERCR0wMqeD/XsS4Pnv5+rmudPdgJRERARCoCWugW2zN1oVusYKoT6NlCoe9RE3pRQP4296ruBGre0LXzmjdUNq/0Cmvb0G3D2jZUOaz6O1DDhpJJDRsqnvSmX/t9VM1N3sAypeY5AQ1zMzr8LJyb0ayzcGZATypLKrhDK0uafoe2CIh1eZBIREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARP4B8Abs2xo+ZWsAAAAASUVORK5CYII=", window.location.href).href; }
+    catch(e){ return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAD2klEQVR4nO3dUWoUQRSF4Y7kXUUfdEWux5W4HlfkiyDuwIeCJBAZeuZ037o1+b4NzIH8VA09Yj98+PRlg1u9mz2AtQmIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiAiIiICICIiIgIgIiIiAiDzOHrBt2/bzx/uyz/r2/e/ZH/Hn96+zP+LJx89fyz7rvx4m/gdTld28dnhJld28NqukOQHNTeelQzKam85L9RlN+A7Up57tiDF96tlmjKkOqFU9QzKpVT1D8aTSgBrWM9w2rGE9Q+WwuoDa1jNcO69tPUPZvKKAmtcz7B/ZvJ6hZqQHiUQqAlri+Bn2TF3i+BkKpjqBiAiIyOkBLXR/DZcHL3R/DWcPdgIRERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBETk9oIL3cx3r8uDp7+e61tmDnUBEBESkIqCFbrE9Uxe6xQqmOoGeLRT6HjWhFwXkb3Ov6k6g5g1dO695Q2XzSq+wtg3dNqxtQ5XDqr8DNWwomdSwoeJJb/q130fV3OQNLFNqnhPQMDejw8/CuRnNOgtnBvSksqSCO7SypOl3aIuAWJcHiUQERERARAREREBEBEREQEQERORx9oBtu7tHt3f2YP2ymU+i7+zHozv7aW+nOQE1+fl6OyijJv+4YJuR0YTvQH3q2Y4Y06eebcaY6oBa1TMkk1rVMxRPKg2oYT3DbcMa1jNUDqsLqG09w7Xz2tYzlM0rCqh5PcP+kc3rGWpGepBIpCKgJY6fYc/UJY6foWCqE4iIgIicHtBC99dwefBC99dw9mAnEBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERCR0wMqeD/XsS4Pnv5+rmudPdgJRERARCoCWugW2zN1oVusYKoT6NlCoe9RE3pRQP4296ruBGre0LXzmjdUNq/0Cmvb0G3D2jZUOaz6O1DDhpJJDRsqnvSmX/t9VM1N3sAypeY5AQ1zMzr8LJyb0ayzcGZATypLKrhDK0uafoe2CIh1eZBIREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARAREREBEBEREQEQERERARP4B8Abs2xo+ZWsAAAAASUVORK5CYII="; }
+  }
+  function showNow(title, body, tag){
+    var opts = {
+      body: body,
+      icon: iconUrl(),
+      badge: iconUrl(),
+      tag: tag || "pixelnest-order",
+      requireInteraction: true, /* stays in the tray until dismissed */
+      vibrate: [200, 100, 200]
+    };
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.ready.then(function(reg){
+        if(reg && reg.showNotification) return reg.showNotification(title, opts);
+        throw new Error("no-sw-notification");
+      }).catch(function(){
+        try { new Notification(title, opts); } catch(e){}
+      });
+    } else {
+      try { new Notification(title, opts); } catch(e){}
+    }
+  }
+  function alertNew(title, body, tag){
+    chime();
+    if(!("Notification" in window)) return;
+    if(Notification.permission === "granted") showNow(title, body, tag);
+  }
+  function setBtnLabel(btn, txt){
+    var s = btn.querySelector(".notify-btn-txt");
+    if(s) s.textContent = txt; else btn.textContent = txt;
+  }
+  function refreshBtn(){
+    var btn = document.getElementById("notifyBtn");
+    var note = document.getElementById("notifyNote");
+    if(!btn) return;
+    btn.classList.remove("is-on"); btn.classList.remove("is-blocked");
+    btn.disabled = false;
+    if(!("Notification" in window)){
+      btn.disabled = true;
+      setBtnLabel(btn, "Notifications not supported in this browser");
+      if(note) note.textContent = "This browser cannot show notifications. Keep the store open and watch the dashboard for new orders.";
+      return;
+    }
+    var p = Notification.permission;
+    if(p === "granted"){
+      btn.classList.add("is-on");
+      setBtnLabel(btn, "Order notifications are ON — tap to test");
+      if(note) note.textContent = "Every new order now plays a sound and leaves a notification in your tray until you dismiss it. Works on any store page while you are signed in as the seller and the store is open (or installed as the app).";
+    } else if(p === "denied"){
+      btn.classList.add("is-blocked");
+      setBtnLabel(btn, "Notifications are blocked — tap for help");
+      if(note) note.textContent = "Your browser has blocked notifications for this site, so order alerts cannot appear. Tap the button for how to allow them again.";
+    } else {
+      setBtnLabel(btn, "Enable order notifications");
+      if(note) note.textContent = "Get a WhatsApp-style alert with sound whenever a new order arrives — it stays in your notification tray until you dismiss it.";
+    }
+  }
+  function wireBtn(){
+    var btn = document.getElementById("notifyBtn");
+    if(!btn) return;
+    if(!btn.__wired){
+      btn.__wired = true;
+      btn.addEventListener("click", function(){
+        unlockAudio(); /* the tap is the user gesture audio needs */
+        if(!("Notification" in window)){ refreshBtn(); return; }
+        if(Notification.permission === "granted"){
+          alertNew("PixelNest — test alert", "Order notifications are working. This is how a new order alert looks and sounds.", "pixelnest-test");
+          refreshBtn();
+          return;
+        }
+        if(Notification.permission === "denied"){
+          if(typeof showToast === "function") showToast("Notifications are blocked — open your browser's site settings for this store, set Notifications to Allow, then tap this button again");
+          return;
+        }
+        Notification.requestPermission().then(function(p){
+          refreshBtn();
+          if(p === "granted") alertNew("PixelNest — notifications ON", "You will now get a sound + a tray notification for every new order.", "pixelnest-test");
+          else if(typeof showToast === "function") showToast("Notification permission was not given — order alerts stay off");
+        }).catch(function(){ refreshBtn(); });
+      });
+    }
+    refreshBtn();
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireBtn);
+  else wireBtn();
+  return { alert: alertNew, chime: chime, refreshBtn: wireBtn };
 })();
 </script>
 </body>

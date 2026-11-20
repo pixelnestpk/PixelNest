@@ -1,5 +1,5 @@
 /* PixelNest service worker — app-shell caching.
-   v6: EmailJS real values release — same shell, new cache version
+   v7: seller order notifications (showNotification) + custom-order file upload release — same shell, new cache version
    so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
@@ -23,7 +23,7 @@
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v6";
+var CACHE_VERSION = "pixelnest-shell-v7";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
@@ -57,6 +57,24 @@ self.addEventListener("activate", function(event){
         if(k !== CACHE_VERSION) return caches.delete(k);
       }));
     }).then(function(){ return self.clients.claim(); })
+  );
+});
+
+/* Seller order alerts: the page shows new-order notifications
+   through this worker (registration.showNotification with
+   requireInteraction, so an alert stays in the tray until the
+   seller dismisses it). Tapping one brings the store back to the
+   front — an already-open window is focused, otherwise the store
+   home page is opened — and the notification is cleared. */
+self.addEventListener("notificationclick", function(event){
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list){
+      for(var i = 0; i < list.length; i++){
+        if("focus" in list[i]) return list[i].focus();
+      }
+      if(self.clients.openWindow) return self.clients.openWindow("index.html");
+    })
   );
 });
 
