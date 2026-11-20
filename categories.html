@@ -1240,6 +1240,39 @@ window.PixelPush = (function(){
   return { subscribeSeller: subscribeSeller, sendNewOrder: sendNewOrder };
 })();
 </script>
+<style>
+/* ================= LAUNCH10 SIDE BADGE =================
+   Small promo badge FIXED to the left edge of every page: it
+   stays on screen while the page is scrolled up and down, in
+   the browser and in the installed app (PWA) alike, because
+   every page of the store carries this same fixed badge and
+   the service worker serves those pages in the app. Under the
+   code it shows a price: normally an example ("Rs. 990 ->
+   Rs. 891"); once the code is applied, the cart's real
+   discounted total. A gentle gold glow pulse draws the eye
+   without nagging. It stays hidden until the live Firestore
+   check on "discountCodes/LAUNCH10" confirms a use remains;
+   the moment usedCount reaches maxUses (20 orders) it
+   disappears and never comes back. z-index 55 keeps it below
+   the cart overlay (60) and drawer (70), and the slim
+   left-edge card never collides with the WhatsApp button
+   (bottom right) or covers more than a sliver of content. */
+.launch-badge{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:55;display:none;align-items:flex-start;gap:7px;max-width:150px;background:#0B0E13;color:#F3C969;border:1px solid rgba(201,162,39,.65);border-left:0;border-radius:0 12px 12px 0;padding:10px 10px 9px 8px;font-weight:800;text-align:left;cursor:pointer;box-shadow:0 8px 22px rgba(11,14,19,.28);animation:launchGlow 2.6s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+.launch-badge.show{display:flex}
+.launch-badge:hover{background:#171B23}
+.launch-badge .lb-dot{flex:none;width:8px;height:8px;border-radius:50%;background:#C9A227;box-shadow:0 0 8px 2px rgba(201,162,39,.8);margin-top:4px}
+.launch-badge .lb-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.launch-badge .lb-code{font-size:.74rem;letter-spacing:.05em;line-height:1.25}
+.launch-badge .lb-price{font-size:.7rem;font-weight:700;letter-spacing:0;line-height:1.3;color:rgba(255,255,255,.82);white-space:nowrap}
+.launch-badge .lb-price s{opacity:.65;font-weight:600}
+.launch-badge .lb-price b{color:#F3C969;font-weight:800}
+.launch-badge.applied{animation:none;background:#123524;color:#B7F4CE;border-color:rgba(21,128,61,.55)}
+.launch-badge.applied .lb-dot{background:#22C55E;box-shadow:none}
+.launch-badge.applied .lb-price{color:rgba(255,255,255,.85)}
+.launch-badge.applied .lb-price b{color:#B7F4CE}
+@keyframes launchGlow{0%,100%{box-shadow:0 8px 22px rgba(11,14,19,.28),0 0 0 0 rgba(201,162,39,0)}50%{box-shadow:0 8px 22px rgba(11,14,19,.28),0 0 20px 5px rgba(201,162,39,.5)}}
+@media (max-width:560px){.launch-badge{max-width:126px;padding:8px 8px 7px 7px;gap:5px}.launch-badge .lb-code{font-size:.66rem}.launch-badge .lb-price{font-size:.63rem}}
+</style>
 </head>
 <body id="top">
 <header>
@@ -5385,6 +5418,105 @@ window.SellerNotify = (function(){
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireBtn);
   else wireBtn();
   return { alert: alertNew, chime: chime, refreshBtn: wireBtn };
+})();
+</script>
+<!-- LAUNCH10 side badge — FIXED to the left edge, so it stays
+     visible while the page scrolls, on every page and in the
+     installed app. Under the code it shows a price: an example
+     (Rs. 990 → Rs. 891) normally, and the cart's real discounted
+     total once the code is applied. Tap it and the code is
+     applied in the cart by the cart's own Apply logic (Firestore
+     validation, saved discount, totals re-rendered 10% lower).
+     Visibility is driven live by Firestore
+     "discountCodes/LAUNCH10": the badge shows only while a use
+     remains and vanishes for good at 20/20. -->
+<button type="button" class="launch-badge" id="launchBadge" aria-label="Apply discount code LAUNCH10 for 10 percent off — for example, Rs. 990 becomes Rs. 891"><span class="lb-dot" aria-hidden="true"></span><span class="lb-main"><span class="lb-code" id="launchBadgeText">LAUNCH10 — 10% OFF</span><span class="lb-price" id="launchBadgePrice"><s>Rs. 990</s> → <b>Rs. 891</b></span></span></button>
+<script>
+(function(){
+  var badge = document.getElementById("launchBadge");
+  if(!badge) return;
+  var txt = document.getElementById("launchBadgeText");
+  var priceEl = document.getElementById("launchBadgePrice");
+  var DONE_KEY = "pixelnest_launch10_done";
+  function lsGet(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } }
+  function lsSet(k, v){ try { window.localStorage.setItem(k, v); } catch(e){} }
+  var exhausted = lsGet(DONE_KEY) === "1";
+  var decided = false; /* Firestore has given a verdict at least once */
+  function showBadge(){ if(!exhausted) badge.classList.add("show"); }
+  function hideForever(){ exhausted = true; lsSet(DONE_KEY, "1"); badge.classList.remove("show"); }
+  function fmtRs(n){ return "Rs. " + Number(n || 0).toLocaleString("en-PK"); }
+  /* Applied state: steady green, no blink, once LAUNCH10 is in the cart.
+     The price line follows the state: an example price normally
+     (Rs. 990 -> Rs. 891), and the cart's real discounted total
+     once the code is applied — refreshed on the same poll that
+     watches the applied state, so it tracks every cart change. */
+  function syncApplied(){
+    try {
+      var on = (typeof appliedDiscount !== "undefined") && appliedDiscount && String(appliedDiscount.code).toUpperCase() === "LAUNCH10";
+      badge.classList.toggle("applied", !!on);
+      if(txt) txt.textContent = on ? "LAUNCH10 APPLIED ✓" : "LAUNCH10 — 10% OFF";
+      if(priceEl){
+        if(on){
+          var total = null;
+          try { if(typeof payableTotal === "function") total = payableTotal(); } catch(e){}
+          if(total === null){ try { total = cartSum() - discountAmount(); } catch(e){} }
+          priceEl.innerHTML = (total !== null && Number(total) > 0) ? "Total <b>" + fmtRs(total) + "</b>" : "10% off applied";
+        } else {
+          priceEl.innerHTML = "<s>Rs. 990</s> → <b>Rs. 891</b>";
+        }
+      }
+      badge.setAttribute("aria-label", on ? "Discount code LAUNCH10 is applied — view your cart" : "Apply discount code LAUNCH10 for 10 percent off — for example, Rs. 990 becomes Rs. 891");
+    } catch(e){}
+  }
+  setInterval(syncApplied, 800); syncApplied();
+  badge.addEventListener("click", function(){
+    syncApplied();
+    if(badge.classList.contains("applied")){ if(typeof openCart === "function") openCart(); return; }
+    var hasItems = false;
+    try { hasItems = (typeof cartCountTotal === "function") && cartCountTotal() > 0; } catch(e){}
+    var inp = document.getElementById("discountCodeInput");
+    if(!hasItems){
+      if(inp) inp.value = "LAUNCH10";
+      if(typeof showToast === "function") showToast("Add a product to your cart first — then tap LAUNCH10 again to take 10% off");
+      return;
+    }
+    var btn = document.getElementById("discountApplyBtn");
+    if(inp && btn){
+      inp.value = "LAUNCH10";
+      btn.click(); /* the cart's own apply flow — validates in Firestore, saves the discount, re-renders the total */
+      if(typeof openCart === "function") openCart();
+      setTimeout(syncApplied, 1200);
+    } else if(typeof openCart === "function"){ openCart(); }
+  });
+  /* Live Firestore watch — started once the shared Firebase app and
+     the orders module are ready (the same retry pattern the store
+     uses elsewhere). Until a verdict arrives the badge stays hidden,
+     so an already-finished code never flashes on screen; if
+     Firestore never answers (offline), the badge appears after a
+     few seconds and the cart's own validation still guards the
+     code when it is applied. */
+  var tries = 0, watching = false;
+  function startWatch(){
+    if(watching) return;
+    if(!window.PixelOrders || !window.PixelOrders.watchDiscountCode || !(window.firebase && window.firebase.apps && window.firebase.apps.length)){
+      if(++tries < 40) setTimeout(startWatch, 250);
+      else if(!decided) showBadge();
+      return;
+    }
+    watching = true;
+    if(window.PixelOrders.ensureDiscountCode) window.PixelOrders.ensureDiscountCode();
+    window.PixelOrders.watchDiscountCode(function(data){
+      if(!data) return; /* read error — keep the current state */
+      decided = true;
+      var used = Number(data.usedCount) || 0;
+      var max = Number(data.maxUses) || 20;
+      if(data.active === false || used >= max) hideForever();
+      else showBadge();
+    });
+    setTimeout(function(){ if(!decided) showBadge(); }, 5000);
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(startWatch, 300); });
+  else setTimeout(startWatch, 300);
 })();
 </script>
 </body>

@@ -8,9 +8,10 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v8: OneSignal push (Web SDK v16) — the worker imports the OneSignal
+   v9: OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first, so pushes arrive even when the app is fully
-   closed; seller order alerts + custom-order file upload release.
+   closed; seller order alerts + custom-order file upload + LAUNCH10
+   blinking badge (fixed, sticky, with price) release.
    Same shell, new cache version so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
@@ -34,7 +35,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v8";
+var CACHE_VERSION = "pixelnest-shell-v9";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
