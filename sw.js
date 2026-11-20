@@ -8,13 +8,13 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v13: seller excluded from Registered Customers; sign-up requires
-   a name, sign-in never creates an account (Sign Up first); account
-   menu Seller Account / Buy / Account / Log Out / My Orders; email
-   verification mandatory before sign-in; OneSignal REST key restored
-   so new-order pushes work again; WhatsApp-style notification
-   read/unread. Same Fiverr-style seller/buyer view, dashboard
-   notifications and sign-in gate fix as v12. OneSignal push (Web
+   v14: persistent sign-in (Firebase LOCAL persistence, so a user
+   signed in once stays signed in); sign-in with an unknown email
+   auto-switches to the Sign Up form; order delivery email wiring
+   (sendDeliveryReadyEmail, placeholder template ID — send skipped
+   until a real delivery template is set). Same seller exclusion,
+   sign-up name, email verification, WhatsApp-style notification
+   read/unread and OneSignal REST key as v13. OneSignal push (Web
    SDK v16) — the worker imports the OneSignal worker code first, so
    pushes arrive even when the app is fully closed. Same shell, new
    cache version so phones pick up the new build.
@@ -40,7 +40,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v13";
+var CACHE_VERSION = "pixelnest-shell-v14";
 var SHELL_URLS = [
   "index.html",
   "shop.html",

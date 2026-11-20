@@ -2095,7 +2095,8 @@ document.addEventListener("click", function(e){
 var EMAILJS_CONFIG = {
   publicKey: "SE66wDR7CnxnaQgLn",
   serviceId: "service_91lnf7f",
-  templateId: "template_0lsjej1"
+  templateId: "template_0lsjej1",
+  deliveryTemplateId: "YOUR_DELIVERY_TEMPLATE_ID"
 };
 function emailJsConfigured(){
   return EMAILJS_CONFIG.publicKey.indexOf("YOUR_") !== 0
@@ -2120,6 +2121,60 @@ function sendOrderConfirmationEmail(d){
     });
     if(sent && sent.catch) sent.catch(function(){ /* ignored — email is best-effort only */ });
   } catch(e){ /* ignored — email must never break checkout */ }
+}
+
+/* ================= ORDER DELIVERY EMAIL (EmailJS) =================
+   When the seller completes an order — he uploads the delivery
+   file in his dashboard and the order becomes Completed (see
+   notifyDeliveryReady in the accounts module) — the customer is
+   emailed that their order is ready to check and download, with a
+   link straight to their order on the Track Order page. Sent with
+   the same EmailJS account and service as the confirmation email
+   above, but through its OWN template.
+
+   >>> ONE-TIME SETUP — until deliveryTemplateId above is replaced
+       with a real template ID, NO delivery email is attempted (the
+       order still completes exactly as before) <<<
+   1. In the same EmailJS account, create a second template and
+      copy its Template ID into deliveryTemplateId above.
+   2. Set the template's "To Email" field to {{to_email}} and use
+      these variables:
+        {{to_name}} {{order_id}} {{product_name}} {{track_link}}
+        {{store_name}}
+      Suggested subject:
+        Your order is ready — {{order_id}} · {{store_name}}
+      Suggested body:
+        Hello {{to_name}},
+        Good news — your order {{order_id}} ({{product_name}}) is ready.
+        Aapka order tayyar hai — ab aap usko check aur download kar sakte ho:
+        {{track_link}}
+        Sign in with this email address to see your download in
+        My Orders, or open the link above — it opens your order
+        directly on the Track Order page.
+        — {{store_name}}
+   The send is best-effort and fully guarded, exactly like the
+   confirmation email: a failure is ignored silently and can never
+   break the delivery itself. */
+function emailJsDeliveryConfigured(){
+  return emailJsConfigured()
+      && EMAILJS_CONFIG.deliveryTemplateId.indexOf("YOUR_") !== 0;
+}
+function sendDeliveryReadyEmail(d){
+  try {
+    if(!emailJsDeliveryConfigured()) return;
+    if(typeof emailjs === "undefined" || !emailjs.send) return;
+    if(!d || !d.toEmail) return;
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    var sent = emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.deliveryTemplateId, {
+      to_email: d.toEmail,
+      to_name: d.toName || "",
+      order_id: d.orderId || "",
+      product_name: d.productName || "",
+      track_link: d.trackLink || "",
+      store_name: "PixelNest"
+    });
+    if(sent && sent.catch) sent.catch(function(){ /* ignored — email is best-effort only */ });
+  } catch(e){ /* ignored — email must never break a delivery */ }
 }
 
 var PRODUCTS = [
@@ -4949,6 +5004,13 @@ window.PixelAccount = (function(){
     }
     try {
       auth = window.firebase.auth();
+      /* Persistent sign-in: LOCAL persistence keeps the session
+         saved in this browser across page reloads and browser
+         restarts, so a signed-in user stays signed in until they
+         tap Log Out themselves (or delete their account). Set
+         once here, before any sign-in happens on this page; a
+         failure is ignored — Firebase's web default is LOCAL. */
+      try { var persistP = auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL); if(persistP && persistP.catch) persistP.catch(function(){}); } catch(e){}
       db = window.firebase.firestore();
       /* No Firebase Storage in this project (no bucket without the
          Blaze plan) — the Storage SDK is not even loaded any more,
@@ -4971,9 +5033,21 @@ window.PixelAccount = (function(){
       }).catch(function(err){ if(window.console && console.error) console.error("PixelNest: Google redirect result", err); });
     } catch(e){}
     auth.onAuthStateChanged(function(u){
-      /* Verification gate for a restored session: an email/password
-         account whose email is still unverified is signed straight
-         back out — sign-in counts only after the email is verified.
+      /* Persistent session: a sign-in survives page reloads and
+         browser restarts (LOCAL persistence, set in init above),
+         so arriving on a page never signs anyone out by itself.
+         The only exits are the user's own Log Out and — for an
+         email/password account whose email is STILL unverified —
+         the verification gate here. That gate never trusts the
+         restored emailVerified flag on its own: the flag can be
+         stale (the user clicked the verification link, but this
+         browser's saved token still says unverified), so the
+         account is refreshed from the server first and signed out
+         only when the server still reports it unverified — a
+         verified user is never signed out on page load. If the
+         refresh cannot complete (offline), the session is kept
+         rather than ended on a guess; ordering stays blocked
+         until verification is confirmed (see needsVerification).
          Skipped while a sign-in/sign-up submit is being handled,
          because that flow sends the link and signs out itself.
          Google accounts arrive verified and are never blocked. */
@@ -4981,14 +5055,20 @@ window.PixelAccount = (function(){
         var isPw = false;
         try { (u.providerData || []).forEach(function(p){ if(p && p.providerId === "password") isPw = true; }); } catch(e){}
         if(isPw){
-          currentUser = null;
-          authStateKnown = true;
-          paintAccount();
-          auth.signOut().catch(function(){});
-          if(typeof showToast === "function") showToast("Please verify your email first, then sign in");
+          u.reload().then(function(){
+            if(!auth || auth.currentUser !== u) return;
+            if(u.emailVerified) acceptUser(u);
+            else rejectUnverified();
+          }).catch(function(){
+            if(!auth || auth.currentUser !== u) return;
+            acceptUser(u);
+          });
           return;
         }
       }
+      acceptUser(u);
+    });
+    function acceptUser(u){
       currentUser = u || null;
       authStateKnown = true;
       paintAccount();
@@ -4997,7 +5077,14 @@ window.PixelAccount = (function(){
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
       if(typeof window.refreshTrackPrivacy === "function") window.refreshTrackPrivacy();
-    });
+    }
+    function rejectUnverified(){
+      currentUser = null;
+      authStateKnown = true;
+      paintAccount();
+      auth.signOut().catch(function(){});
+      if(typeof showToast === "function") showToast("Please verify your email first, then sign in");
+    }
     paintAccount();
   }
 
@@ -5242,6 +5329,37 @@ window.PixelAccount = (function(){
     var e = $("authError");
     if(e){ e.textContent = msg || ""; e.style.display = msg ? "block" : "none"; }
   }
+  /* Sign In with an email that has no account: show the
+     "Sign Up first" message, then switch the dialog to the
+     Sign Up form BY ITSELF — the visitor must not have to tap
+     the Sign Up tab. The typed email and password stay in the
+     form, so they can sign up right away. The message is shown
+     again after the switch (setMode clears it) so it stays
+     readable on the Sign Up form. */
+  function goSignUpWithMsg(msg){
+    showErr(msg);
+    window.setTimeout(function(){
+      var pg = $("authPage");
+      if(pg && !pg.classList.contains("open")) return;
+      if(mode !== "signin") return;
+      setMode("signup");
+      showErr(msg);
+    }, 1200);
+  }
+  /* Only auth/user-not-found proves the email has no account,
+     so only it auto-switches to Sign Up. auth/invalid-credential
+     must NOT be treated as "no account": with email-enumeration
+     protection Firebase returns it both for a non-existent
+     account AND for an existing account whose password was
+     mistyped, so auto-switching on it would send a real account
+     holder who mistyped their password over to the Sign Up
+     form. That case stays on the Sign In form, where
+     friendlyErr's message already covers both possibilities
+     ("Your email or password is incorrect — if you have no
+     account yet, please Sign Up first, then Sign In."). */
+  function isNoAccountCode(code){
+    return code === "auth/user-not-found";
+  }
   function setMode(m){
     mode = m;
     var ti = $("tabSignIn"), tu = $("tabSignUp");
@@ -5363,11 +5481,12 @@ window.PixelAccount = (function(){
         authFlowBusy = false;
         var code = err && err.code ? err.code : "";
         /* Sign In never creates an account: with no account for
-           this email, move the visitor to the Sign Up form (name,
-           email, password) — an account must be created first,
-           then Sign In works. */
-        if(mode === "signin" && code === "auth/user-not-found") setMode("signup");
-        showErr(friendlyErr(err));
+           this email, show the "Sign Up first" message and then
+           move the visitor to the Sign Up form automatically
+           (name, email, password) — an account must be created
+           first, then Sign In works. */
+        if(mode === "signin" && isNoAccountCode(code)) goSignUpWithMsg(friendlyErr(err));
+        else showErr(friendlyErr(err));
       });
   }
   var signupVerifySent = false;
@@ -5411,7 +5530,12 @@ window.PixelAccount = (function(){
         return null;
       }
       return blockUnverified(cred.user, email).then(function(){ authFlowBusy = false; });
-    }).catch(function(err){ authFlowBusy = false; showErr(friendlyErr(err)); });
+    }).catch(function(err){
+      authFlowBusy = false;
+      var code = err && err.code ? err.code : "";
+      if(mode === "signin" && isNoAccountCode(code)) goSignUpWithMsg(friendlyErr(err));
+      else showErr(friendlyErr(err));
+    });
   }
   function googleSignIn(){
     if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
@@ -5656,6 +5780,35 @@ window.PixelAccount = (function(){
       return uploadOneFile(file, onFrac);
     });
   }
+  /* Order-delivery email: when a delivery upload completes an
+     order, the customer is emailed "Your order is ready" (see
+     sendDeliveryReadyEmail in the main script). The customer's
+     email is never stored on the order document itself, so it is
+     read from their registered-customer record (customers/<uid> —
+     the same record the dashboard's Registered Customers list
+     shows), using the uid the order document carries. The email
+     goes to the address the customer signed up with. Best-effort
+     and fully guarded: any failure is silent and never affects
+     the delivery. The Track Order link carries the Order ID, so
+     the page opens with that order already loaded. */
+  function notifyDeliveryReady(orderId, odata){
+    try {
+      if(!db || !odata || !odata.uid) return;
+      if(typeof window.sendDeliveryReadyEmail !== "function") return;
+      db.collection("customers").doc(String(odata.uid)).get().then(function(snap){
+        if(!snap.exists) return;
+        var c = snap.data() || {};
+        if(!c.email) return;
+        window.sendDeliveryReadyEmail({
+          toEmail: c.email,
+          toName: c.name || "",
+          orderId: orderId,
+          productName: odata.productName || "",
+          trackLink: "https://pixelnestpk.github.io/PixelNest/track-order.html?order=" + encodeURIComponent(String(orderId))
+        });
+      }).catch(function(){ /* ignored — email is best-effort only */ });
+    } catch(e){ /* ignored — email must never break a delivery */ }
+  }
   window.PixelDelivery = {
     uploadFailedError: uploadFailedError,
     isUploadFailedError: isUploadFailedError,
@@ -5672,18 +5825,19 @@ window.PixelAccount = (function(){
                delivered files themselves are merged into the PRIVATE
                document ("orderPrivate"), so the file download URLs
                never sit on the publicly readable tracking document. */
-            var finish = function(uidVal){
+            var finish = function(uidVal, odata){
               var jobs = [ db.collection("orders").doc(String(orderId)).update({ status: "Completed", deliveredAt: FV.serverTimestamp() }) ];
               if(done.length){
                 var privUpd = { deliveryFiles: FV.arrayUnion.apply(null, done) };
                 if(uidVal) privUpd.uid = uidVal;
                 jobs.push(db.collection("orderPrivate").doc(String(orderId)).set(privUpd, { merge: true }));
               }
-              Promise.all(jobs).then(function(){ resolve(done); }).catch(reject);
+              Promise.all(jobs).then(function(){ notifyDeliveryReady(orderId, odata); resolve(done); }).catch(reject);
             };
             db.collection("orders").doc(String(orderId)).get().then(function(snap){
-              finish(snap.exists ? (snap.data().uid || "") : "");
-            }).catch(function(){ finish(""); });
+              var od = snap.exists ? (snap.data() || {}) : {};
+              finish(od.uid || "", od);
+            }).catch(function(){ finish("", {}); });
             return;
           }
           var f = files[i];
