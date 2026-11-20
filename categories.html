@@ -17,7 +17,19 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PixelNest">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<style>html{background:#FFFFFF}body{background:#FFFFFF;margin:0}</style>
+<style>html{background:#FFFFFF}body{background:#FFFFFF;margin:0}
+/* Auth loading state — in the FIRST style block on purpose, so it is
+   already active at the very first paint, before any other stylesheet
+   or script runs: while <body> carries the auth-pending class (it is
+   written into the HTML markup itself), the signed-out Sign In button
+   and the account button are hidden completely and a dimmed, pulsing
+   "Loading…" pill shows in their place. The PixelAccount module
+   removes the class the moment the auth state is known (plus a safety
+   timer), and the real Sign In / account button appears. */
+body.auth-pending #signInBtn,body.auth-pending #acctBtn,body.auth-pending #acctMenu{display:none!important}
+body.auth-pending #acctLoading{display:inline-flex!important}
+#acctLoading{display:none;align-items:center;gap:8px;background:rgba(201,162,39,.16);color:#EAC95C;border:1.5px solid rgba(201,162,39,.55);border-radius:999px;padding:0 18px;min-height:48px;font-weight:800;font-size:.93rem;white-space:nowrap;animation:authPulse .9s ease-in-out infinite alternate}
+@keyframes authPulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -337,21 +349,26 @@ footer a:hover{color:var(--teal)}
 /* ---------- Cart drawer ---------- */
 .overlay{position:fixed;inset:0;background:rgba(13,20,34,.55);z-index:60;display:none}
 .overlay.open{display:block}
-.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(480px,100vw);max-width:100vw;background:#fff;z-index:70;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.2);overflow:hidden}
+.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(440px,100vw);max-width:100vw;background:#fff;z-index:70;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.2);overflow:hidden;overflow-x:clip}
 .drawer.open{display:flex;animation:slideIn .22s ease-out}
 @keyframes slideIn{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
 .drawer-head h2{font-size:1.3rem}
 .icon-btn{width:44px;height:44px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:17px;display:grid;place-items:center}
-.drawer-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 18px calc(76px + env(safe-area-inset-bottom,0px))}
+.drawer-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px calc(76px + env(safe-area-inset-bottom,0px))}
 .drawer-body>*{min-width:0;max-width:100%}
-.cart-item{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;max-width:100%}
-.cart-item img{width:64px;height:64px;flex:none;border-radius:10px;object-fit:cover}
+#cartItems{min-width:0;max-width:100%}
+.cart-item{display:flex;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px;width:100%;min-width:0;max-width:100%}
+.cart-item img{width:60px;height:60px;flex:none;border-radius:10px;object-fit:cover}
+.ci-body{flex:1 1 auto;min-width:0;max-width:100%}
 .cart-item h4{margin:0 0 2px;font-size:.95rem;color:var(--navy);overflow-wrap:break-word}
 .cart-item .cp{font-weight:800;color:var(--teal)}
-.qty{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
-.qty button{width:36px;height:36px;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800}
-.remove{margin-left:auto;background:none;border:0;color:var(--coral);font-weight:700;min-height:36px}
+.qty{display:flex;align-items:center;gap:7px;margin-top:6px;flex-wrap:nowrap;width:100%;min-width:0}
+.qty>button:not(.remove){width:36px;height:36px;min-height:36px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800}
+.qty b{flex:none;min-width:14px;text-align:center}
+.qty .remove{margin-left:auto;flex:none;white-space:nowrap;width:auto;height:auto;border:0;border-radius:0;background:none}
+.remove{background:none;border:0;color:var(--coral);font-weight:700;min-height:36px;padding:0 2px;font-size:.92rem}
+@media (max-width:380px){ .cart-item img{width:50px;height:50px} .qty>button:not(.remove){width:32px;height:32px;min-height:32px} .qty{gap:5px} }
 .total-row{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800;padding:14px 0;border-top:2px dashed var(--line);margin-top:8px;color:var(--navy)}
 .discount-line{display:flex;justify-content:space-between;font-size:.98rem;font-weight:800;padding:0 0 10px;color:var(--green)}
 .discount-form{display:flex;gap:8px;margin:2px 0 4px}
@@ -691,16 +708,20 @@ select option{color:#111827;background-color:#ffffff}
 /* Sign In is the FIRST, most prominent header control for signed-out
    visitors — a solid gold button that cannot be missed. */
 /* While Firebase auth is still resolving on page load, the header
-   account area shows as a dimmed, pulsing LOADING state - a
-   signed-in (seller) user must never see a normal, ready-looking
-   signed-out "Sign In" button flash on screen before the saved
-   session restores. The PixelAccount module removes the
-   auth-pending class from <body> the moment the auth state is
+   account area shows a dimmed, pulsing "Loading…" pill and the
+   signed-out "Sign In" button stays fully HIDDEN - a signed-in
+   (seller) user must never see a normal, ready-looking signed-out
+   "Sign In" button flash on screen before the saved session
+   restores. The same rules also live in the first <style> block in
+   <head> so they hold from the very first paint; the class itself
+   is written on <body> in the HTML. The PixelAccount module removes
+   the auth-pending class from <body> the moment the auth state is
    known (and a safety timer removes it even if Firebase never
    answers, so the loading state can never get stuck). */
-body.auth-pending #acctArea{opacity:.55}
-body.auth-pending #signInBtn{animation:authPulse .9s ease-in-out infinite alternate}
-@keyframes authPulse{from{filter:brightness(1)}to{filter:brightness(1.15)}}
+body.auth-pending #signInBtn,body.auth-pending #acctBtn,body.auth-pending #acctMenu{display:none!important}
+body.auth-pending #acctLoading{display:inline-flex!important}
+#acctLoading{display:none;align-items:center;gap:8px;background:rgba(201,162,39,.16);color:#EAC95C;border:1.5px solid rgba(201,162,39,.55);border-radius:999px;padding:0 18px;min-height:48px;font-weight:800;font-size:.93rem;white-space:nowrap;animation:authPulse .9s ease-in-out infinite alternate}
+@keyframes authPulse{from{filter:brightness(1)}to{filter:brightness(1.18)}}
 #signInBtn{background:var(--gold);color:#17130A;border:1.5px solid var(--gold);border-radius:999px;padding:0 24px;font-weight:800;min-height:48px;font-size:1rem;cursor:pointer;box-shadow:0 6px 18px rgba(201,162,39,.35);white-space:nowrap}
 #signInBtn:hover{background:#B8931F;border-color:#B8931F}
 .acct-btn{background:transparent;color:#EAC95C;border:1.5px solid rgba(201,162,39,.7);border-radius:999px;padding:0 18px;font-weight:800;min-height:46px;font-size:.93rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
@@ -1367,7 +1388,8 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
   <div class="wrap">
     <div class="header-in">
       <div class="acct" id="acctArea">
-        <button id="signInBtn" type="button">Sign In</button>
+        <span id="acctLoading" role="status" aria-label="Loading your account">Loading…</span>
+        <button id="signInBtn" type="button" style="display:none">Sign In</button>
         <button class="acct-btn" id="acctBtn" type="button" style="display:none" aria-label="Your account">Account</button>
         <div class="acct-menu" id="acctMenu" style="display:none">
           <div class="am-email" id="acctEmail"></div>
@@ -1513,7 +1535,7 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         </ul>
       </div>
     </div>
-    <div class="foot-bottom">© PixelNest — digital products, delivered in the app within 1–3 days. No physical shipping. <button class="seller-link" id="openOrders" type="button" style="display:none">Seller Orders</button></div>
+    <div class="foot-bottom">© PixelNest — digital products, delivered in the app within 1–3 days after payment is confirmed, depending on the product. No physical shipping. <button class="seller-link" id="openOrders" type="button" style="display:none">Seller Orders</button></div>
   </div>
 </footer>
 <a class="wa-float" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
@@ -2289,7 +2311,7 @@ function renderCart(){
     box.innerHTML = ids.map(function(id){
       var p = byId(id);
       return '<div class="cart-item"><img src="'+p.img+'" alt="">'
-        + '<div style="flex:1;min-width:0"><h4>'+p.name+'</h4><span class="cp">'+priceText(p)+'</span>'
+        + '<div class="ci-body"><h4>'+p.name+'</h4><span class="cp">'+priceText(p)+'</span>'
         + '<div class="qty"><button data-dec="'+id+'" aria-label="Decrease quantity">−</button><b>'+cart[id]+'</b><button data-inc="'+id+'" aria-label="Increase quantity">+</button>'
         + '<button class="remove" data-remove="'+id+'">Remove</button></div></div></div>';
     }).join("");
@@ -3679,7 +3701,7 @@ document.getElementById("manualOrderForm").addEventListener("submit", function(e
   /* Online tracking is created too — the customer can track with the
      same Order ID. The name and number NEVER go to Firestore; they stay
      only in this browser's local record. */
-  if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: prod, quantity: qty, total: tot, deliveryNote: "Your file will be uploaded in the app — within 1–3 days, depending on the product", paymentMethod: "Manual order", trxId: "", buyerName: document.getElementById("mName").value.trim() });
+  if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: prod, quantity: qty, total: tot, deliveryNote: "Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product", paymentMethod: "Manual order", trxId: "", buyerName: document.getElementById("mName").value.trim() });
   this.reset();
   showToast("Order " + oid + " added — the customer can now track it");
 });
@@ -3824,7 +3846,22 @@ function renderTrackResult(id, data){
   if(status === "Completed"){
     deliveryHtml = '<div class="track-delivered">Delivered — your file has been delivered.</div>' + filesHtml + ownerFilesNote;
   } else {
-    deliveryHtml = '<div class="track-note">' + escHtml(data.deliveryNote || "Your file will be uploaded in the app — within 1–3 days, depending on the product") + '</div>'
+    /* Per-order delivery message — one wording everywhere: paid
+       orders are delivered within 1–3 days after payment is
+       confirmed, depending on the product; the FREE sample and
+       other 1-day orders are delivered within 1 day. Orders placed
+       earlier carry a saved deliveryNote — when it still uses the
+       old short wording it is upgraded here, so the customer always
+       sees the current wording. Custom orders keep their own
+       2–3 day note. */
+    var trackMsg = data.deliveryNote || "";
+    var oneDayOrder = free || Number(data.total) === 0 || /within 1 day/i.test(trackMsg);
+    if(!trackMsg || (trackMsg.indexOf("after payment is confirmed") === -1 && !oneDayOrder && trackMsg.indexOf("2–3 days") === -1)){
+      trackMsg = oneDayOrder
+        ? "Your file will be uploaded in the app within 1 day — download it from My Orders or here on the Track Order page"
+        : "Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or here on the Track Order page";
+    }
+    deliveryHtml = '<div class="track-note">' + escHtml(trackMsg) + '</div>'
       + filesHtml
       + '<div class="track-note">You do not need to tap anything — this order becomes <b>Completed</b> when the seller uploads your file here.</div>';
   }

@@ -8,19 +8,22 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v16: 9 bug fixes from the #50 live check — auto-switch on ANY
-   sign-in error, LAUNCH10 stale state cleared when the cart
-   empties, cart drawer no longer overflows, no signed-out flash
-   (auth-pending loading state), checkout gate opens on Sign In,
-   banner typo fixed, delivery wording unified (1-3 days after
-   payment, depending on the product), EmailJS comment updated to
-   LIVE, seller dashboard left-to-right. Same delivery email
-   (template_8bmn0gq), persistent sign-in, seller exclusion,
-   sign-up name, email verification, WhatsApp-style notification
-   read/unread and OneSignal REST key as v15. OneSignal push (Web
-   SDK v16) — the worker imports the OneSignal worker code first,
-   so pushes arrive even when the app is fully closed. Same shell,
-   new cache version so phones pick up the new build.
+   v17: 3 re-fixes from the #51 live check — cart drawer Remove
+   button fully visible (36px circle now only on +/- buttons,
+   drawer 440px), header loading state in the HTML itself
+   (auth-pending on <body> + first-paint Loading pill, no
+   signed-out flash), delivery wording unified (1-3 days after
+   payment, depending on the product; within 1 day for FREE
+   sample / 1-day orders). Same auto-switch on ANY sign-in error,
+   LAUNCH10 stale state fix, checkout gate on Sign In, banner
+   typo fixed, EmailJS comment LIVE, seller dashboard LTR,
+   delivery email (template_8bmn0gq), persistent sign-in, seller
+   exclusion, sign-up name, email verification, WhatsApp-style
+   notification read/unread and OneSignal REST key as v16.
+   OneSignal push (Web SDK v16) — the worker imports the OneSignal
+   worker code first, so pushes arrive even when the app is fully
+   closed. Same shell, new cache version so phones pick up the new
+   build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
    cached fallback), so the store opens fast on repeat visits and
@@ -43,7 +46,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v16";
+var CACHE_VERSION = "pixelnest-shell-v17";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
