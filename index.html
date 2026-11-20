@@ -1154,6 +1154,92 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .notify-btn:disabled{opacity:.6;cursor:default}
 .notify-note{font-size:.85rem;color:var(--muted);flex:1;min-width:200px}
 </style>
+<!-- OneSignal Web Push (SDK v16) - seller-only order alerts that arrive
+     even when the app is closed. The SDK loads on every page but NEVER
+     prompts anyone by itself: no bell button, no slide-down, no
+     automatic permission request, so customers never see a subscribe
+     prompt. The only subscription happens when the SELLER taps
+     "Enable order notifications" in his dashboard
+     (window.PixelPush.subscribeSeller), which also tags that
+     subscription role=seller. When a buyer places an order, the
+     buyer's browser calls the OneSignal REST API
+     (window.PixelPush.sendNewOrder) to push "New PixelNest Order"
+     to the seller-tagged subscription only; the alert stays in the
+     phone's notification tray until the seller dismisses it. The
+     store's existing service worker (sw.js) doubles as the
+     OneSignal worker - it imports the OneSignal worker code at its
+     top - so serviceWorkerPath points at it and no second worker
+     fights over the same scope. The REST API key below is the
+     seller's own: he sent it himself knowing it ships in this
+     public store code, and it can only send notifications from his
+     own OneSignal app. -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.PixelPush = (function(){
+  var APP_ID = "7b3f05b6-3f8b-47f0-8e9f-d113f896fecb";
+  var REST_KEY = "os_v2_app_pm7qlnr7rnd7bdu72ej7rfx6zm2nl56omaqe4m5idju5iaw6257254w7ztjrtbhrzsfvvejgceu4sz52rkafqzye3d5d7dv3q2tybyi";
+  var STORE_URL = "https://pixelnestpk.github.io/PixelNest/";
+  var inAssets = /\/assets\//.test(window.location.pathname || "");
+  window.OneSignalDeferred.push(function(OneSignal){
+    try {
+      var p = OneSignal.init({
+        appId: APP_ID,
+        allowLocalhostAsSecureOrigin: true,
+        serviceWorkerPath: inAssets ? "sw.js" : "sw.js",
+        serviceWorkerParam: { scope: inAssets ? "./" : "assets/" },
+        notifyButton: { enable: false },
+        welcomeNotification: { disable: true }
+      });
+      if(p && p.catch) p.catch(function(){});
+    } catch(e){}
+  });
+  /* Seller only - called from the dashboard's "Enable order
+     notifications" button (via the SellerNotify module) once the
+     notification permission is granted. Subscribes THIS browser to
+     OneSignal push and tags the subscription as the seller's, so
+     order pushes reach only the seller. Never called for
+     customers, and never automatically. */
+  function subscribeSeller(){
+    window.OneSignalDeferred.push(function(OneSignal){
+      try {
+        var sub = OneSignal.User && OneSignal.User.PushSubscription;
+        if(!sub || !sub.optIn) return;
+        Promise.resolve(sub.optIn()).then(function(){
+          try { OneSignal.User.addTag("role", "seller"); } catch(e){}
+          try { OneSignal.User.addTag("seller", "true"); } catch(e){}
+        }).catch(function(){});
+      } catch(e){}
+    });
+  }
+  /* Buyer side - called the moment an order is placed (shop
+     checkout and the custom-order form). Sends the push through
+     the OneSignal REST API to the seller-tagged subscription.
+     Best-effort and silent: a failed push never affects the order,
+     which is already saved exactly as before. */
+  function sendNewOrder(orderId, productName, total){
+    try {
+      var body = "Order " + String(orderId || "") + " \u2014 " + String(productName || "New order");
+      var t = Number(total) || 0;
+      if(t > 0) body += " \u00b7 Rs. " + t.toLocaleString("en-PK");
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Key " + REST_KEY },
+        body: JSON.stringify({
+          app_id: APP_ID,
+          filters: [ { field: "tag", key: "role", relation: "=", value: "seller" } ],
+          headings: { en: "New PixelNest Order" },
+          contents: { en: body },
+          url: STORE_URL,
+          priority: 10,
+          ttl: 86400
+        })
+      }).catch(function(){});
+    } catch(e){}
+  }
+  return { subscribeSeller: subscribeSeller, sendNewOrder: sendNewOrder };
+})();
+</script>
 </head>
 <body id="top">
 <header>
@@ -2565,6 +2651,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     setDiscountFeedback("");
     renderCart();
   }
+  if(window.PixelPush) window.PixelPush.sendNewOrder(currentOrderId, orderProductStr, orderTotal);
   var sb = document.getElementById("successBox");
   sb.classList.add("show");
   sb.scrollIntoView({behavior:"smooth", block:"center"});
@@ -2676,6 +2763,7 @@ var _cf=document.getElementById("customForm"); if(_cf) _cf.addEventListener("sub
     var customStatus = "Pending";
     recordOrder({ id: oid, product: "Custom — " + type, name: name, phone: "", status: customStatus, pay: pay, trx: trx, clientFile: clientFile || null });
     if(window.PixelOrders) window.PixelOrders.createTracking({ orderId: oid, productName: "Custom — " + type, quantity: 1, total: 0, deliveryNote: "Custom order — your file will be uploaded in the app (download from My Orders or the Track Order page), within 2–3 days", paymentMethod: pay, trxId: trx, buyerName: name, uid: (window.PixelAccount ? window.PixelAccount.uid() : ""), thenStatus: "", clientFile: clientFile || null });
+    if(window.PixelPush) window.PixelPush.sendNewOrder(oid, "Custom — " + type, 0);
     var cs = document.getElementById("customSuccess");
     if(cs){
       document.getElementById("customOid").textContent = oid;
@@ -4433,7 +4521,7 @@ window.PixelAccount = (function(){
     auth.onAuthStateChanged(function(u){
       currentUser = u || null;
       paintAccount();
-      if(isSeller()) startOrderNotify(); else stopOrderNotify();
+      if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else stopOrderNotify();
       paintVerifyBoxes();
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
@@ -5455,7 +5543,13 @@ window.SellerNotify = (function(){
     if(p === "granted"){
       btn.classList.add("is-on");
       setBtnLabel(btn, "Order notifications are ON — tap to test");
-      if(note) note.textContent = "Every new order now plays a sound and leaves a notification in your tray until you dismiss it. Works on any store page while you are signed in as the seller and the store is open (or installed as the app).";
+      /* Permission is granted, so keep the OneSignal seller subscription
+         itself switched on too (seller account only - never a customer):
+         this is what makes the closed-app push in the note below true
+         even for a seller who granted permission before OneSignal was
+         added. optIn() with permission already granted shows no prompt. */
+      if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller() && window.PixelPush) window.PixelPush.subscribeSeller();
+      if(note) note.textContent = "Order notifications are ON - push alerts now reach this phone even when the app is closed, and stay in your notification tray until you dismiss them. While the store is open, every new order also plays the sound alert.";
     } else if(p === "denied"){
       btn.classList.add("is-blocked");
       setBtnLabel(btn, "Notifications are blocked — tap for help");
@@ -5475,6 +5569,7 @@ window.SellerNotify = (function(){
         if(!("Notification" in window)){ refreshBtn(); return; }
         if(Notification.permission === "granted"){
           alertNew("PixelNest — test alert", "Order notifications are working. This is how a new order alert looks and sounds.", "pixelnest-test");
+          if(window.PixelPush) window.PixelPush.subscribeSeller();
           refreshBtn();
           return;
         }
@@ -5484,7 +5579,7 @@ window.SellerNotify = (function(){
         }
         Notification.requestPermission().then(function(p){
           refreshBtn();
-          if(p === "granted") alertNew("PixelNest — notifications ON", "You will now get a sound + a tray notification for every new order.", "pixelnest-test");
+          if(p === "granted"){ alertNew("PixelNest — notifications ON", "You will now get a sound + a tray notification for every new order.", "pixelnest-test"); if(window.PixelPush) window.PixelPush.subscribeSeller(); }
           else if(typeof showToast === "function") showToast("Notification permission was not given — order alerts stay off");
         }).catch(function(){ refreshBtn(); });
       });

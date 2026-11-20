@@ -1,6 +1,17 @@
+/* OneSignal Web Push worker code — imported FIRST, inside this same
+   worker, so OneSignal push messages are received and displayed by
+   the store's existing service worker even when the app is fully
+   closed. The pages point OneSignal's serviceWorkerPath at this
+   file (sw.js), so no separate OneSignal worker fights over the
+   scope. If this import ever fails (offline first install), the
+   rest of the worker below still runs exactly as before. */
+try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
+
 /* PixelNest service worker — app-shell caching.
-   v7: seller order notifications (showNotification) + custom-order file upload release — same shell, new cache version
-   so phones pick up the new build.
+   v8: OneSignal push (Web SDK v16) — the worker imports the OneSignal
+   worker code first, so pushes arrive even when the app is fully
+   closed; seller order alerts + custom-order file upload release.
+   Same shell, new cache version so phones pick up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
    cached fallback), so the store opens fast on repeat visits and
@@ -23,7 +34,7 @@
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v7";
+var CACHE_VERSION = "pixelnest-shell-v8";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
@@ -67,6 +78,13 @@ self.addEventListener("activate", function(event){
    front — an already-open window is focused, otherwise the store
    home page is opened — and the notification is cleared. */
 self.addEventListener("notificationclick", function(event){
+  /* OneSignal pushes are handled by OneSignal's own click handler
+     (imported above), which opens the store URL they carry. This
+     handler is only for the store's LOCAL seller alerts, whose
+     tags start with "pixelnest-" — leave every other notification
+     (OneSignal pushes included) to its own handler. */
+  var tg = (event.notification && event.notification.tag) || "";
+  if(tg.indexOf("pixelnest-") !== 0) return;
   event.notification.close();
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list){
