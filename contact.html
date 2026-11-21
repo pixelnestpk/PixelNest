@@ -1484,7 +1484,8 @@ a{color:#7C6213}
 @keyframes pncMarqueeRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 .pnc-chips:hover .pnc-track,.pnc-chips:focus-within .pnc-track{animation-play-state:paused}
 @media (prefers-reduced-motion: reduce){ .pnc-track{animation:none} .pnc-row{overflow-x:auto} .pnc-chips{-webkit-mask-image:none;mask-image:none} }
-.pnc-msg.welcome{animation:pncIn .5s ease-out}
+.pnc-msg.welcome{animation:pncIn .5s ease-out;line-height:1.45;padding:10px 13px}
+.pnc-chips{flex:none}
 @keyframes pncIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .pnc-input{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid #EEEAF9;background:#fff;flex:none}
 .pnc-input input{flex:1;min-width:0;min-height:46px;border:1.5px solid #D9D2F2;border-radius:12px;padding:0 13px;font-size:.92rem;color:#1E222B;background:#fff;font-family:inherit}
@@ -6591,8 +6592,8 @@ window.SellerNotify = (function(){
   }
   function welcomeText(){
     var nm = visitorName();
-    var head = nm ? ("Welcome, " + nm + "! \u2726 How can I help you?") : "Welcome to PixelNest! \u2726 How can I help you?";
-    return head + "\n\nI'm your PixelNest assistant \u2014 here's what I can do for you:\n\u2022 Help you place an order, step by step\n\u2022 Explain payment \u2014 Easypaisa for Pakistan, WhatsApp + Western Union for foreign buyers\n\u2022 Tell you the exact price and delivery time of any product\n\u2022 Help you track your order\n\u2022 Tell you about the FREE sample pack and the LAUNCH10 10% discount\n\u2022 Explain custom orders, refunds and more\n\nTip: I reply in YOUR language \u2014 English, \u0627\u0631\u062F\u0648, Roman Urdu, Espa\u00F1ol, Fran\u00E7ais, Deutsch, \u0627\u0644\u0639\u0631\u0628\u064A\u0629, \u0939\u093F\u0928\u094D\u0926\u0940, \u0420\u0443\u0441\u0441\u043A\u0438\u0439, \u4E2D\u6587 and many more. Just write to me in your language.\n\nTap a quick question below \u2014 or simply type your own question to start.";
+    var head = nm ? ("Welcome, " + nm + " to PixelNest!") : "Welcome to PixelNest!";
+    return head + "\nYou can talk in any language.";
   }
   var BASE = /\/assets\/[^\/]+\.html$/.test(location.pathname) ? "" : "assets/";
   var WA_LINK = '<a href="https://wa.me/923355290894" target="_blank" rel="noopener">WhatsApp 0335 5290894</a>';
@@ -6615,7 +6616,7 @@ window.SellerNotify = (function(){
   }
 
   var A = {
-    welcome: { en: "Welcome to PixelNest ✦ Premium digital products — wall art, planners, CVs, Excel tools and more — delivered right here in the app within 1–3 days.\n\nI'm your PixelNest assistant. Ask me about:\n• How to order\n• Payment — Pakistan (Easypaisa) or foreign buyers (WhatsApp + Western Union)\n• Delivery times\n• Tracking your order\n• Prices, the FREE sample and the LAUNCH10 10% discount\n\nTip: I reply in your language — English, اردو, Roman Urdu, Español, Français, Deutsch, Português, Italiano, Türkçe, العربية, हिन्दी, Русский, 中文, 日本語, 한국어 and more. Just write to me in your language. Tap a quick question below, or type your own." },
+    welcome: { en: "Welcome to PixelNest!\nYou can talk in any language." },
     greeting: {
       en: "Hello! Welcome to PixelNest ✦ Ask me how to order, how to pay (Pakistan or foreigner), delivery times, tracking, prices or the LAUNCH10 discount — or tap a quick question below.",
       ru: "Assalam o Alaikum! PixelNest mein khush aamdeed ✦ Mujh se poochein: order kesay karein, payment (Pakistan ya foreigner), delivery time, tracking, prices ya LAUNCH10 discount — ya neechay quick sawal dabayein.",

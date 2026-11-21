@@ -8,9 +8,9 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v23: Help chat suggestion pills flow in 2 marquee rows like ChatGPT
-   "Put ChatGPT to work" screen (row 1 one way, row 2 back, slow),
-   welcome first with the users own name. Same as v22 otherwise:
+   v24: Help chat welcome is now just 2 short lines — "Welcome, <name>
+   to PixelNest!" then "You can talk in any language." — so the pills
+   below it are visible without scrolling. Same as v23 otherwise:
    Help chat ChatGPT-style + 3D intro once per session (sessionStorage
    flag, Home clicks skip it), WhatsApp chat button removed (only the
    foreigner checkout button + footer plain-text number remain), Help
@@ -33,7 +33,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    comment LIVE, seller dashboard LTR, delivery email
    (template_8bmn0gq), persistent sign-in, seller exclusion,
    sign-up name, email verification, WhatsApp-style notification
-   read/unread as v22.
+   read/unread as v23.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first. Same shell, new cache version so phones pick
    up the new build.
@@ -59,7 +59,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v23";
+var CACHE_VERSION = "pixelnest-shell-v24";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
