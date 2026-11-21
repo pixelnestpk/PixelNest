@@ -8,7 +8,10 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v19: 4 fixes vs live #53 — distinct professional colours (teal
+   v20: 3D intro on the home page — full-screen THREE.js gold
+   pixel-cube nest, Loading Store 0%->100% in ~7s, then Sign Up /
+   View Store as Guest buttons into the real store (no demo text).
+   Same as v19 otherwise: distinct professional colours (teal
    action buttons, violet PixelNest Assistant chatbot), PixelNest
    Assistant chatbot on the whole store (foreigner flow explained),
    checkout now asks "Are you from Pakistan or a foreigner?"
@@ -23,7 +26,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    comment LIVE, seller dashboard LTR, delivery email
    (template_8bmn0gq), persistent sign-in, seller exclusion,
    sign-up name, email verification, WhatsApp-style notification
-   read/unread as v18.
+   read/unread as v19.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first. Same shell, new cache version so phones pick
    up the new build.
@@ -49,7 +52,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v19";
+var CACHE_VERSION = "pixelnest-shell-v20";
 var SHELL_URLS = [
   "index.html",
   "shop.html",

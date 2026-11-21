@@ -1478,8 +1478,90 @@ a{color:#7C6213}
   #pnChatPanel{right:12px;left:12px;width:auto;bottom:calc(148px + env(safe-area-inset-bottom,0px));height:min(540px,calc(100dvh - 190px))}
 }
 </style>
+<style>
+/* ================= 3D INTRO — the store's opening screen =================
+   The store opens with this full-screen 3D look: the gold PixelNest
+   mark rotates in 3D while a loading bar fills to 100% in about 7
+   seconds (never more than 8). Then two buttons appear — Sign Up,
+   which opens this store's own sign-up form (sign-in already lives
+   on the website), and View Store as Guest, which opens the store
+   directly. The small stats row at the bottom mirrors the store's
+   own live trust numbers, kept small so the 3D look stays big. */
+body.pn-intro-open{overflow:hidden}
+#pnIntro{position:fixed;inset:0;z-index:2000;background:#070707;color:#F5F0DF;display:flex;flex-direction:column;overflow:hidden;height:100vh;height:100dvh;transition:opacity .6s ease;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+#pnIntro.pn-done{opacity:0;pointer-events:none}
+#pnIntroGL{position:absolute;inset:0;z-index:0}
+#pnIntroGL canvas{display:block;width:100%!important;height:100%!important}
+.pn-intro-vig{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 90% 65% at 50% 38%,transparent 55%,rgba(0,0,0,.55) 100%)}
+.pn-intro-in{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 18px calc(20px + env(safe-area-inset-bottom,0px));pointer-events:none;width:100%}
+.pn-intro-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pn-intro-brand{font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-weight:800;letter-spacing:.05em;font-size:clamp(46px,10vw,86px);line-height:1.02;margin:0;color:#C9A227;text-shadow:0 2px 34px rgba(201,162,39,.35)}
+.pn-intro-brand span{color:#F5F0DF}
+.pn-intro-tag{margin:12px 0 0;color:rgba(245,240,223,.72);font-size:clamp(14px,3.6vw,17px);font-weight:500}
+.pn-intro-mid{width:100%;display:flex;flex-direction:column;align-items:center}
+.pn-slot{display:grid;width:100%;justify-items:center}
+.pn-slot>*{grid-area:1/1}
+.pn-load{width:min(420px,86vw);align-self:center;transition:opacity .45s ease,visibility .45s}
+.pn-load.done{opacity:0;visibility:hidden}
+.pn-load-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(245,240,223,.55);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+.pn-load-row b{color:#EAC95C;font-variant-numeric:tabular-nums}
+.pn-load-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.pn-load-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#9A7B1C,#C9A227,#EAC95C)}
+.pn-actions{display:none;gap:12px;flex-wrap:wrap;justify-content:center;align-self:center;pointer-events:auto}
+.pn-actions.show{display:flex}
+.pn-actions .pn-btn{border-radius:999px;padding:0 30px;font-weight:800;font-size:16px;min-height:54px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid rgba(201,162,39,.55);background:rgba(14,13,11,.85);color:#F5F0DF;cursor:pointer;font-family:inherit}
+.pn-actions .pn-btn-gold{background:linear-gradient(180deg,#EAC95C,#C9A227 55%,#A8861D);color:#191204;border-color:#EAC95C;box-shadow:0 12px 30px rgba(201,162,39,.35)}
+.pn-actions .pn-btn-gold:hover{filter:brightness(1.07)}
+.pn-actions .pn-btn-ghost:hover{border-color:#C9A227;color:#EAC95C}
+.pn-trust{margin-top:22px;display:flex;justify-content:center;flex-wrap:wrap;background:rgba(12,11,9,.72);border:1px solid rgba(201,162,39,.22);border-radius:12px;overflow:hidden;max-width:94vw}
+.pn-trust .cell{padding:8px 14px 7px;text-align:center}
+.pn-trust .cell + .cell{border-left:1px solid rgba(201,162,39,.14)}
+.pn-trust .num{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:#C9A227;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pn-trust .lbl{margin-top:2px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,240,223,.55);font-weight:700;white-space:nowrap}
+@media (max-width:560px){
+  .pn-actions{flex-direction:column;width:min(340px,88vw)}
+  .pn-actions .pn-btn{width:100%}
+  .pn-trust .cell{padding:7px 9px 6px}
+  .pn-trust .num{font-size:14px}
+  .pn-trust .lbl{font-size:8px}
+}
+@media (prefers-reduced-motion: reduce){ #pnIntro{transition:none} }
+</style>
+<noscript><style>#pnIntro{display:none!important}</style></noscript>
 </head>
-<body id="top" class="auth-pending">
+<body id="top" class="auth-pending pn-intro-open">
+<!-- 3D INTRO — full-screen opening look. The gold PixelNest mark
+     rotates in 3D while the loading bar fills to 100% (about 7
+     seconds, max 8); then Sign Up and View Store as Guest appear,
+     and either one opens this store. -->
+<div id="pnIntro" role="dialog" aria-label="Welcome to PixelNest">
+  <div id="pnIntroGL" aria-hidden="true"></div>
+  <div class="pn-intro-vig" aria-hidden="true"></div>
+  <div class="pn-intro-in">
+    <div class="pn-intro-top">
+      <div class="pn-intro-brand">Pixel<span>Nest</span></div>
+      <p class="pn-intro-tag">Digital products, crafted like gold.</p>
+    </div>
+    <div class="pn-intro-mid">
+      <div class="pn-slot">
+        <div class="pn-load" id="pnLoad" aria-hidden="true">
+          <div class="pn-load-row"><span>Loading Store</span><b id="pnLoadPct">0%</b></div>
+          <div class="pn-load-bar"><div class="pn-load-fill" id="pnLoadFill"></div></div>
+        </div>
+        <div class="pn-actions" id="pnActions">
+          <button type="button" class="pn-btn pn-btn-gold" id="pnSignUp">Sign Up</button>
+          <button type="button" class="pn-btn pn-btn-ghost" id="pnGuest">View Store as Guest</button>
+        </div>
+      </div>
+      <div class="pn-trust" role="group" aria-label="Store trust statistics">
+        <div class="cell"><div class="num" id="pnTsCustomers">—</div><div class="lbl">Registered Customers</div></div>
+        <div class="cell"><div class="num" id="pnTsOrders">—</div><div class="lbl">Orders Placed</div></div>
+        <div class="cell"><div class="num" id="pnTsCompleted">—</div><div class="lbl">Orders Completed</div></div>
+        <div class="cell"><div class="num" id="pnTsRating">—</div><div class="lbl">Store Rating</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 <header>
   <div class="wrap">
     <div class="header-in">
@@ -7094,6 +7176,243 @@ window.SellerNotify = (function(){
     input.value = "";
     send(v);
   });
+})();
+</script>
+
+<script src="assets/three.min.js"></script>
+<script>
+/* ================= 3D INTRO — opening screen logic =================
+   Loading fills to 100% in about 7 seconds (never more than 8), then
+   the Sign Up and View Store as Guest buttons appear. Guest opens the
+   store directly; Sign Up opens the store with its own sign-up form
+   on top (sign-in already lives on the website). The 3D mark is kept
+   big so the screen never looks empty; the stats row stays small and
+   mirrors the store's own live trust numbers. */
+(function(){
+  "use strict";
+  var intro = document.getElementById("pnIntro");
+  if(!intro){ document.body.classList.remove("pn-intro-open"); return; }
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var closed = false, rafId = null, statTimer = null;
+
+  /* Mirror the store's live trust numbers (the same Firestore-fed
+     values the homepage strip shows) into the intro's small row. */
+  function mirrorStats(){
+    [["tsCustomers","pnTsCustomers"],["tsOrders","pnTsOrders"],["tsCompleted","pnTsCompleted"],["tsRating","pnTsRating"]].forEach(function(pr){
+      var src = document.getElementById(pr[0]), dst = document.getElementById(pr[1]);
+      if(src && dst && src.textContent) dst.textContent = src.textContent;
+    });
+  }
+  mirrorStats();
+  statTimer = setInterval(mirrorStats, 600);
+
+  /* ---- Loading: 0% → 100% in ~7s, then the two buttons ---- */
+  var fill = document.getElementById("pnLoadFill"), pct = document.getElementById("pnLoadPct");
+  var loadBox = document.getElementById("pnLoad"), actions = document.getElementById("pnActions");
+  var LOAD_MS = reduceMotion ? 1200 : 7000;
+  var startTs = null, actionsShown = false;
+  function showActions(){
+    if(actionsShown || closed) return; actionsShown = true;
+    if(loadBox) loadBox.classList.add("done");
+    if(actions) actions.classList.add("show");
+  }
+  function loadStep(ts){
+    if(closed) return;
+    if(!startTs) startTs = ts;
+    var t = Math.min(1, (ts - startTs) / LOAD_MS);
+    var eased = t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+    var val = Math.round(eased * 100);
+    if(fill) fill.style.width = val + "%";
+    if(pct) pct.textContent = val + "%";
+    if(t < 1) requestAnimationFrame(loadStep);
+    else setTimeout(showActions, 350);
+  }
+  requestAnimationFrame(loadStep);
+  setTimeout(showActions, 9000); /* safety net: buttons can never get stuck */
+
+  function closeIntro(){
+    if(closed) return; closed = true;
+    if(statTimer) clearInterval(statTimer);
+    intro.classList.add("pn-done");
+    document.body.classList.remove("pn-intro-open");
+    setTimeout(function(){ intro.style.display = "none"; if(rafId) cancelAnimationFrame(rafId); }, 700);
+  }
+  var guestBtn = document.getElementById("pnGuest");
+  if(guestBtn) guestBtn.addEventListener("click", closeIntro);
+  var signUpBtn = document.getElementById("pnSignUp");
+  if(signUpBtn) signUpBtn.addEventListener("click", function(){
+    closeIntro();
+    /* The store's own header Sign In button opens its auth form; tap
+       it, then switch that form to its Sign Up tab. If the visitor is
+       already signed in, that button is hidden and they simply land
+       in the store. */
+    setTimeout(function(){
+      var si = document.getElementById("signInBtn");
+      if(si && window.getComputedStyle(si).display !== "none"){
+        si.click();
+        setTimeout(function(){ var tu = document.getElementById("tabSignUp"); if(tu) tu.click(); }, 80);
+      }
+    }, 120);
+  });
+
+  /* ================= THREE.js 3D scene =================
+     The gold pixel-cube "nest" with a glowing heart and golden rings,
+     scaled up large so it fills the screen. Drag to rotate. If WebGL
+     or three.js is unavailable, the intro still works — brand,
+     loading and buttons all sit on the dark background. */
+  function initGL(){
+    if(typeof THREE === "undefined") return;
+    var holder = document.getElementById("pnIntroGL");
+    var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    holder.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x070707, 0.02);
+
+    var camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 6.6);
+
+    /* Fit any screen: pull back on portrait phones so nothing is
+       cropped, push in on wide laptop screens so the mark stays big. */
+    var baseZ = 6.6;
+    function fitCamera(){
+      var w = window.innerWidth, h = window.innerHeight;
+      var aspect = w / Math.max(1, h);
+      camera.aspect = aspect;
+      if(aspect < 0.55){ baseZ = 12.6; camera.fov = 54; }
+      else if(aspect < 0.75){ baseZ = 10.4; camera.fov = 52; }
+      else if(aspect < 1.0){ baseZ = 8.8; camera.fov = 50; }
+      else if(aspect < 1.35){ baseZ = 7.4; camera.fov = 47; }
+      else if(aspect < 1.9){ baseZ = 6.6; camera.fov = 46; }
+      else { baseZ = 6.0; camera.fov = 44; }
+      camera.position.z = baseZ;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    fitCamera();
+
+    try {
+      /* Tiny custom env room (a few emissive planes) — far cheaper than
+         RoomEnvironment under software WebGL, still gives gold its shine. */
+      var envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x0a0906);
+      function envPlane(color, intensity, w, h, pos, rot){
+        var p = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+          new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity) }));
+        p.position.set(pos[0], pos[1], pos[2]); p.rotation.set(rot[0], rot[1], rot[2]);
+        envScene.add(p);
+      }
+      envPlane(0xfff3cf, 7, 6, 3, [0, 5, 0], [Math.PI/2, 0, 0]);
+      envPlane(0xd4af37, 4, 5, 2.4, [-6, 1.5, 0], [0, Math.PI/2, 0]);
+      envPlane(0xffffff, 2.4, 5, 2.4, [6, 1, 0], [0, -Math.PI/2, 0]);
+      envPlane(0x8a6d1f, 2, 8, 2, [0, 1, -6], [0, 0, 0]);
+      var pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(envScene, 0.06).texture;
+    } catch(e){ /* the lights below still carry the scene */ }
+
+    var goldMat  = new THREE.MeshStandardMaterial({ color:0xd4af37, metalness:1.0, roughness:0.28 });
+    var goldDark = new THREE.MeshStandardMaterial({ color:0x8a6d1f, metalness:1.0, roughness:0.42 });
+    var darkMat  = new THREE.MeshStandardMaterial({ color:0x1c1a16, metalness:0.65, roughness:0.45 });
+    var glowMat  = new THREE.MeshStandardMaterial({ color:0xffdf7e, metalness:0.4, roughness:0.2, emissive:0xd4af37, emissiveIntensity:1.6 });
+
+    var world = new THREE.Group(); scene.add(world);
+    var nest = new THREE.Group();
+    nest.position.y = 0.35;
+    nest.scale.set(1.5, 1.5, 1.5); /* the rotating mark, kept big */
+    world.add(nest);
+
+    /* Pixel-cube cluster: a 3D "nest" of cubes with a glowing heart */
+    var cubeGeo = new THREE.BoxGeometry(0.52, 0.52, 0.52);
+    var spots = [];
+    for(var x = -1; x <= 1; x++) for(var y = -1; y <= 1; y++) for(var z = -1; z <= 1; z++){
+      var corner = Math.abs(x) + Math.abs(y) + Math.abs(z) === 3;
+      if(!corner) spots.push([x, y, z]);
+    }
+    spots.forEach(function(s, i){
+      var isHeart = s[0] === 0 && s[1] === 0 && s[2] === 0;
+      var m = new THREE.Mesh(cubeGeo, isHeart ? glowMat : (i % 4 === 0 ? darkMat : goldMat));
+      m.position.set(s[0] * 0.62, s[1] * 0.62, s[2] * 0.62);
+      m.castShadow = true; m.receiveShadow = true;
+      nest.add(m);
+    });
+
+    /* Golden nest rings */
+    var ringGeo = new THREE.TorusGeometry(1.95, 0.045, 16, 120);
+    var rings = [];
+    [[0.5, 0.2, 0], [-0.4, 0.9, 0.3], [1.15, -0.3, 0.6]].forEach(function(r){
+      var ring = new THREE.Mesh(ringGeo, goldDark);
+      ring.rotation.set(r[0], r[1], r[2]); ring.castShadow = true;
+      nest.add(ring); rings.push(ring);
+    });
+
+    /* Ground disc fading into the dark */
+    var ground = new THREE.Mesh(
+      new THREE.CircleGeometry(9, 48),
+      new THREE.MeshStandardMaterial({ color:0x0d0c0a, metalness:0.3, roughness:0.9 })
+    );
+    ground.rotation.x = -Math.PI/2; ground.position.y = -3.05; ground.receiveShadow = true;
+    world.add(ground);
+    var groundRing = new THREE.Mesh(new THREE.TorusGeometry(4.4, 0.02, 8, 100), goldDark);
+    groundRing.rotation.x = Math.PI/2; groundRing.position.y = -3.02; world.add(groundRing);
+
+    /* Lights: key, fill, rim */
+    var key = new THREE.DirectionalLight(0xfff1c4, 2.6);
+    key.position.set(4, 6, 5); key.castShadow = true;
+    key.shadow.mapSize.set(512, 512);
+    scene.add(key);
+    scene.add(new THREE.AmbientLight(0x40381e, 1.1));
+    var rim = new THREE.PointLight(0xd4af37, 60, 30); rim.position.set(-5, 2.5, -4); scene.add(rim);
+    var front = new THREE.PointLight(0xffffff, 14, 24); front.position.set(0, 1, 6); scene.add(front);
+
+    /* Drag to rotate + pointer parallax */
+    var targetRX = 0, targetRY = 0, dragging = false, lastX = 0, dragRY = 0;
+    var el = renderer.domElement;
+    el.style.touchAction = "pan-y";
+    el.addEventListener("pointerdown", function(e){ dragging = true; lastX = e.clientX; });
+    window.addEventListener("pointerup", function(){ dragging = false; });
+    window.addEventListener("pointermove", function(e){
+      if(closed) return;
+      if(dragging){ dragRY += (e.clientX - lastX) * 0.005; lastX = e.clientX; }
+      else {
+        targetRY = ((e.clientX / window.innerWidth) - 0.5) * 0.5;
+        targetRX = ((e.clientY / window.innerHeight) - 0.5) * 0.28;
+      }
+    });
+
+    window.addEventListener("resize", fitCamera);
+    window.addEventListener("orientationchange", function(){ setTimeout(fitCamera, 60); });
+
+    var t0 = performance.now();
+    function frame(){
+      if(closed) return;
+      rafId = requestAnimationFrame(frame);
+      try {
+        var t = (performance.now() - t0) / 1000;
+        var speed = reduceMotion ? 0.25 : 1;
+        nest.rotation.y = t * 0.22 * speed + dragRY + targetRY;
+        nest.rotation.x = Math.sin(t * 0.4) * 0.08 * speed + targetRX * 0.5;
+        nest.position.y = 0.35 + (reduceMotion ? 0 : Math.sin(t * 1.1) * 0.18);
+        rings.forEach(function(r, idx){ r.rotation.z += 0.0016 * (idx + 1) * speed; r.rotation.x += 0.0011 * (idx + 1) * speed; });
+        camera.position.x += ((targetRY * 1.4) - camera.position.x) * 0.04;
+        camera.position.y += ((1.2 - targetRX * 1.2) - camera.position.y) * 0.04;
+        camera.position.z += (baseZ - camera.position.z) * 0.08;
+        camera.lookAt(0, 0.15, 0);
+        renderer.render(scene, camera);
+      } catch(err){ /* keep the loop alive */ }
+    }
+    frame();
+  }
+
+  /* Start the 3D a beat after the intro itself is on screen, so the
+     brand, loading bar and buttons are never blocked by WebGL setup. */
+  setTimeout(function(){ try { initGL(); } catch(e){ /* intro still works without 3D */ } }, 60);
 })();
 </script>
 
