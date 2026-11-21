@@ -8,9 +8,14 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v24: Help chat welcome is now just 2 short lines — "Welcome, <name>
-   to PixelNest!" then "You can talk in any language." — so the pills
-   below it are visible without scrolling. Same as v23 otherwise:
+   v25: STRICT seller/buyer separation — when the seller account is
+   signed in the whole store hides and only the seller dashboard
+   shows (products one line each, name + price); buyers never see
+   any seller option; the notification test alert no longer hangs
+   on serviceWorker.ready (getRegistration() + 700ms fallback).
+   Same as v24 otherwise: Help chat welcome is just 2 short lines
+   — "Welcome, <name> to PixelNest!" then "You can talk in any
+   language." — so the pills below it are visible without scrolling.
    Help chat ChatGPT-style + 3D intro once per session (sessionStorage
    flag, Home clicks skip it), WhatsApp chat button removed (only the
    foreigner checkout button + footer plain-text number remain), Help
@@ -33,7 +38,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    comment LIVE, seller dashboard LTR, delivery email
    (template_8bmn0gq), persistent sign-in, seller exclusion,
    sign-up name, email verification, WhatsApp-style notification
-   read/unread as v23.
+   read/unread as v24.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first. Same shell, new cache version so phones pick
    up the new build.
@@ -59,7 +64,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v24";
+var CACHE_VERSION = "pixelnest-shell-v25";
 var SHELL_URLS = [
   "index.html",
   "shop.html",

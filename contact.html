@@ -972,6 +972,11 @@ body.auth-pending #acctLoading{display:inline-flex!important}
   #ordersPage .pstat{min-width:52px;padding:4px 5px}
   #ordersPage .pstat b{font-size:.95rem}
 }
+/* One line only — a product name never wraps onto a second line:
+   it truncates with an ellipsis, so every product stays a single
+   line with its price, the same way the notification rows read. */
+#ordersPage .prow{flex-wrap:nowrap}
+#ordersPage .prow-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 </style>
 <style>
@@ -1364,6 +1369,29 @@ body.is-seller-view #openCart,
 body.is-seller-view #drawer,
 body.is-seller-view #overlay{display:none!important}
 body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
+/* Seller sees ONLY his dashboard: while the seller is signed in, the
+   whole store page hides on every page — hero, products, categories,
+   samples, How It Works, reviews, custom order, FAQ and the footer —
+   together with the store header nav, search, cart, WhatsApp float
+   and the Help chat. All that remains is the header (logo + his
+   account button) and the compact seller home below, which sits
+   behind the dashboard — there is no long store page to scroll.
+   Buyers and signed-out visitors never get this class: their store
+   is completely unchanged. */
+body.is-seller-view:not(.is-seller-store) main,
+body.is-seller-view:not(.is-seller-store) footer,
+body.is-seller-view:not(.is-seller-store) .wa-float,
+body.is-seller-view:not(.is-seller-store) #pnChatBtn,
+body.is-seller-view:not(.is-seller-store) #pnChatPanel,
+body.is-seller-view:not(.is-seller-store) .nav,
+body.is-seller-view:not(.is-seller-store) .mobile-nav,
+body.is-seller-view:not(.is-seller-store) #searchToggle,
+body.is-seller-view:not(.is-seller-store) #searchPanel{display:none!important}
+#sellerHome{display:none}
+body.is-seller-view:not(.is-seller-store) #sellerHome{display:block}
+.seller-home-in{padding-top:56px;padding-bottom:64px;text-align:center}
+.seller-home-in h1{font-size:clamp(1.9rem,4.5vw,2.6rem);margin:0 0 10px}
+.seller-home-in p{color:var(--muted);margin:0 auto 22px;max-width:46ch}
 /* Seller dashboard — registered customers list + detail page */
 #ordersPage .cust-list{display:grid;gap:8px;margin-top:4px}
 #ordersPage .cust-row{display:flex;align-items:center;gap:10px;width:100%;direction:ltr;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;font:inherit;box-shadow:var(--shadow-sm)}
@@ -1508,7 +1536,7 @@ body.pn-chat-open{overflow:hidden}
         <button class="acct-btn" id="acctBtn" type="button" style="display:none" aria-label="Your account">Account</button>
         <div class="acct-menu" id="acctMenu" style="display:none">
           <div class="am-email" id="acctEmail"></div>
-          <button type="button" id="acctSellerBtn">Seller Account</button>
+          <button type="button" id="acctSellerBtn" style="display:none">Seller Account</button>
           <button type="button" id="acctBuyBtn">Buy</button>
           <button type="button" id="acctInfoBtn">Account</button>
           <button type="button" id="acctOutBtn">Log Out</button>
@@ -1554,6 +1582,19 @@ body.pn-chat-open{overflow:hidden}
     </nav>
   </div>
 </header>
+
+<!-- SELLER HOME — seller account only. While the seller is signed
+     in, the store page (main + footer) is hidden and this compact
+     panel is all that sits behind his dashboard, so he never
+     scrolls a long store page. It renders only in seller view;
+     buyers and signed-out visitors never see it. -->
+<div id="sellerHome">
+  <div class="wrap seller-home-in">
+    <h1>Seller Dashboard</h1>
+    <p>Your orders, customers and products — everything is in your dashboard.</p>
+    <button type="button" class="btn btn-primary" id="sellerHomeBtn">Open Seller Dashboard</button>
+  </div>
+</div>
 <main>
 
     <div class="wrap">
@@ -3907,6 +3948,7 @@ function openOrdersDashboard(){
 }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
 document.getElementById("openOrders").addEventListener("click", openOrdersDashboard);
+var sellerHomeBtn = document.getElementById("sellerHomeBtn"); if(sellerHomeBtn) sellerHomeBtn.addEventListener("click", openOrdersDashboard);
 document.getElementById("ordersClose").addEventListener("click", closeOrdersDashboard);
 document.getElementById("ordersPage").addEventListener("click", function(e){ if(e.target === this) closeOrdersDashboard(); });
 document.getElementById("ordersList").addEventListener("click", function(e){
@@ -5232,7 +5274,7 @@ window.PixelAccount = (function(){
       authStateKnown = true;
       if(document.body) document.body.classList.remove("auth-pending");
       paintAccount();
-      if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else stopOrderNotify();
+      if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); maybeAutoOpenSellerDash(); } else { stopOrderNotify(); sellerDashAutoOpened = false; }
       paintVerifyBoxes();
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
@@ -5405,6 +5447,21 @@ window.PixelAccount = (function(){
       if(m !== acctMode) paintAccount();
     });
   }
+  /* Seller sign-in lands on the dashboard: the first time the
+     seller's auth state lands on a page, his dashboard opens by
+     itself — once per page load, so if he closes it, it stays
+     closed until the next page or sign-in. */
+  var sellerDashAutoOpened = false;
+  function maybeAutoOpenSellerDash(){
+    if(sellerDashAutoOpened) return;
+    sellerDashAutoOpened = true;
+    setTimeout(function(){
+      if(!isSeller()) return;
+      var pg = document.getElementById("ordersPage");
+      if(pg && pg.classList.contains("open")) return;
+      if(typeof openOrdersDashboard === "function") openOrdersDashboard();
+    }, 400);
+  }
   function paintAccount(){
     var si = $("signInBtn"), ab = $("acctBtn"), menu = $("acctMenu"), em = $("acctEmail");
     /* Seller visibility rule: the Seller Orders entry points (footer
@@ -5417,12 +5474,13 @@ window.PixelAccount = (function(){
        out or in as a customer removes the class again, instantly,
        with no reload. */
     if(document.body) document.body.classList.toggle("is-seller-view", sellerOn);
+    if(!sellerOn && document.body) document.body.classList.remove("is-seller-store");
     /* The cart belongs to the signed-in account: re-point it at
        this account's own saved cart (or the guest cart when signed
        out), so one account never sees another account's items. */
     if(typeof window.syncCartToAccount === "function") window.syncCartToAccount(currentUser);
     var ol = $("openOrders"); if(ol) ol.style.display = sellerOn ? "" : "none";
-    var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = "";
+    var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = sellerOn ? "" : "none";
     if(!si || !ab) return;
     if(currentUser){
       si.style.display = "none";
@@ -5517,7 +5575,7 @@ window.PixelAccount = (function(){
     setMode("signin");
     var note = $("authNote");
     if(note){
-      if(purpose === "seller") note.innerHTML = "The seller dashboard is for the seller only. Seller: sign in with your <b>seller account</b> (shakircadet1@gmail.com) — email/password above or Google below, both work. Customers sign in here with their own accounts — every customer can see only their own orders, nobody else can.";
+      if(purpose === "seller") note.innerHTML = "The seller dashboard is for the seller only. Seller: sign in with your <b>seller account</b> — email/password above or Google below, both work. Customers sign in here with their own accounts — every customer can see only their own orders, nobody else can.";
       else if(purpose === "checkout" || purpose === "custom") note.innerHTML = "Sign-in is required to place an order — so your files are delivered only to you and nobody else can see your order. After signing in, you will return to your order.";
       else note.innerHTML = "New here? Please <b>Sign Up</b> first — Sign In works only with an account you have already created. Every customer can see only their own orders and files — the website is open to all customers so they can place orders, but each customer’s orders are private and the seller dashboard is for the seller only.";
     }
@@ -6001,12 +6059,22 @@ window.PixelAccount = (function(){
     var asb = $("acctSellerBtn");
     if(asb) asb.addEventListener("click", function(){
       var m = $("acctMenu"); if(m) m.style.display = "none";
-      if(isSeller()){ if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
+      if(isSeller()){ if(document.body) document.body.classList.remove("is-seller-store"); if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
       else if(typeof showToast === "function") showToast("Seller access only — this dashboard is for the seller only");
     });
     var abuy = $("acctBuyBtn");
     if(abuy) abuy.addEventListener("click", function(){
       var m = $("acctMenu"); if(m) m.style.display = "none";
+      if(isSeller()){
+        /* The seller switching to the buyer side: the store shows
+           on this page (his purchase controls stay hidden — he
+           never buys from his own store). "Seller Account" in this
+           same menu switches back to the dashboard-only view. */
+        if(document.body) document.body.classList.add("is-seller-store");
+        if(typeof closeOrdersDashboard === "function") closeOrdersDashboard();
+        window.scrollTo(0, 0);
+        return;
+      }
       var sl = document.querySelector('a[data-route="shop"]');
       if(sl && sl.href) window.location.href = sl.href;
     });
@@ -6336,7 +6404,10 @@ window.SellerNotify = (function(){
     try { return new URL("assets/icon-192.png", window.location.href).href; }
     catch(e){ return "assets/icon-192.png"; }
   }
-  function showNow(title, body, tag){
+  function pageNotify(title, opts){
+    try { new Notification(title, opts); return true; } catch(e){ return false; }
+  }
+  function showNow(title, body, tag, onFail){
     var opts = {
       body: body,
       icon: iconUrl(),
@@ -6345,21 +6416,45 @@ window.SellerNotify = (function(){
       requireInteraction: true, /* stays in the tray until dismissed */
       vibrate: [200, 100, 200]
     };
-    if("serviceWorker" in navigator){
-      navigator.serviceWorker.ready.then(function(reg){
-        if(reg && reg.showNotification) return reg.showNotification(title, opts);
-        throw new Error("no-sw-notification");
-      }).catch(function(){
-        try { new Notification(title, opts); } catch(e){}
-      });
-    } else {
-      try { new Notification(title, opts); } catch(e){}
-    }
+    var settled = false;
+    function done(){ settled = true; }
+    function fail(){ if(!settled){ settled = true; if(onFail) onFail(); } }
+    /* The worker is registered from assets/, so its scope covers
+       only the pages under assets/ — on the home page no worker
+       matches this page at all, and serviceWorker.ready then never
+       settles: the old code waited on it forever, so the alert
+       (including the "tap to test" one) silently never appeared.
+       getRegistration() answers at once for THIS page, and a short
+       timer falls back to a plain page notification, so an alert
+       is never lost waiting on the worker. */
+    if("serviceWorker" in navigator && navigator.serviceWorker.getRegistration){
+      var timer = setTimeout(function(){
+        if(settled) return;
+        if(pageNotify(title, opts)) done(); else fail();
+      }, 700);
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if(settled) return;
+        if(reg && reg.showNotification){
+          clearTimeout(timer);
+          reg.showNotification(title, opts).then(done, function(){
+            if(pageNotify(title, opts)) done(); else fail();
+          });
+        }
+        /* No worker for this page: the timer above falls back. */
+      }).catch(function(){ /* the timer fallback still fires */ });
+    } else if(pageNotify(title, opts)) done();
+    else fail();
   }
-  function alertNew(title, body, tag){
+  function alertNew(title, body, tag, onFail){
     chime();
-    if(!("Notification" in window)) return;
-    if(Notification.permission === "granted") showNow(title, body, tag);
+    if(!("Notification" in window)){ if(onFail) onFail(); return; }
+    if(Notification.permission === "granted") showNow(title, body, tag, onFail);
+    else if(onFail) onFail();
+  }
+  /* A test alert that could not be displayed is never silent: the
+     seller is told plainly, instead of tapping and seeing nothing. */
+  function testFailed(){
+    if(typeof showToast === "function") showToast("The test alert could not be shown — this browser could not display a notification. Open the store in Chrome (or the installed app) and tap test again");
   }
   function setBtnLabel(btn, txt){
     var s = btn.querySelector(".notify-btn-txt");
@@ -6406,7 +6501,7 @@ window.SellerNotify = (function(){
         unlockAudio(); /* the tap is the user gesture audio needs */
         if(!("Notification" in window)){ refreshBtn(); return; }
         if(Notification.permission === "granted"){
-          alertNew("PixelNest — test alert", "Order notifications are working. This is how a new order alert looks and sounds.", "pixelnest-test");
+          alertNew("PixelNest — test alert", "Order notifications are working. This is how a new order alert looks and sounds.", "pixelnest-test", testFailed);
           if(window.PixelPush) window.PixelPush.subscribeSeller();
           refreshBtn();
           return;
@@ -6417,7 +6512,7 @@ window.SellerNotify = (function(){
         }
         Notification.requestPermission().then(function(p){
           refreshBtn();
-          if(p === "granted"){ alertNew("PixelNest — notifications ON", "You will now get a sound + a tray notification for every new order.", "pixelnest-test"); if(window.PixelPush) window.PixelPush.subscribeSeller(); }
+          if(p === "granted"){ alertNew("PixelNest — notifications ON", "You will now get a sound + a tray notification for every new order.", "pixelnest-test", testFailed); if(window.PixelPush) window.PixelPush.subscribeSeller(); }
           else if(typeof showToast === "function") showToast("Notification permission was not given — order alerts stay off");
         }).catch(function(){ refreshBtn(); });
       });
