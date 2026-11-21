@@ -1464,9 +1464,11 @@ a{color:#7C6213}
 .pnc-msg a{color:#5B21B6;font-weight:800}
 .pnc-msg.me a{color:#fff}
 .pnc-typing{align-self:flex-start;background:#fff;border:1px solid #E7E2F7;color:#6B7280;border-radius:14px;border-bottom-left-radius:4px;padding:9px 13px;font-size:.85rem;font-style:italic}
-.pnc-chips{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid #EEEAF9;background:#fff;flex:none;max-height:118px;overflow-y:auto}
+.pnc-chips{display:flex;gap:7px;flex-wrap:wrap;padding:4px 2px 2px;background:transparent;align-self:stretch;animation:pncIn .5s ease-out}
 .pnc-chip{border:1.5px solid #C9BFF2;background:var(--chat-soft);color:#4C1D95;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
 .pnc-chip:hover{background:#E3D9FA}
+.pnc-msg.welcome{animation:pncIn .5s ease-out}
+@keyframes pncIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .pnc-input{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid #EEEAF9;background:#fff;flex:none}
 .pnc-input input{flex:1;min-width:0;min-height:46px;border:1.5px solid #D9D2F2;border-radius:12px;padding:0 13px;font-size:.92rem;color:#1E222B;background:#fff;font-family:inherit}
 .pnc-input input:focus{outline:2px solid var(--chat)}
@@ -6536,6 +6538,27 @@ window.SellerNotify = (function(){
   var form = document.getElementById("pnForm");
   var input = document.getElementById("pnText");
   var welcomed = false;
+  var started = false;
+  var chatSession = 0;
+
+  /* The welcome greets the visitor by the first name on THEIR OWN
+     signed-in account — read live from PixelAccount at the moment the
+     chat opens, never a fixed name. A visitor who is not signed in
+     (or whose account has no name yet) gets the plain store welcome. */
+  function visitorName(){
+    try{
+      var u = (window.PixelAccount && window.PixelAccount.user) ? window.PixelAccount.user() : null;
+      if(!u) return "";
+      var nm = String(u.displayName || "").trim();
+      if(nm) return nm.split(/\s+/)[0];
+    }catch(e){}
+    return "";
+  }
+  function welcomeText(){
+    var nm = visitorName();
+    var head = nm ? ("Welcome, " + nm + "! \u2726 How can I help you?") : "Welcome to PixelNest! \u2726 How can I help you?";
+    return head + "\n\nI'm your PixelNest assistant \u2014 here's what I can do for you:\n\u2022 Help you place an order, step by step\n\u2022 Explain payment \u2014 Easypaisa for Pakistan, WhatsApp + Western Union for foreign buyers\n\u2022 Tell you the exact price and delivery time of any product\n\u2022 Help you track your order\n\u2022 Tell you about the FREE sample pack and the LAUNCH10 10% discount\n\u2022 Explain custom orders, refunds and more\n\nTip: I reply in YOUR language \u2014 English, \u0627\u0631\u062F\u0648, Roman Urdu, Espa\u00F1ol, Fran\u00E7ais, Deutsch, \u0627\u0644\u0639\u0631\u0628\u064A\u0629, \u0939\u093F\u0928\u094D\u0926\u0940, \u0420\u0443\u0441\u0441\u043A\u0438\u0439, \u4E2D\u6587 and many more. Just write to me in your language.\n\nTap a quick question below \u2014 or simply type your own question to start.";
+  }
   var BASE = /\/assets\/[^\/]+\.html$/.test(location.pathname) ? "" : "assets/";
   var WA_LINK = '<a href="https://wa.me/923355290894" target="_blank" rel="noopener">WhatsApp 0335 5290894</a>';
   var TRACK_LINK = '<a href="' + BASE + 'track-order.html">Track Order page</a>';
@@ -6636,21 +6659,30 @@ window.SellerNotify = (function(){
   };
 
   var ALIAS = [
-    ["free-sample", ["sample pack", "starter pack", "نمونہ پیک"]],
-    ["wall-art", ["wall art", "poster", "islamic art", "وال آرٹ", "پوسٹر"]],
-    ["colouring", ["colouring", "coloring", "colour", "کلرنگ"]],
-    ["planner", ["planner", "journal", "پلانر"]],
-    ["budget", ["budget", "excel sheet", "ایکسل"]],
-    ["invoice-bundle", ["invoice", "salary", "attendance", "انوائس"]],
-    ["social", ["social media", "instagram", "facebook post", "سوشل"]],
-    ["cv", ["cv", "resume", "سی وی", "رزومے"]],
-    ["ebook-guide", ["ebook", "e-book", "book", "guide", "freelancing", "کتاب"]],
-    ["thumbnail", ["thumbnail", "youtube", "تھمب نیل"]]
+    ["wall-art-colouring-bundle", ["wall art bundle", "colouring bundle", "bundle pack", "combo pack", "combo", "\u062F\u0648\u0646\u0648\u06BA \u067E\u06CC\u06A9", "\u0926\u094B\u0928\u094B\u0902 \u092A\u0948\u0915"]],
+    ["free-sample", ["sample pack", "starter pack", "\u0646\u0645\u0648\u0646\u06C1 \u067E\u06CC\u06A9", "muestra gratis", "muestra gratuita", "echantillon gratuit", "amostra gratis", "campione gratuito", "ucretsiz numune"]],
+    ["wall-art", ["wall art", "poster", "islamic art", "arte de pared", "arte mural", "arte de parede", "arte da parete", "art mural", "affiche", "wandbild", "wandkunst", "duvar sanati", "\u0645\u0644\u0635\u0642", "\u0641\u0646 \u062C\u062F\u0627\u0631\u064A", "\u0935\u0949\u0932 \u0906\u0930\u094D\u091F", "\u092A\u094B\u0938\u094D\u091F\u0930", "\u043F\u043E\u0441\u0442\u0435\u0440", "\u0648\u0627\u0644 \u0622\u0631\u0679", "\u067E\u0648\u0633\u0679\u0631"]],
+    ["colouring", ["colouring", "coloring", "colour", "para colorear", "para colorir", "da colorare", "coloriage", "malbuch", "ausmalbuch", "boyama", "\u062A\u0644\u0648\u064A\u0646", "\u0930\u0902\u0917 \u092D\u0930\u0928\u0947", "\u0440\u0430\u0441\u043A\u0440\u0430\u0441\u043A", "\u06A9\u0644\u0631\u0646\u06AF"]],
+    ["planner", ["planner", "journal", "planificador", "planejador", "pianificatore", "planning", "planer", "planlayici", "\u0645\u062E\u0637\u0637", "\u092A\u094D\u0932\u093E\u0928\u0930", "\u043F\u043B\u0430\u043D\u0435\u0440", "\u067E\u0644\u0627\u0646\u0631"]],
+    ["budget", ["budget", "excel sheet", "presupuesto", "orcamento", "butce", "\u0645\u064A\u0632\u0627\u0646\u064A\u0629", "\u092C\u091C\u091F", "\u0431\u044E\u0434\u0436\u0435\u0442", "\u0627\u06CC\u06A9\u0633\u0644"]],
+    ["invoice-bundle", ["invoice", "salary", "attendance", "factura", "fatura", "fattura", "rechnung", "\u0641\u0627\u062A\u0648\u0631\u0629", "\u091A\u093E\u0932\u093E\u0928", "\u0627\u0646\u0648\u0627\u0626\u0633"]],
+    ["social", ["social media", "instagram", "facebook post", "redes sociales", "redes sociais", "reseaux sociaux", "soziale medien", "sosyal medya", "\u0938\u094B\u0936\u0932 \u092E\u0940\u0921\u093F\u092F\u093E", "\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062A\u0648\u0627\u0635\u0644", "\u0633\u0648\u0634\u0644"]],
+    ["cv", ["cv", "resume", "curriculum", "curriculo", "hoja de vida", "lebenslauf", "ozgecmis", "\u0633\u064A\u0631\u0629 \u0630\u0627\u062A\u064A\u0629", "\u0930\u093F\u091C\u093C\u094D\u092F\u0942\u092E\u0947", "\u0440\u0435\u0437\u044E\u043C\u0435", "\u0633\u06CC \u0648\u06CC", "\u0631\u0632\u0648\u0645\u06D2"]],
+    ["ebook-guide", ["ebook", "e-book", "book", "guide", "freelancing", "libro electronico", "livre electronique", "livro digital", "libro digitale", "e-kitap", "\u0643\u062A\u0627\u0628 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A", "\u0908\u092C\u0941\u0915", "\u044D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u0430\u044F \u043A\u043D\u0438\u0433\u0430", "guia", "\u06A9\u062A\u0627\u0628"]],
+    ["thumbnail", ["thumbnail", "youtube", "miniatura", "miniaturas", "miniature", "kucuk resim", "\u0645\u0635\u063A\u0631\u0629", "\u0925\u0902\u092C\u0928\u0947\u0932", "\u043C\u0438\u043D\u0438\u0430\u0442\u044E\u0440", "\u062A\u06BE\u0645\u0628 \u0646\u06CC\u0644"]]
   ];
+  /* Accent-insensitive matching: "p\u00F3ster", "cu\u00E1nto" or
+     "curr\u00EDculum" in any language still finds the product. */
+  function normQ(s){
+    var t = String(s == null ? "" : s).toLowerCase();
+    try { t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); } catch(e){}
+    return t;
+  }
   function findProduct(s){
+    var q = normQ(s);
     for(var i = 0; i < ALIAS.length; i++){
       for(var j = 0; j < ALIAS[i][1].length; j++){
-        if(s.indexOf(ALIAS[i][1][j]) >= 0){
+        if(q.indexOf(normQ(ALIAS[i][1][j])) >= 0){
           var list = catalogue();
           for(var k = 0; k < list.length; k++) if(list[k].id === ALIAS[i][0]) return list[k];
         }
@@ -6845,7 +6877,7 @@ window.SellerNotify = (function(){
     ["paypk", /\bpagar\b|paiement|bezahlen|pagamento|ödeme nasıl|भुगतान|оплатить|支払い|支付|결제/i],
     ["account", /cuenta|compte|konto|conta|hesab|حساب|حساب کاربری|खाता|аккаунт|アカウント|账户|계정/i],
     ["contact", /contacto|kontakt|contato|contatto|iletişim|संपर्क|контакт|連絡先|联系方式|연락처/i],
-    ["products", /precio|prix|preis|preço|prezzo|fiyat|продукт|商品|製品|제품|lista de|liste des/i],
+    ["products", /precio|cuesta|cu\u00E1nto|cuanto|prix|combien|co\u00FBte|preis|wie viel|kostet|pre\u00E7o|quanto|custa|prezzo|costa|fiyat|ka\u00E7|\u043F\u0440\u043E\u0434\u0443\u043A\u0442|\u0446\u0435\u043D\u0430|\u5546\u54C1|\u4FA3\u683C|\u88FD\u54C1|\uC81C\uD488|\uAC00\uACA9|lista de|liste des/i],
     ["order", /pedido|commande|bestellung|ordine|sipariş|заказ|注文|订单|주문|comprar|acheter|kaufen/i],
     ["thanks", /gracias|merci|danke|obrigad|grazie|teşekkür|धन्यवाद|спасибо|ありがとう|谢谢|감사/i],
     ["greeting", /^(hola|bonjour|hallo|olá|ola|ciao|merhaba|привет|здравствуй|こんにちは|你好|您好|안녕|halo|hej)\b/i]
@@ -6923,7 +6955,9 @@ window.SellerNotify = (function(){
     var lang = detectLang(text);
     var intent = intentOf2(text, intentOf(text));
     var p = findProduct(text.toLowerCase());
-    if(p && (intent === "products" || intent === "fallback" || intent === "delivery")) return productDetail(p, lang);
+    if(p && PRICE_RE.test(text)) return withMore(priceAnswer(p, lang), lang, intent);
+    if(p && (intent === "products" || intent === "fallback" || intent === "delivery")) return withMore(productDetail(p, lang), lang, intent);
+    if(!p && PRICE_RE.test(text) && intent === "fallback") intent = "products";
     var a = A[intent] || A.fallback;
     var rawAns = a[lang] || null;
     if(!rawAns && typeof LANGX !== "undefined" && LANGX[lang]) rawAns = LANGX[lang][intent] || LANGX[lang].fallback || null;
@@ -6940,7 +6974,60 @@ window.SellerNotify = (function(){
         out = esc(pre || preMap.en) + out;
       }
     }
-    return out;
+    return withMore(out, lang, intent);
+  }
+
+  /* Closing line appended to every answer (except the thanks answer,
+     which already says it): a gentle reminder, in the visitor's own
+     language, that the assistant can help with more. */
+  var MORE = {
+    en: "Anything else you'd like to know? Just ask \u2014 I can help with ordering, payment, delivery, tracking, prices and more.",
+    ru: "Kuch aur janna ho to bas pooch lein \u2014 order, payment, delivery, tracking, prices, har cheez mein madad kar sakta hun.",
+    ur: "\u06A9\u0686\u06BE \u0627\u0648\u0631 \u062C\u0627\u0646\u0646\u0627 \u06C1\u0648 \u062A\u0648 \u0628\u0633 \u067E\u0648\u0686\u06BE \u0644\u06CC\u06BA \u2014 \u0622\u0631\u0688\u0631\u060C \u0627\u062F\u0627\u0626\u06CC\u06AF\u06CC\u060C \u0688\u06CC\u0644\u06CC\u0648\u0631\u06CC\u060C \u0679\u0631\u06CC\u06A9\u0646\u06AF\u060C \u0642\u06CC\u0645\u062A\u0648\u06BA\u060C \u06C1\u0631 \u0686\u06CC\u0632 \u0645\u06CC\u06BA \u0645\u062F\u062F \u06A9\u0631 \u0633\u06A9\u062A\u0627 \u06C1\u0648\u06BA\u06D4",
+    es: "\u00BFAlgo m\u00E1s que quieras saber? Solo pregunta \u2014 puedo ayudarte con pedidos, pagos, entregas, seguimiento, precios y m\u00E1s.",
+    fr: "Autre chose que vous voulez savoir ? Demandez simplement \u2014 je peux vous aider pour les commandes, le paiement, la livraison, le suivi, les prix et plus encore.",
+    de: "M\u00F6chten Sie noch etwas wissen? Fragen Sie einfach \u2014 ich helfe bei Bestellung, Zahlung, Lieferung, Sendungsverfolgung, Preisen und mehr.",
+    pt: "Quer saber mais alguma coisa? \u00C9 s\u00F3 perguntar \u2014 posso ajudar com pedidos, pagamento, entrega, rastreio, pre\u00E7os e muito mais.",
+    it: "Vuoi sapere altro? Chiedi pure \u2014 posso aiutarti con ordini, pagamenti, consegne, tracciamento, prezzi e altro.",
+    tr: "Bilmek istedi\u011Finiz ba\u015Fka bir \u015Fey var m\u0131? Sorman\u0131z yeterli \u2014 sipari\u015F, \u00F6deme, teslimat, takip, fiyatlar ve daha fazlas\u0131nda yard\u0131mc\u0131 olabilirim.",
+    ar: "\u0647\u0644 \u062A\u0631\u064A\u062F \u0645\u0639\u0631\u0641\u0629 \u0623\u064A \u0634\u064A\u0621 \u0622\u062E\u0631\u061F \u0641\u0642\u0637 \u0627\u0633\u0623\u0644 \u2014 \u064A\u0645\u0643\u0646\u0646\u064A \u0627\u0644\u0645\u0633\u0627\u0639\u062F\u0629 \u0641\u064A \u0627\u0644\u0637\u0644\u0628\u060C \u0648\u0627\u0644\u062F\u0641\u0639\u060C \u0648\u0627\u0644\u062A\u0633\u0644\u064A\u0645\u060C \u0648\u0627\u0644\u062A\u062A\u0628\u0639\u060C \u0648\u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u0627\u0644\u0645\u0632\u064A\u062F.",
+    fa: "\u0686\u06CC\u0632 \u062F\u06CC\u06AF\u0631\u06CC \u0647\u0645 \u0645\u06CC\u200C\u062E\u0648\u0627\u0647\u06CC\u062F \u0628\u062F\u0627\u0646\u06CC\u062F\u061F \u0641\u0642\u0637 \u0628\u067E\u0631\u0633\u06CC\u062F \u2014 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u0645 \u062F\u0631 \u0633\u0641\u0627\u0631\u0634\u060C \u067E\u0631\u062F\u0627\u062E\u062A\u060C \u062A\u062D\u0648\u06CC\u0644\u060C \u067E\u06CC\u06AF\u06CC\u0631\u06CC\u060C \u0642\u06CC\u0645\u062A\u200C\u0647\u0627 \u0648 \u0645\u0648\u0627\u0631\u062F \u062F\u06CC\u06AF\u0631 \u06A9\u0645\u06A9 \u06A9\u0646\u0645.",
+    hi: "\u0915\u0941\u091B \u0914\u0930 \u091C\u093E\u0928\u0928\u093E \u091A\u093E\u0939\u0924\u0947 \u0939\u0948\u0902? \u092C\u0938 \u092A\u0942\u091B \u0932\u0947\u0902 \u2014 \u092E\u0948\u0902 \u0911\u0930\u094D\u0921\u0930, \u092D\u0941\u0917\u0924\u093E\u0928, \u0921\u093F\u0932\u0940\u0935\u0930\u0940, \u091F\u094D\u0930\u0948\u0915\u093F\u0902\u0917, \u0915\u0940\u092E\u0924\u094B\u0902 \u0914\u0930 \u092C\u0939\u0941\u0924 \u0915\u0941\u091B \u092E\u0947\u0902 \u092E\u0926\u0926 \u0915\u0930 \u0938\u0915\u0924\u093E \u0939\u0942\u0901\u0964",
+    bn: "\u0986\u09B0 \u0995\u09BF\u099B\u09C1 \u099C\u09BE\u09A8\u09A4\u09C7 \u099A\u09BE\u09A8? \u09B6\u09C1\u09A7\u09C1 \u099C\u09BF\u099C\u09CD\u099E\u09BE\u09B8\u09BE \u0995\u09B0\u09C1\u09A8 \u2014 \u0985\u09B0\u09CD\u09A1\u09BE\u09B0, \u09AA\u09C7\u09AE\u09C7\u09A8\u09CD\u099F, \u09A1\u09C7\u09B2\u09BF\u09AD\u09BE\u09B0\u09BF, \u099F\u09CD\u09B0\u09CD\u09AF\u09BE\u0995\u09BF\u0982, \u09A6\u09BE\u09AE \u098F\u09AC\u0982 \u0986\u09B0\u0993 \u0985\u09A8\u09C7\u0995 \u0995\u09BF\u099B\u09C1\u09A4\u09C7 \u09B8\u09BE\u09B9\u09BE\u09AF\u09CD\u09AF \u0995\u09B0\u09A4\u09C7 \u09AA\u09BE\u09B0\u09BF\u0964",
+    rus: "\u0425\u043E\u0442\u0438\u0442\u0435 \u0443\u0437\u043D\u0430\u0442\u044C \u0447\u0442\u043E-\u0442\u043E \u0435\u0449\u0451? \u041F\u0440\u043E\u0441\u0442\u043E \u0441\u043F\u0440\u043E\u0441\u0438\u0442\u0435 \u2014 \u044F \u043F\u043E\u043C\u043E\u0433\u0443 \u0441 \u0437\u0430\u043A\u0430\u0437\u043E\u043C, \u043E\u043F\u043B\u0430\u0442\u043E\u0439, \u0434\u043E\u0441\u0442\u0430\u0432\u043A\u043E\u0439, \u043E\u0442\u0441\u043B\u0435\u0436\u0438\u0432\u0430\u043D\u0438\u0435\u043C, \u0446\u0435\u043D\u0430\u043C\u0438 \u0438 \u043C\u043D\u043E\u0433\u0438\u043C \u0434\u0440\u0443\u0433\u0438\u043C.",
+    uk: "\u0425\u043E\u0447\u0435\u0442\u0435 \u0434\u0456\u0437\u043D\u0430\u0442\u0438\u0441\u044F \u0449\u0435 \u0449\u043E\u0441\u044C? \u041F\u0440\u043E\u0441\u0442\u043E \u0437\u0430\u043F\u0438\u0442\u0430\u0439\u0442\u0435 \u2014 \u044F \u0434\u043E\u043F\u043E\u043C\u043E\u0436\u0443 \u0456\u0437 \u0437\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F\u043C, \u043E\u043F\u043B\u0430\u0442\u043E\u044E, \u0434\u043E\u0441\u0442\u0430\u0432\u043A\u043E\u044E, \u0432\u0456\u0434\u0441\u0442\u0435\u0436\u0435\u043D\u043D\u044F\u043C, \u0446\u0456\u043D\u0430\u043C\u0438 \u0442\u0430 \u0456\u043D\u0448\u0438\u043C.",
+    zh: "\u8FD8\u60F3\u4E86\u89E3\u5176\u4ED6\u95EE\u9898\u5417\uFF1F\u5C3D\u7BA1\u95EE\u6211 \u2014 \u6211\u53EF\u4EE5\u5E2E\u52A9\u60A8\u4E0B\u5355\u3001\u4ED8\u6B3E\u3001\u914D\u9001\u3001\u8DDF\u8E2A\u3001\u67E5\u8BE2\u4EF7\u683C\u7B49\u7B49\u3002",
+    ja: "\u4ED6\u306B\u3082\u77E5\u308A\u305F\u3044\u3053\u3068\u306F\u3042\u308A\u307E\u3059\u304B\uFF1F\u304A\u6C17\u8EFD\u306B\u3069\u3046\u305E \u2014 \u6CE8\u6587\u3001\u304A\u652F\u6255\u3044\u3001\u914D\u9001\u3001\u8FFD\u8DE1\u3001\u4FA1\u683C\u306A\u3069\u3001\u4F55\u3067\u3082\u304A\u624B\u4F1D\u3044\u3057\u307E\u3059\u3002",
+    ko: "\uB354 \uAD81\uAE08\uD55C \uC810\uC774 \uC788\uC73C\uC2E0\uAC00\uC694? \uD3B8\uD558\uAC8C \uBB3C\uC5B4\uBCF4\uC138\uC694 \u2014 \uC8FC\uBB38, \uACB0\uC81C, \uBC30\uC1A1, \uC870\uD68C, \uAC00\uACA9 \uB4F1 \uBB34\uC5C7\uC774\uB4E0 \uB3C4\uC640\uB4DC\uB9BD\uB2C8\uB2E4.",
+    id: "Ada lagi yang ingin Anda ketahui? Tanyakan saja \u2014 saya bisa membantu pemesanan, pembayaran, pengiriman, pelacakan, harga, dan lainnya.",
+    nl: "Wil je nog iets weten? Vraag het gerust \u2014 ik help met bestellen, betalen, levering, tracking, prijzen en meer.",
+    th: "\u0E2D\u0E22\u0E32\u0E01\u0E17\u0E23\u0E32\u0E1A\u0E2D\u0E30\u0E44\u0E23\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E40\u0E15\u0E34\u0E21\u0E44\u0E2B\u0E21? \u0E16\u0E32\u0E21\u0E44\u0E14\u0E49\u0E40\u0E25\u0E22 \u2014 \u0E09\u0E31\u0E19\u0E0A\u0E48\u0E27\u0E22\u0E44\u0E14\u0E49\u0E17\u0E31\u0E49\u0E07\u0E01\u0E32\u0E23\u0E2A\u0E31\u0E48\u0E07\u0E0B\u0E37\u0E49\u0E2D \u0E01\u0E32\u0E23\u0E0A\u0E33\u0E23\u0E30\u0E40\u0E07\u0E34\u0E19 \u0E01\u0E32\u0E23\u0E08\u0E31\u0E14\u0E2A\u0E48\u0E07 \u0E01\u0E32\u0E23\u0E15\u0E34\u0E14\u0E15\u0E32\u0E21 \u0E23\u0E32\u0E04\u0E32 \u0E41\u0E25\u0E30\u0E2D\u0E37\u0E48\u0E19 \u0E46",
+    el: "\u0398\u03AD\u03BB\u03B5\u03C4\u03B5 \u03BD\u03B1 \u03BC\u03AC\u03B8\u03B5\u03C4\u03B5 \u03BA\u03AC\u03C4\u03B9 \u03AC\u03BB\u03BB\u03BF; \u0391\u03C0\u03BB\u03CE\u03C2 \u03C1\u03C9\u03C4\u03AE\u03C3\u03C4\u03B5 \u2014 \u03BC\u03C0\u03BF\u03C1\u03CE \u03BD\u03B1 \u03B2\u03BF\u03B7\u03B8\u03AE\u03C3\u03C9 \u03BC\u03B5 \u03C0\u03B1\u03C1\u03B1\u03B3\u03B3\u03B5\u03BB\u03AF\u03B5\u03C2, \u03C0\u03BB\u03B7\u03C1\u03C9\u03BC\u03AE, \u03C0\u03B1\u03C1\u03AC\u03B4\u03BF\u03C3\u03B7, \u03C0\u03B1\u03C1\u03B1\u03BA\u03BF\u03BB\u03BF\u03CD\u03B8\u03B7\u03C3\u03B7, \u03C4\u03B9\u03BC\u03AD\u03C2 \u03BA\u03B1\u03B9 \u03AC\u03BB\u03BB\u03B1.",
+    he: "\u05E8\u05D5\u05E6\u05D9\u05DD \u05DC\u05D3\u05E2\u05EA \u05DE\u05E9\u05D4\u05D5 \u05E0\u05D5\u05E1\u05E3? \u05E4\u05E9\u05D5\u05D8 \u05E9\u05D0\u05DC\u05D5 \u2014 \u05D0\u05E0\u05D9 \u05D9\u05DB\u05D5\u05DC \u05DC\u05E2\u05D6\u05D5\u05E8 \u05E2\u05DD \u05D4\u05D6\u05DE\u05E0\u05D5\u05EA, \u05EA\u05E9\u05DC\u05D5\u05DD, \u05DE\u05E9\u05DC\u05D5\u05D7, \u05DE\u05E2\u05E7\u05D1, \u05DE\u05D7\u05D9\u05E8\u05D9\u05DD \u05D5\u05E2\u05D5\u05D3."
+  };
+  function withMore(html, lang, intent){
+    if(intent === "thanks") return html;
+    return html + esc("\n\n" + (MORE[lang] || MORE.en));
+  }
+
+  /* A question about a price, in any language, gets the product's REAL
+     price \u2014 never the generic topic list. */
+  var PRICE_RE = /price|cost|how much|precio|cuesta|cu\u00E1nto|cuanto|combien|co\u00FBte|coute|prix|wie viel|kostet|preis|quanto|custa|pre\u00E7o|preco|costa|prezzo|fiyat|ka\u00E7|\u0915\u093F\u0924\u0928|\u0915\u0940\u092E\u0924|\u09A6\u09BE\u09AE|\u0995\u09A4 \u099F\u09BE\u0995\u09BE|\u0441\u043A\u043E\u043B\u044C\u043A\u043E|\u0446\u0435\u043D\u0430|\u0441\u0442\u043E\u0438\u0442|\u0446\u0456\u043D\u0430|\u0441\u043A\u0456\u043B\u044C\u043A\u0438|\u0642\u06CC\u0645\u062A|\u0686\u0646\u062F|\u0643\u0645|\u0633\u0639\u0631|\u0628\u0643\u0645|\u3044\u304F\u3089|\u4FA1\u683C|\u591A\u5C11\u94B1|\u591A\u5C11|\uC5BC\uB9C8|\uAC00\uACA9|berapa|harga|hoeveel|kost|\u0E23\u0E32\u0E04\u0E32|\u0E40\u0E17\u0E48\u0E32\u0E44\u0E2B\u0E23\u0E48|\u03C4\u03B9\u03BC\u03AE|\u03C0\u03CC\u03C3\u03BF|\u05DB\u05DE\u05D4|\u05DE\u05D7\u05D9\u05E8/i;
+  var PRICE_TPL = {
+    en: "The price of {N} is {P}.\nDelivery: {D} \u2014 in the app, after the seller accepts your order.\nWant the full details (what's included, format)? Just ask, or open it in the Shop.",
+    ru: "{N} ki price {P} hai.\nDelivery: {D} \u2014 app mein, seller ke order accept karne ke baad.\nFull details (kya shamil hai, format) chahiyein to bas pooch lein, ya Shop mein khol lein.",
+    ur: "{N} \u06A9\u06CC \u0642\u06CC\u0645\u062A {P} \u06C1\u06D2\u06D4\n\u0688\u06CC\u0644\u06CC\u0648\u0631\u06CC: {D} \u2014 \u0627\u06CC\u067E \u0645\u06CC\u06BA\u060C \u0633\u06CC\u0644\u0631 \u06A9\u06D2 \u0622\u0631\u0688\u0631 \u0642\u0628\u0648\u0644 \u06A9\u0631\u0646\u06D2 \u06A9\u06D2 \u0628\u0639\u062F\u06D4\n\u0645\u06A9\u0645\u0644 \u062A\u0641\u0635\u06CC\u0644 (\u06A9\u06CC\u0627 \u0634\u0627\u0645\u0644 \u06C1\u06D2\u060C \u0641\u0627\u0631\u0645\u06CC\u0679) \u0686\u0627\u06C1\u06CC\u06D2 \u062A\u0648 \u0628\u0633 \u067E\u0648\u0686\u06BE \u0644\u06CC\u06BA\u060C \u06CC\u0627 Shop \u0645\u06CC\u06BA \u06A9\u06BE\u0648\u0644 \u0644\u06CC\u06BA\u06D4",
+    es: "El precio de {N} es {P}.\nEntrega: {D} \u2014 en la app, despu\u00E9s de que el vendedor acepte tu pedido.\n\u00BFQuieres todos los detalles (qu\u00E9 incluye, formato)? Solo pregunta, o \u00E1brelo en la Tienda.",
+    fr: "Le prix de {N} est de {P}.\nLivraison : {D} \u2014 dans l'application, apr\u00E8s acceptation de votre commande par le vendeur.\nVous voulez tous les d\u00E9tails (contenu, format) ? Demandez-moi, ou ouvrez-le dans la Boutique.",
+    de: "Der Preis f\u00FCr {N} betr\u00E4gt {P}.\nLieferung: {D} \u2014 in der App, nachdem der Verk\u00E4ufer Ihre Bestellung angenommen hat.\nAlle Details (Inhalt, Format) gef\u00E4llig? Fragen Sie einfach, oder \u00F6ffnen Sie es im Shop.",
+    pt: "O pre\u00E7o de {N} \u00E9 {P}.\nEntrega: {D} \u2014 na app, depois de o vendedor aceitar o seu pedido.\nQuer todos os detalhes (o que inclui, formato)? \u00C9 s\u00F3 perguntar, ou abra na Loja.",
+    it: "Il prezzo di {N} \u00E8 {P}.\nConsegna: {D} \u2014 nell'app, dopo che il venditore ha accettato il tuo ordine.\nVuoi tutti i dettagli (cosa include, formato)? Chiedi pure, o aprilo nel Negozio.",
+    tr: "{N} fiyat\u0131 {P}.\nTeslimat: {D} \u2014 sat\u0131c\u0131 sipari\u015Finizi kabul ettikten sonra uygulama i\u00E7inde.\nT\u00FCm detaylar\u0131 (i\u00E7erik, format) ister misiniz? Sorman\u0131z yeterli, ya da Ma\u011Fazada a\u00E7\u0131n.",
+    ar: "\u0633\u0639\u0631 {N} \u0647\u0648 {P}.\n\u0627\u0644\u062A\u0633\u0644\u064A\u0645: {D} \u2014 \u062F\u0627\u062E\u0644 \u0627\u0644\u062A\u0637\u0628\u064A\u0642\u060C \u0628\u0639\u062F \u0623\u0646 \u064A\u0642\u0628\u0644 \u0627\u0644\u0628\u0627\u0626\u0639 \u0637\u0644\u0628\u0643.\n\u0647\u0644 \u062A\u0631\u064A\u062F \u0643\u0644 \u0627\u0644\u062A\u0641\u0627\u0635\u064A\u0644 (\u0627\u0644\u0645\u062D\u062A\u0648\u0649\u060C \u0627\u0644\u0635\u064A\u063A\u0629)\u061F \u0641\u0642\u0637 \u0627\u0633\u0623\u0644\u060C \u0623\u0648 \u0627\u0641\u062A\u062D\u0647 \u0641\u064A \u0627\u0644\u0645\u062A\u062C\u0631."
+  };
+  function priceAnswer(p, lang){
+    var tpl = PRICE_TPL[lang] || PRICE_TPL.en;
+    return esc(tpl.split("{N}").join(p.name).split("{P}").join(priceOf(p)).split("{D}").join(p.delivery));
   }
 
   function addMsg(html, who){
@@ -6952,19 +7039,28 @@ window.SellerNotify = (function(){
     return d;
   }
   function botReply(text){
+    var sess = chatSession;
     var typing = document.createElement("div");
     typing.className = "pnc-typing";
-    typing.textContent = "PixelNest Assistant is typing…";
+    typing.textContent = "PixelNest Assistant is typing\u2026";
     msgs.appendChild(typing);
     msgs.scrollTop = msgs.scrollHeight;
     setTimeout(function(){
       if(typing.parentNode) typing.parentNode.removeChild(typing);
+      if(sess !== chatSession || panel.hidden) return;
       addMsg(answerFor(text), "bot");
     }, 480);
   }
   function send(text){
     var t = String(text || "").trim();
     if(!t) return;
+    if(!started){
+      /* ChatGPT-style: the quick questions are a one-time starter.
+         The moment the chat begins \u2014 a tapped suggestion or a typed
+         message \u2014 they leave and never come back under the text. */
+      started = true;
+      chipsBox.style.display = "none";
+    }
     addMsg(esc(t), "me");
     botReply(t);
   }
@@ -6988,14 +7084,34 @@ window.SellerNotify = (function(){
     b.addEventListener("click", function(){ send(c[1]); });
     chipsBox.appendChild(b);
   });
+  chipsBox.style.display = "none";
 
+  function showWelcome(){
+    var sess = chatSession;
+    var typing = document.createElement("div");
+    typing.className = "pnc-typing";
+    typing.textContent = "PixelNest Assistant is typing\u2026";
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(function(){
+      if(typing.parentNode) typing.parentNode.removeChild(typing);
+      if(sess !== chatSession || panel.hidden) return;
+      var w = addMsg(esc(welcomeText()), "bot");
+      w.classList.add("welcome");
+      /* The suggestions live in the chat flow, right under the welcome
+         \u2014 never pinned over the text, never half cut. */
+      msgs.appendChild(chipsBox);
+      chipsBox.style.display = "flex";
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 700);
+  }
   function openChat(){
     panel.hidden = false;
     document.body.classList.add("pn-chat-open");
     btn.setAttribute("aria-expanded", "true");
     if(!welcomed){
       welcomed = true;
-      setTimeout(function(){ addMsg(esc(A.welcome.en), "bot"); }, 150);
+      showWelcome();
     }
     setTimeout(function(){ try { input.focus(); } catch(e){} }, 60);
   }
@@ -7003,6 +7119,15 @@ window.SellerNotify = (function(){
     panel.hidden = true;
     document.body.classList.remove("pn-chat-open");
     btn.setAttribute("aria-expanded", "false");
+    /* Reopening always starts a brand-new chat: the old conversation
+       is cleared and the next open shows the welcome and the quick
+       questions again, fresh. */
+    chatSession++;
+    if(chipsBox.parentNode) chipsBox.parentNode.removeChild(chipsBox);
+    chipsBox.style.display = "none";
+    msgs.innerHTML = "";
+    welcomed = false;
+    started = false;
   }
   btn.addEventListener("click", function(){ panel.hidden ? openChat() : closeChat(); });
   document.getElementById("pnChatClose").addEventListener("click", closeChat);
