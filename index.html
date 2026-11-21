@@ -995,6 +995,32 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 #ordersPage .discount-usage{margin:10px 2px 0;font-size:.88rem;font-weight:700;color:var(--navy)}
 </style>
 <style>
+/* ================= SELLER DASHBOARD — SEPARATE PAGES =================
+   The dashboard is a compact overview now: its stat cards (Total
+   Orders, Pending, Active, Completed, Total Earned, Registered
+   Customers, Notifications) are links that open their own page
+   inside the dashboard, and every page has a "← Dashboard" button
+   back to the overview. Nothing expands downward on the overview
+   itself any more. */
+#ordersPage .dash-nav .o-stat{position:relative}
+#ordersPage button.o-stat{font:inherit;color:inherit;text-align:left;width:100%;display:block}
+#ordersPage .o-stat .o-stat-go{position:absolute;top:9px;right:11px;font-size:1.05rem;font-weight:800;color:var(--gold-deep)}
+#ordersPage .o-stat .notif-count{position:absolute;top:7px;right:30px}
+#ordersPage .dash-rating-row{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.9rem;color:var(--muted);font-weight:700}
+#ordersPage .dash-rating-row b{color:var(--navy);font-size:1rem}
+#ordersPage .dash-manual-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font:inherit;font-weight:800;color:var(--navy);cursor:pointer;box-shadow:var(--shadow-sm)}
+#ordersPage .dash-manual-btn:hover{border-color:var(--gold)}
+#ordersPage .dash-view[hidden]{display:none!important}
+#ordersPage .dash-view-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+#ordersPage .dash-view-head h3{margin:0;font-size:1.05rem;color:var(--navy)}
+#ordersPage .dash-view-head .notif-read-btn{margin-inline-start:auto}
+#ordersPage .dash-back{background:var(--soft);border:1px solid var(--line);color:var(--navy);border-radius:999px;padding:0 14px;min-height:38px;font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
+#ordersPage .dash-back:hover{border-color:var(--gold);background:var(--gold-soft)}
+#ordersPage .dash-view-note{color:var(--muted);font-size:.88rem;line-height:1.45;margin:0 0 10px}
+#ordersPage .dash-earned-banner{background:var(--gold-soft);border:1px solid var(--gold-line);color:var(--gold-deep);border-radius:12px;padding:11px 14px;font-weight:800;margin:0 0 10px}
+@media (max-width:560px){ #ordersPage .dash-nav{grid-template-columns:repeat(2,1fr)} }
+</style>
+<style>
 /* ================= INSTALL APP BUTTON =================
    The hero carries a clear Install App button. When the browser
    offers its own install prompt (Android Chrome), the button fires
@@ -1202,25 +1228,28 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
      prompt. The only subscription happens when the SELLER taps
      "Enable order notifications" in his dashboard
      (window.PixelPush.subscribeSeller), which also tags that
-     subscription role=seller. When a buyer places an order, the
-     buyer's browser calls the OneSignal REST API
-     (window.PixelPush.sendNewOrder) to push "New PixelNest Order"
-     to the seller-tagged subscription only; the alert stays in the
-     phone's notification tray until the seller dismisses it. The
+     subscription role=seller. The matching REST-API send from
+     the buyer's browser is DISABLED in this static build (see the
+     note at sendNewOrder below): it needs the OneSignal REST API
+     key, which must never ship in client code. While the seller
+     has the store open he still gets the in-app order alerts
+     (SellerNotify) the moment an order arrives. The
      store's existing service worker (sw.js) doubles as the
      OneSignal worker - it imports the OneSignal worker code at its
      top - so serviceWorkerPath points at it and no second worker
-     fights over the same scope. The REST API key is kept in this code at the owner's decision — see the note at REST_KEY below. -->
+     fights over the same scope. -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.PixelPush = (function(){
   var APP_ID = "7b3f05b6-3f8b-47f0-8e9f-d113f896fecb";
-  /* OneSignal REST API key, kept in this client code at the store
-     owner's explicit decision (same setup as the live store): the
-     buyer's browser uses it to send the "New PixelNest Order" push
-     to the seller-tagged subscription when an order is placed. */
-  var REST_KEY = "os_v2_app_pm7qlnr7rnd7bdu72ej7rfx6zm2nl56omaqe4m5idju5iaw6257254w7ztjrtbhrzsfvvejgceu4sz52rkafqzye3d5d7dv3q2tybyi";
+  /* No OneSignal REST API key ships in this page: that key can
+     send pushes as the store, so it belongs on a server, never in
+     client code. sendNewOrder below is therefore disabled in this
+     static build — restoring closed-app order pushes means
+     moving that one send behind a server-side holder for the key
+     (a server-backed build). The seller subscription above (App
+     ID only, no credential) is unaffected. */
   var STORE_URL = "https://pixelnestpk.github.io/PixelNest/";
   var inAssets = /\/assets\//.test(window.location.pathname || "");
   window.OneSignalDeferred.push(function(OneSignal){
@@ -1255,30 +1284,15 @@ window.PixelPush = (function(){
     });
   }
   /* Buyer side - called the moment an order is placed (shop
-     checkout and the custom-order form). Posts the order push to
-     the OneSignal REST API, addressed only to subscriptions
-     tagged role=seller. The order itself is saved exactly the
-     same either way; a failed push never blocks checkout. */
+     checkout and the custom-order form). DISABLED in this static
+     build: posting to the OneSignal REST API needs the REST API
+     key, and that credential must not ship in client code (see
+     the note above). The order itself is saved exactly the same
+     either way, and the seller still gets the in-app order alert
+     (SellerNotify) while the store is open. Kept as a no-op so
+     the checkout call sites stay valid. */
   function sendNewOrder(orderId, productName, total){
-    if(!REST_KEY) return;
-    try {
-      var body = "Order " + String(orderId || "") + " \u2014 " + String(productName || "New order");
-      var t = Number(total) || 0;
-      if(t > 0) body += " \u00b7 Rs. " + t.toLocaleString("en-PK");
-      fetch("https://onesignal.com/api/v1/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Key " + REST_KEY },
-        body: JSON.stringify({
-          app_id: APP_ID,
-          filters: [ { field: "tag", key: "role", relation: "=", value: "seller" } ],
-          headings: { en: "New PixelNest Order" },
-          contents: { en: body },
-          url: STORE_URL,
-          priority: 10,
-          ttl: 86400
-        })
-      }).catch(function(){});
-    } catch(e){}
+    return;
   }
   return { subscribeSeller: subscribeSeller, sendNewOrder: sendNewOrder };
 })();
@@ -1346,7 +1360,10 @@ body.is-seller-view .card-rate,
 body.is-seller-view #ppStarsLine,
 body.is-seller-view .launch-badge,
 body.is-seller-view .free-band,
-body.is-seller-view #custom{display:none!important}
+body.is-seller-view #custom,
+body.is-seller-view #openCart,
+body.is-seller-view #drawer,
+body.is-seller-view #overlay{display:none!important}
 body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
 /* Seller dashboard — registered customers list + detail page */
 #ordersPage .cust-list{display:grid;gap:8px;margin-top:4px}
@@ -1383,6 +1400,84 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
 #ordersPage .nd-row>span{flex:none;width:72px;font-size:.64rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:2px}
 #ordersPage .nd-row>b{color:var(--navy);font-weight:700;font-size:.86rem;word-break:break-word}
 </style>
+<style>
+/* ================= Colour system — black & gold VIP base, teal
+   buttons, violet assistant =================
+   The store keeps its black-and-gold VIP identity (header, hero,
+   footer, headings, gold rules and the black Buy buttons). Action
+   buttons get their own professional teal and the support assistant
+   its own violet, so the page is never one single colour — and the
+   muted body text is darkened a step so every line stays clearly
+   readable on white. */
+:root{
+  --teal:#0F766E; --teal-dark:#0B5D56; --teal-soft:#E6F3F0;
+  --btn:#0F766E; --btn-dark:#0B5D56;
+  --chat:#6D28D9; --chat-dark:#5B21B6; --chat-soft:#EFE9FB;
+  --muted:#4B5563;
+}
+a{color:#7C6213}
+.kicker{color:#7C6213}
+.btn-primary{background:var(--btn);color:#fff;box-shadow:0 10px 24px rgba(15,118,110,.28)}
+.btn-primary:hover{background:var(--btn-dark)}
+.cart-btn{background:var(--btn);color:#fff}
+.cart-btn:hover{background:var(--btn-dark)}
+#signInBtn{background:var(--btn);border-color:var(--btn);color:#fff;box-shadow:0 6px 18px rgba(15,118,110,.32)}
+#signInBtn:hover{background:var(--btn-dark);border-color:var(--btn-dark)}
+.card-btns .add-btn{background:var(--btn);color:#fff}
+.card-btns .add-btn:hover{background:var(--btn-dark)}
+.card-btns .add-btn.added{background:var(--green);color:#fff}
+.discount-apply-btn{background:var(--btn);color:#fff;border-color:var(--btn)}
+.discount-apply-btn:hover{background:var(--btn-dark)}
+.pay-num-row button{background:var(--btn)}
+.pay-num-row button:hover{background:var(--btn-dark)}
+#ordersPage .o-accept{background:var(--btn);border-color:var(--btn);color:#fff}
+#ordersPage .o-accept:hover{background:var(--btn-dark)}
+#ordersPage .o-accept:disabled{background:var(--soft);color:var(--muted);border-color:var(--line)}
+
+/* Checkout — Pakistan / foreigner question + foreign payment box */
+.origin-row{margin-bottom:4px}
+.origin-row label:has(input:checked){border-color:var(--navy);background:var(--gold-soft)}
+.pay-foreign-box{background:#EAF7EE;border-color:#BFE3CB}
+.wa-pay-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;text-decoration:none;font-weight:800;border-radius:12px;min-height:50px;padding:11px 14px;margin-top:10px}
+.wa-pay-btn:hover{background:#178A41}
+
+/* Header Help tab — opens the assistant */
+.nav button.help-tab{background:var(--chat);color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:800;font-size:.92rem;cursor:pointer;white-space:nowrap;font-family:inherit}
+.nav button.help-tab:hover{background:var(--chat-dark)}
+.mobile-nav button.help-tab{flex:none;background:var(--chat);color:#fff;border:0;border-radius:999px;padding:8px 13px;font-weight:800;font-size:.9rem;cursor:pointer;font-family:inherit}
+.mobile-nav button.help-tab:hover{background:var(--chat-dark)}
+
+/* ================= PixelNest Assistant (violet) ================= */
+#pnChatBtn{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:95;background:var(--chat);color:#fff;border:0;border-radius:999px;min-height:52px;padding:0 20px;display:flex;align-items:center;gap:9px;font-weight:800;font-size:.95rem;box-shadow:0 14px 34px rgba(109,40,217,.42);cursor:pointer;font-family:inherit}
+#pnChatBtn:hover{background:var(--chat-dark)}
+#pnChatBtn svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#pnChatPanel{position:fixed;right:16px;bottom:calc(152px + env(safe-area-inset-bottom,0px));z-index:96;width:min(384px,calc(100vw - 24px));height:min(560px,calc(100dvh - 200px));background:#fff;border:1px solid #E3E0F5;border-radius:18px;box-shadow:0 30px 70px rgba(16,19,24,.32);display:flex;flex-direction:column;overflow:hidden}
+#pnChatPanel[hidden]{display:none}
+.pnc-head{background:linear-gradient(135deg,#6D28D9,#4C1D95);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;flex:none}
+.pnc-head b{font-size:1rem;display:block;line-height:1.25;font-family:'Playfair Display',Georgia,serif}
+.pnc-head span{font-size:.78rem;color:rgba(255,255,255,.88);display:block}
+#pnChatClose{margin-left:auto;background:rgba(255,255,255,.16);color:#fff;border:0;width:36px;height:36px;border-radius:10px;font-size:1rem;cursor:pointer;flex:none;line-height:1}
+#pnChatClose:hover{background:rgba(255,255,255,.3)}
+.pnc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:#FBFAFF}
+.pnc-msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:.9rem;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.pnc-msg.bot{background:#fff;border:1px solid #E7E2F7;border-bottom-left-radius:4px;color:#1E222B;align-self:flex-start;box-shadow:0 2px 8px rgba(76,29,149,.05)}
+.pnc-msg.me{background:var(--chat);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.pnc-msg a{color:#5B21B6;font-weight:800}
+.pnc-msg.me a{color:#fff}
+.pnc-typing{align-self:flex-start;background:#fff;border:1px solid #E7E2F7;color:#6B7280;border-radius:14px;border-bottom-left-radius:4px;padding:9px 13px;font-size:.85rem;font-style:italic}
+.pnc-chips{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid #EEEAF9;background:#fff;flex:none;max-height:118px;overflow-y:auto}
+.pnc-chip{border:1.5px solid #C9BFF2;background:var(--chat-soft);color:#4C1D95;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
+.pnc-chip:hover{background:#E3D9FA}
+.pnc-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #EEEAF9;background:#fff;flex:none}
+.pnc-input input{flex:1;min-width:0;min-height:46px;border:1.5px solid #D9D2F2;border-radius:12px;padding:0 13px;font-size:.92rem;color:#1E222B;background:#fff;font-family:inherit}
+.pnc-input input:focus{outline:2px solid var(--chat)}
+.pnc-input button{flex:none;width:46px;height:46px;border:0;border-radius:12px;background:var(--chat);cursor:pointer;display:grid;place-items:center}
+.pnc-input button:hover{background:var(--chat-dark)}
+.pnc-input button svg{width:19px;height:19px;fill:#fff}
+@media (max-width:640px){
+  #pnChatPanel{right:12px;left:12px;width:auto;bottom:calc(148px + env(safe-area-inset-bottom,0px));height:min(540px,calc(100dvh - 190px))}
+}
+</style>
 </head>
 <body id="top" class="auth-pending">
 <header>
@@ -1413,6 +1508,7 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         <a href="about.html" data-route="about">About</a>
         <a href="contact.html" data-route="contact">Contact</a>
         <a href="track-order.html" data-route="track">Track Order</a>
+        <button type="button" class="help-tab" data-help-open>Help</button>
         <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
       </nav>
       <button class="search-toggle" id="searchToggle" type="button" aria-label="Search products" aria-expanded="false" aria-controls="searchPanel">
@@ -1436,7 +1532,8 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
       <a href="#faq" data-route="faq">FAQ</a>
       <a href="track-order.html" data-route="track">Track Order</a>
       <a href="contact.html" data-route="contact">Contact</a>
-      <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
+      <button type="button" class="help-tab" data-help-open>Help</button>
+        <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
     </nav>
   </div>
 </header>
@@ -1815,7 +1912,13 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         <label>Your CV details <textarea id="fCvDetails" placeholder="Your full name, city, education, work experience, skills, languages — and the kind of job you want. The seller makes both your Europass CV templates from exactly these details."></textarea><span class="field-hint">You are ordering the <b>Professional Europass CV — 2 Templates</b> — the seller needs these details to make both templates. Write them here, or send them on WhatsApp chat after ordering, quoting your Order ID.</span></label>
       </div>
       <div id="paySection">
-        <p style="font-weight:700;font-size:.88rem;margin:4px 0 8px">Payment Method — pay right here</p>
+        <p style="font-weight:800;font-size:.95rem;margin:4px 0 8px;color:var(--navy)">Are you from Pakistan or a foreigner?</p>
+        <div class="radio-row origin-row">
+          <label><input type="radio" name="buyerOrigin" value="Pakistan" checked> I am from Pakistan</label>
+          <label><input type="radio" name="buyerOrigin" value="Foreigner"> I am a foreigner (outside Pakistan)</label>
+        </div>
+        <div id="payPkFlow">
+        <p style="font-weight:700;font-size:.88rem;margin:10px 0 8px">Payment Method — pay right here</p>
         <div class="radio-row">
           <label><input type="radio" name="pay" value="Easypaisa" checked> Easypaisa</label>
         </div>
@@ -1834,6 +1937,19 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         </div>
         <label style="margin-top:10px">Transaction ID (Trx ID) — <span style="color:#B91C1C">required for paid orders</span> <input id="fTrx" placeholder="e.g. 12345678901 — from your payment app" autocomplete="off"><span class="field-hint">Pay first via <b>Easypaisa to 03361520429</b>, then paste the Trx ID here — your order is placed as <b>Pending</b>, and the seller accepts it once your payment is confirmed. <b>Without a Trx ID, a paid order will not be placed.</b> Only the FREE sample (Rs. 0) needs no Trx ID.</span></label>
         <div class="trx-error" id="trxError" role="alert"><b>Payment needed first — order not placed.</b><br>Please pay the amount shown above via <b>Easypaisa to 03361520429</b> in your Easypaisa app, then enter the <b>Transaction ID (Trx ID)</b> from that payment above and tap “Place Order” again. Paid orders cannot be placed without a Trx ID. The FREE sample (Rs. 0) is the only order that needs no Trx ID.</div>
+        </div>
+        <div id="payForeignFlow" style="display:none">
+          <div class="pay-box pay-foreign-box">
+            <span class="pay-amt" id="payAmountForeign">Amount to pay: Rs. 0</span>
+            <p><b>Foreign buyers pay manually through WhatsApp — no Easypaisa, no Trx ID.</b></p>
+            <div class="pay-steps" aria-label="How foreign buyers pay — 3 steps">
+              <div class="pay-step"><span class="ps-num">1</span><p><b>Place your order here first</b> — fill the form above and tap “Place Order”. Your order is created as <b>Pending</b> with an Order ID.</p></div>
+              <div class="pay-step"><span class="ps-num">2</span><p><b>Message the seller on WhatsApp</b> (0335 5290894) with your Order ID, and pay the amount by <b>Western Union</b> — or another way you and the seller agree on.</p></div>
+              <div class="pay-step"><span class="ps-num">3</span><p><b>Share your payment proof</b> (receipt or reference number) in that WhatsApp chat. The seller confirms your payment, accepts your order, and your file is delivered in the app within 1–3 days after confirmation, depending on the product.</p></div>
+            </div>
+            <a class="wa-pay-btn" id="foreignWaBtn" href="https://wa.me/923355290894" target="_blank" rel="noopener">Message the seller on WhatsApp</a>
+          </div>
+        </div>
       </div>
       <div class="success" id="successBox">
         <b>Order placed — we have received your order!</b><br>
@@ -1925,30 +2041,41 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
   <div class="pp-card o-card">
     <div class="pp-top"><span class="o-top-title">Seller Orders</span><button class="icon-btn" id="ordersClose" aria-label="Close orders dashboard">✕</button></div>
     <div class="o-body">
-      <div class="o-stats" id="oStats" role="group" aria-label="Order totals — tap a status to open that status under every product below, tap it again to close them all">
-        <div class="o-stat is-filter" data-ofilter="all" role="button" tabindex="0" aria-pressed="true"><b id="oTotal">0</b><span>Total Orders</span></div>
-        <div class="o-stat st-pending" data-ofilter="Pending" role="button" tabindex="0" aria-pressed="false"><b id="oPending">0</b><span>Pending</span></div>
-        <div class="o-stat st-active" data-ofilter="Active" role="button" tabindex="0" aria-pressed="false"><b id="oActive">0</b><span>Active</span></div>
-        <div class="o-stat st-completed" data-ofilter="Completed" role="button" tabindex="0" aria-pressed="false"><b id="oCompleted">0</b><span>Completed</span></div>
-      </div>
-      <div class="o-stats t-stats" role="group" aria-label="Store history — the store's real totals, the same numbers shown on the homepage">
-        <div class="o-stat"><b id="dCustomers">—</b><span>Registered Customers</span></div>
-        <div class="o-stat"><b id="dOrders">—</b><span>Total Orders</span></div>
-        <div class="o-stat"><b id="dCompleted">—</b><span>Orders Completed</span></div>
-        <div class="o-stat"><b id="dRating">—</b><span>Store Rating</span></div>
-      </div>
-      <p class="discount-usage" id="discountUsage" style="display:none"></p>
-      <div class="notify-bar">
+      <div id="dashHome">
+        <div class="o-stats dash-nav" id="oStats" role="group" aria-label="Seller dashboard — tap a card to open its page">
+          <button type="button" class="o-stat is-link" data-dashview="orders" data-dashmode="all"><b id="oTotal">0</b><span>Total Orders</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link st-pending" data-dashview="orders" data-dashmode="Pending"><b id="oPending">0</b><span>Pending</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link st-active" data-dashview="orders" data-dashmode="Active"><b id="oActive">0</b><span>Active</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link st-completed" data-dashview="orders" data-dashmode="Completed"><b id="oCompleted">0</b><span>Completed</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link" data-dashview="orders" data-dashmode="earned"><b id="oEarned">Rs. 0</b><span>Total Earned</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link" data-dashview="customers"><b id="dCustomers">—</b><span>Registered Customers</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+          <button type="button" class="o-stat is-link" data-dashview="notifs"><b id="notifCardCount">0</b><span>Notifications</span><span class="notif-count" id="notifCount" style="display:none">0</span><span class="o-stat-go" aria-hidden="true">›</span></button>
+        </div>
+        <div class="dash-rating-row"><span>Store Rating</span><b id="dRating">—</b></div>
+        <p class="discount-usage" id="discountUsage" style="display:none"></p>
+                <div class="notify-bar">
         <button type="button" class="notify-btn" id="notifyBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="notify-btn-txt">Enable order notifications</span></button>
         <span class="notify-note" id="notifyNote">Get a WhatsApp-style alert with sound whenever a new order arrives — it stays in your notification tray until you dismiss it.</span>
       </div>
-      <div id="ordersList"></div>
-      <div class="notif-head"><h3>Notifications</h3><span class="notif-count" id="notifCount" style="display:none">0</span><button type="button" class="notif-read-btn" id="notifReadBtn">Mark all as read</button></div>
-      <div class="notif-list" id="notifList"><p class="o-note">Loading notifications…</p></div>
-      <h3>Registered Customers</h3>
-      <div class="cust-list" id="customersList"><p class="o-note">Loading customers…</p></div>
-      <h3>Add an order manually</h3>
-      <form class="o-form" id="manualOrderForm">
+        <button type="button" class="dash-manual-btn" id="dashManualBtn"><span>Add an order manually</span><span aria-hidden="true">›</span></button>
+      </div>
+      <div id="dashOrdersView" class="dash-view" hidden>
+        <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3 id="dashOrdersTitle">All Orders</h3></div>
+        <p class="dash-view-note" id="dashOrdersNote" style="display:none"></p>
+        <p class="dash-earned-banner" id="dashEarnedBanner" style="display:none"></p>
+        <div id="ordersList"></div>
+      </div>
+      <div id="dashCustomersView" class="dash-view" hidden>
+        <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Registered Customers</h3></div>
+        <div class="cust-list" id="customersList"><p class="o-note">Loading customers…</p></div>
+      </div>
+      <div id="dashNotifView" class="dash-view" hidden>
+        <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Notifications</h3><button type="button" class="notif-read-btn" id="notifReadBtn">Mark all as read</button></div>
+        <div class="notif-list" id="notifList"><p class="o-note">Loading notifications…</p></div>
+      </div>
+      <div id="dashManualView" class="dash-view" hidden>
+        <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Add an order manually</h3></div>
+                <form class="o-form" id="manualOrderForm">
         <input required id="mOid" placeholder="Order ID (e.g. DS-ABC123)" aria-label="Order ID">
         <input id="mProduct" placeholder="Product name" aria-label="Product name">
         <input id="mName" placeholder="Customer name" aria-label="Customer name">
@@ -1957,6 +2084,7 @@ body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
         <input id="mTotal" type="number" min="0" placeholder="Total Rs. (e.g. 990)" aria-label="Total in rupees">
         <button class="btn btn-primary" type="submit">Add Order</button>
       </form>
+      </div>
     </div>
   </div>
 </div>
@@ -2248,11 +2376,25 @@ var RELATED = {
    so a refresh, an accidental tab close or coming back later never
    empties it. Only product ids and quantities are stored — nothing
    personal — and ids that no longer exist are dropped on load. */
+/* Per-account carts: every signed-in account has its OWN cart,
+   saved under its own key ("pixelnest_cart_v1__<uid>"), and a
+   signed-out visitor has the guest cart ("__guest"). One account
+   can therefore never see another account's items: signing in
+   switches the visible cart to that account's own saved cart —
+   nothing is ever merged or carried across accounts — and
+   signing out switches back to the guest cart. The accounts
+   module calls window.syncCartToAccount on every sign-in /
+   sign-out / session restore. A cart saved by an older version
+   under the single shared key is deleted on first load: its
+   items cannot be attributed to any one account, so they must
+   never be shown to whoever happens to sign in next. */
 var CART_KEY = "pixelnest_cart_v1";
-function saveCart(){ try { window.localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} }
-function loadCart(){
+var cartOwner = "guest";
+function cartKeyFor(owner){ return CART_KEY + "__" + owner; }
+function saveCart(){ try { window.localStorage.setItem(cartKeyFor(cartOwner), JSON.stringify(cart)); } catch(e){} }
+function loadCartFor(owner){
   try {
-    var raw = window.localStorage.getItem(CART_KEY);
+    var raw = window.localStorage.getItem(cartKeyFor(owner));
     var c = raw ? JSON.parse(raw) : null;
     if(!c || typeof c !== "object") return {};
     var clean = {};
@@ -2263,7 +2405,26 @@ function loadCart(){
     return clean;
   } catch(e){ return {}; }
 }
+function loadCart(){ return loadCartFor(cartOwner); }
 var cart = loadCart();
+(function(){
+  try { window.localStorage.removeItem(CART_KEY); } catch(e){}
+})();
+window.syncCartToAccount = function(u){
+  var owner = (u && u.uid) ? String(u.uid) : "guest";
+  if(owner === cartOwner) return;
+  /* Strictly the new owner's OWN saved cart and discount —
+     nothing is merged or carried across accounts, so one
+     account's items can never appear in another account's cart.
+     The guest cart keeps its own items for the signed-out
+     visitor, and an account's cart waits under its own key
+     until that same account signs in again. */
+  cartOwner = owner;
+  cart = loadCartFor(owner);
+  appliedDiscount = loadDiscount();
+  renderCart();
+  if(typeof renderProducts === "function") renderProducts();
+};
 /* Discount code — one code (LAUNCH10, 10% off, first 20 orders),
    validated against Firestore ("discountCodes/LAUNCH10") and kept
    in this browser so it survives a reload and moving between the
@@ -2272,19 +2433,28 @@ var cart = loadCart();
    code (inside PixelOrders.createTracking) — merely applying the
    code at checkout never uses up a use. */
 var DISCOUNT_KEY = "pixelnest_discount_v1";
+/* The applied discount belongs to the cart's owner, exactly like
+   the cart itself: one key per account, plus the guest key. */
+function discountKeyFor(owner){ return DISCOUNT_KEY + "__" + owner; }
+function discountKey(){ return discountKeyFor(cartOwner); }
 function loadDiscount(){
   try {
-    var raw = window.localStorage.getItem(DISCOUNT_KEY);
+    var raw = window.localStorage.getItem(discountKey());
     var d = raw ? JSON.parse(raw) : null;
     if(d && d.code) return { code: String(d.code), percentOff: Number(d.percentOff) || 10 };
   } catch(e){}
   return null;
 }
 var appliedDiscount = loadDiscount();
+(function(){
+  /* The old single shared discount key is deleted, never carried
+     over — the same strict per-account rule as the cart. */
+  try { window.localStorage.removeItem(DISCOUNT_KEY); } catch(e){}
+})();
 function saveDiscount(){
   try {
-    if(appliedDiscount) window.localStorage.setItem(DISCOUNT_KEY, JSON.stringify(appliedDiscount));
-    else window.localStorage.removeItem(DISCOUNT_KEY);
+    if(appliedDiscount) window.localStorage.setItem(discountKey(), JSON.stringify(appliedDiscount));
+    else window.localStorage.removeItem(discountKey());
   } catch(e){}
 }
 function clearDiscount(){
@@ -2309,6 +2479,7 @@ var activeFilter = "all";
 var sortMode = "featured";
 var currentOrderId = "";
 var lastOrderWasFree = false;
+var lastPlacedCart = null;
 var ppCurrentId = "";
 var pendingRating = 0;
 
@@ -2550,6 +2721,8 @@ function updatePayBox(){
   var freeMode = ids.length > 0 && cartSum() === 0;
   sec.style.display = freeMode ? "none" : "";
   amt.textContent = "Amount to pay: " + fmt(payableTotal());
+  var famt = document.getElementById("payAmountForeign");
+  if(famt) famt.textContent = "Amount to pay: " + fmt(payableTotal());
 }
 
 /* Discount row in the drawer — the applied-code line, the feedback
@@ -2661,7 +2834,7 @@ function copyText(txt, doneMsg){
   }
 }
 
-function openCart(){ document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); }
+function openCart(){ /* The seller account has no cart at all — the drawer never opens for the seller. */ if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller()) return; document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); }
 function closeCart(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("overlay").classList.remove("open"); }
 document.getElementById("openCart").addEventListener("click", openCart);
 document.getElementById("closeCart").addEventListener("click", closeCart);
@@ -2707,7 +2880,9 @@ function buildOrderText(){
     ? "This order is the FREE sample pack — no payment needed."
     : (trx
       ? "Payment sent to 03361520429 via "+pay+" — Trx ID: "+trx+". Please deliver my file within 1–3 days after payment is confirmed, depending on the product. Thank you!"
-      : "Payment pending — I will pay "+fmt(payableTotal())+" to 03361520429 via "+pay+".");
+      : (buyerIsForeigner()
+        ? "I am a foreigner (outside Pakistan) — I will pay "+fmt(payableTotal())+" manually through WhatsApp (e.g. Western Union) and share my payment proof there for the seller to confirm."
+        : "Payment pending — I will pay "+fmt(payableTotal())+" to 03361520429 via "+pay+"."));
   var cvDetEl=document.getElementById("fCvDetails");
   var cvDet=(cart["cv"] && cvDetEl) ? cvDetEl.value.trim() : "";
   if(appliedDiscount && discountAmount() > 0) lines.push("","Discount ("+appliedDiscount.code+"): −"+fmt(discountAmount()));
@@ -2720,6 +2895,45 @@ function buildOrderText(){
 document.getElementById("copyPayNum").addEventListener("click", function(){
   copyText("03361520429", "Payment number copied: 03361520429");
 });
+/* Checkout origin question — "Are you from Pakistan or a foreigner?"
+   Pakistan (the default) keeps the Easypaisa flow exactly as before:
+   pay to 03361520429 first, paste the Trx ID, then Place Order.
+   Foreigner swaps the payment area to the manual WhatsApp flow: no
+   Easypaisa and no Trx ID — the buyer places the order here, then
+   messages the seller on WhatsApp, pays manually (e.g. Western
+   Union), shares the payment proof there, and the seller confirms
+   the payment and processes the order. The two guidance notes under
+   the form swap their wording with the choice. */
+function buyerIsForeigner(){
+  var r = document.querySelector('input[name="buyerOrigin"]:checked');
+  return !!(r && r.value === "Foreigner");
+}
+var flowNoteEl = document.querySelector("#checkoutForm .order-flow-note");
+var formNoteEl = document.querySelector("#checkoutForm .note");
+var flowNotePk = flowNoteEl ? flowNoteEl.innerHTML : "";
+var formNotePk = formNoteEl ? formNoteEl.innerHTML : "";
+var flowNoteForeign = "<b>How ordering works for foreign buyers:</b> fill in the form and tap “Place Order” — no Easypaisa and no Trx ID. Then message the seller on <b>WhatsApp 0335 5290894</b> with your Order ID, pay the total manually (e.g. <b>Western Union</b>) and share your payment proof there. The seller confirms your payment and accepts your order (it starts as <b>Pending</b>), and your file is delivered in the app within 1–3 days after confirmation, depending on the product. Sign in first (button at the top) — an account is required to order, so your files stay private: only you can see your orders and downloads.";
+var formNoteForeign = "Foreign buyers pay manually through WhatsApp: message the seller on 0335 5290894 with your Order ID, pay by Western Union (or another way you both agree) and share your payment proof — the seller confirms it and processes your order. No card is charged on this website. Your file is delivered in the app within 1–3 days after payment is confirmed, depending on the product (custom orders: 2–3 days) — download it from My Orders or the Track Order page.";
+function paintOriginFlow(){
+  var f = buyerIsForeigner();
+  var pk = document.getElementById("payPkFlow");
+  var fo = document.getElementById("payForeignFlow");
+  if(pk) pk.style.display = f ? "none" : "";
+  if(fo) fo.style.display = f ? "" : "none";
+  var te = document.getElementById("trxError");
+  if(f && te) te.classList.remove("show");
+  var wa = document.getElementById("foreignWaBtn");
+  if(wa){
+    var t = "Hello! I am ordering from outside Pakistan on PixelNest and want to pay for my order manually (e.g. Western Union).";
+    wa.href = waAppUrl(t);
+    wa.setAttribute("data-wa-web", waWebUrl(t));
+  }
+  if(flowNoteEl) flowNoteEl.innerHTML = f ? flowNoteForeign : flowNotePk;
+  if(formNoteEl) formNoteEl.innerHTML = f ? formNoteForeign : formNotePk;
+}
+document.querySelectorAll('input[name="buyerOrigin"]').forEach(function(r){ r.addEventListener("change", paintOriginFlow); });
+paintOriginFlow();
+
 /* Typing a Trx ID clears the required-Trx warning right away. */
 (function(){
   var f = document.getElementById("fTrx");
@@ -2789,7 +3003,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   var checkoutTrxEarlyEl = document.getElementById("fTrx");
   var checkoutTrxEarly = checkoutTrxEarlyEl ? checkoutTrxEarlyEl.value.trim() : "";
   var trxErrBox = document.getElementById("trxError");
-  if(checkoutTotalEarly > 0 && !checkoutTrxEarly){
+  if(checkoutTotalEarly > 0 && !checkoutTrxEarly && !buyerIsForeigner()){
     if(trxErrBox) trxErrBox.classList.add("show");
     if(checkoutTrxEarlyEl){ checkoutTrxEarlyEl.classList.add("trx-missing"); checkoutTrxEarlyEl.focus(); checkoutTrxEarlyEl.scrollIntoView({behavior:"smooth", block:"center"}); }
     showToast("Order not placed — pay first via Easypaisa to 03361520429 and enter the Trx ID");
@@ -2812,8 +3026,8 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   lastOrderWasFree = orderTotal === 0 && !!cart["free-sample"];
   /* Payment is Easypaisa ONLY — 03361520429 is an Easypaisa number, so
      paymentMethod is always "Easypaisa" for paid orders. */
-  var payMethod = lastOrderWasFree ? "Free (no payment)" : "Easypaisa";
-  var trxId = lastOrderWasFree ? "" : document.getElementById("fTrx").value.trim();
+  var payMethod = lastOrderWasFree ? "Free (no payment)" : (buyerIsForeigner() ? "WhatsApp manual payment (foreigner)" : "Easypaisa");
+  var trxId = (lastOrderWasFree || buyerIsForeigner()) ? "" : document.getElementById("fTrx").value.trim();
   /* Paid shop orders reach this line ONLY with a Trx ID (enforced
      above), but EVERY order — paid or free, the FREE sample pack
      included — starts as Pending: it becomes Active only when the
@@ -2848,6 +3062,9 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     : (trxId
       ? "Payment received via " + payMethod + " (Trx ID submitted) — your order is Pending until the seller accepts it; then your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product; download it from My Orders or the Track Order page"
       : "Payment pending — pay " + fmt(orderTotal) + " via " + payMethod + " to 03361520429, then share the Trx ID with the seller on chat. Your file will be uploaded in the app within 1–3 days after payment is confirmed, depending on the product");
+  if(buyerIsForeigner() && !lastOrderWasFree){
+    deliveryNote = "Foreigner order — pay manually through WhatsApp: message the seller on WhatsApp (0335 5290894) with this Order ID, pay " + fmt(orderTotal) + " by Western Union or another way you both agree, and share your payment proof there. The seller confirms your payment and processes your order; your file is delivered in the app within 1–3 days after confirmation, depending on the product — download it from My Orders or the Track Order page";
+  }
   var trackPromise = null;
   if(window.PixelOrders) trackPromise = window.PixelOrders.createTracking({
     orderId: currentOrderId,
@@ -2885,6 +3102,8 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   if(payInfo){
     if(lastOrderWasFree){
       payInfo.innerHTML = "This order is <b>Pending</b> — the FREE sample pack needs no payment. The seller will accept your order and upload the sample files in the app within 1 day — download them from My Orders or track the order any time with your Order ID.";
+    } else if(buyerIsForeigner()){
+      payInfo.innerHTML = "You chose <b>Foreigner</b> — pay manually through WhatsApp: message the seller on <b>WhatsApp 0335 5290894</b> with your Order ID <b>" + escHtml(currentOrderId) + "</b>, pay <b>" + fmt(orderTotal) + "</b> by <b>Western Union</b> (or another way you both agree), and share your payment proof there. The seller confirms your payment and processes your order — your file is then delivered in the app within 1–3 days after confirmation, depending on the product. Your order is now <b>Pending</b> until your payment is confirmed.";
     } else if(trxId){
       payInfo.innerHTML = "Payment received via <b>" + escHtml(payMethod) + "</b> — Trx ID: <b>" + escHtml(trxId) + "</b>. Your order is now <b>Pending</b> — the seller will accept it shortly, and your file will then be delivered in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or track it live with your Order ID.";
     } else {
@@ -2907,6 +3126,17 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     setDiscountFeedback("");
     renderCart();
   }
+  /* The order is placed, so the cart is emptied: bought items do
+     not stay sitting in the cart. A copy of the placed cart is
+     kept in lastPlacedCart so the drawer's Copy Order / Download
+     Bill buttons can still produce this order's text from the
+     success panel. */
+  lastPlacedCart = {};
+  Object.keys(cart).forEach(function(k){ lastPlacedCart[k] = cart[k]; });
+  cart = {};
+  saveCart();
+  renderCart();
+  renderProducts();
   if(window.PixelPush) window.PixelPush.sendNewOrder(currentOrderId, orderProductStr, orderTotal);
   var sb = document.getElementById("successBox");
   sb.classList.add("show");
@@ -2927,7 +3157,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     deliveryText: orderDelivery,
     paymentNote: lastOrderWasFree
       ? "No payment is needed for this order — it is the FREE Starter Sample Pack. Your order is Pending until the seller accepts it; the sample files are then delivered in the app, ready to download from My Orders or the Track Order page."
-      : "Payment is by Easypaisa only: pay the exact amount to 03361520429 in your Easypaisa app, and keep your Transaction ID (Trx ID) for verification. Your order is Pending until the seller confirms your payment; your file is then delivered in the app, ready to download from My Orders or the Track Order page."
+      : (buyerIsForeigner() ? "You ordered as a foreigner (outside Pakistan): pay manually through WhatsApp — message the seller on WhatsApp (0335 5290894) with your Order ID, pay by Western Union or another way you both agree, and share your payment proof there. The seller confirms your payment and processes your order; your file is then delivered in the app, ready to download from My Orders or the Track Order page." : "Payment is by Easypaisa only: pay the exact amount to 03361520429 in your Easypaisa app, and keep your Transaction ID (Trx ID) for verification. Your order is Pending until the seller confirms your payment; your file is then delivered in the app, ready to download from My Orders or the Track Order page.")
   });
 });
 
@@ -2936,17 +3166,32 @@ document.getElementById("trackThisOrder").addEventListener("click", function(){
   openTrackPage(currentOrderId);
 });
 
+/* Order text for Copy Order / Download Bill: from the live cart
+   while it has items. Right after an order is placed the cart is
+   emptied, so the placed order's own items (lastPlacedCart) are
+   used instead — the buttons keep working from the success panel. */
+function orderTextForCopy(){
+  if(Object.keys(cart).length) return buildOrderText();
+  if(lastPlacedCart && Object.keys(lastPlacedCart).length){
+    var keep = cart; cart = lastPlacedCart;
+    var t = buildOrderText();
+    cart = keep;
+    return t;
+  }
+  return null;
+}
 document.getElementById("copyOrder").addEventListener("click", function(){
-  if(!Object.keys(cart).length){ showToast("Your cart is empty"); return; }
+  var txt = orderTextForCopy();
+  if(txt === null){ showToast("Your cart is empty"); return; }
   if(!currentOrderId) currentOrderId = makeOrderId();
-  var txt=buildOrderText().replace(/\*/g,"");
-  copyText(txt, "Order copied — Order ID: "+currentOrderId);
+  copyText(txt.replace(/\*/g,""), "Order copied — Order ID: "+currentOrderId);
 });
 
 document.getElementById("downloadOrder").addEventListener("click", function(){
-  if(!Object.keys(cart).length){ showToast("Your cart is empty"); return; }
+  var txt0 = orderTextForCopy();
+  if(txt0 === null){ showToast("Your cart is empty"); return; }
   if(!currentOrderId) currentOrderId = makeOrderId();
-  var txt=buildOrderText().replace(/\*/g,"");
+  var txt=txt0.replace(/\*/g,"");
   var blob=new Blob([txt],{type:"text/plain"});
   var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="pixelnest-order-"+currentOrderId+".txt"; a.click();
   URL.revokeObjectURL(a.href);
@@ -3339,6 +3584,8 @@ function renderNotifications(){
   evs.forEach(function(ev){ if(!notifIsRead(ev, keys, readAt)) unread++; });
   var cnt = document.getElementById("notifCount");
   if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
+  var ncc = document.getElementById("notifCardCount");
+  if(ncc) ncc.textContent = evs.length;
   if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet \u2014 new orders, payments and order updates will appear here.</p>'; return; }
   var tick = '<span class="notif-tick" title="Read" aria-label="Read"><svg width="19" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true"><path d="M1 6.6 4.7 10 11.2 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 8.8 11.1 10.2 17.9 2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.innerHTML = evs.slice(0, 60).map(function(ev){
@@ -3482,11 +3729,9 @@ function setSellerFilter(f){
   renderOrders();
 }
 function syncSellerFilterTabs(){
-  document.querySelectorAll("#oStats .o-stat").forEach(function(el){
-    var on = el.getAttribute("data-ofilter") === sellerStatusFilter;
-    el.classList.toggle("is-filter", on);
-    el.setAttribute("aria-pressed", on ? "true" : "false");
-  });
+  /* The dashboard's stat cards are page links now, not filter
+     tabs, so there is nothing to highlight. Kept because
+     renderOrders() calls it on every render. */
   var h = document.getElementById("ordersHeading");
   if(h) h.textContent = "Orders by product";
 }
@@ -3666,6 +3911,20 @@ function prowStatHtml(g, gi, label, n, st){
   var open = productOpen[g.name] === st;
   return '<button type="button" class="pstat pst-' + st + (open ? ' is-open' : '') + '" data-ptoggle data-pidx="' + gi + '" data-pstatus="' + st + '" aria-expanded="' + (open ? 'true' : 'false') + '"' + (n ? '' : ' disabled') + '><b>' + n + '</b><span>' + label + '</span></button>';
 }
+/* Completed orders leave the dashboard BOARD automatically 2 days
+   after they were completed (deliveredAt; the order date is the
+   fallback for older records), so the board stays short. Nothing is
+   deleted: the order stays in Firestore and in the customer's own
+   tracking and downloads, and it still counts in the dashboard's
+   Completed count and Total Earned — renderOrders counts every
+   order first and only leaves the expired ones out of the product
+   groups' visible entry lists (entry.hidden). */
+function boardExpiredCompleted(o){
+  if(!o || o.status !== "Completed") return false;
+  var t = tsMillis(o.deliveredAt) || tsMillis(o.createdAt);
+  if(!t) return false;
+  return (Date.now() - t) > 48 * 60 * 60 * 1000;
+}
 function renderOrders(){
   var fsIds = {};
   fsOrders.forEach(function(o){ if(o && o.orderId) fsIds[o.orderId] = o; });
@@ -3703,12 +3962,12 @@ function renderOrders(){
     var key = cp ? cp.name : name;
     var g = groupByName[key];
     if(!g){ g = { name: key, product: cp || null, entries: [], counts: { Pending:0, Active:0, Completed:0 }, earned: 0 }; groupByName[key] = g; lastGroups.push(g); }
-    g.entries.push(entry);
+    if(entry.hidden) g.hiddenCount = (g.hiddenCount || 0) + 1; else g.entries.push(entry);
     if(g.counts.hasOwnProperty(entry.status)) g.counts[entry.status]++;
     var t = Number(entry.o && entry.o.total);
     if(t > 0 && (entry.status === "Active" || entry.status === "Completed")) g.earned += t;
   }
-  fsOrders.forEach(function(o){ addToGroup(o.productName || "—", { kind: "fs", status: o.status || "Pending", o: o }); });
+  fsOrders.forEach(function(o){ addToGroup(o.productName || "—", { kind: "fs", status: o.status || "Pending", o: o, hidden: boardExpiredCompleted(o) }); });
   localOnly.forEach(function(o){ addToGroup(o.product || "—", { kind: "local", status: o.status || "Pending", o: o }); });
   /* Fiverr-style: EVERY catalogue product gets its landscape row —
      even with no orders yet (real zeros) — in catalogue order;
@@ -3720,11 +3979,18 @@ function renderOrders(){
   });
   lastGroups.forEach(function(g){ if(!g.product) orderedGroups.push(g); });
   lastGroups = orderedGroups;
+  /* Overall Total Earned — Active and Completed orders only, the
+     same rule the per-product rows use — shown on the dashboard's
+     Total Earned card and on the Total Earned page's banner. */
+  var totalEarnedAll = 0;
+  lastGroups.forEach(function(g){ totalEarnedAll += g.earned || 0; });
+  var oEarnedEl = document.getElementById("oEarned"); if(oEarnedEl) oEarnedEl.textContent = fmt(totalEarnedAll);
+  var earnedBannerEl = document.getElementById("dashEarnedBanner"); if(earnedBannerEl) earnedBannerEl.textContent = "Total Earned: " + fmt(totalEarnedAll) + " — from all Active and Completed orders";
   var html = "";
   lastGroups.forEach(function(g, gi){
-    var total = g.entries.length;
+    var total = g.entries.length + (g.hiddenCount || 0);
     var open = productOpen[g.name];
-    var isOpen = !!open && (open === "all" || (g.counts[open] || 0) > 0);
+    var isOpen = !!open && (open === "all" || (open === "earned" ? (g.counts.Active + g.counts.Completed) > 0 : (g.counts[open] || 0) > 0));
     html += '<div class="pgroup"><div class="prow' + (isOpen ? ' is-open' : '') + '" data-ptoggle data-pidx="' + gi + '" data-pstatus="all" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '" aria-label="' + escHtml(g.name) + ' \u2014 tap to show or hide its stats and orders">'
       + '<span class="prow-name">' + escHtml(g.name) + '</span>'
       + (g.product ? '<span class="prow-price">' + priceText(g.product) + '</span>' : '')
@@ -3739,11 +4005,12 @@ function renderOrders(){
         + '</div>';
       var shown = 0;
       g.entries.forEach(function(en){
-        if(open !== "all" && en.status !== open) return;
+        if(open === "earned"){ if(en.status === "Pending") return; }
+        else if(open !== "all" && en.status !== open) return;
         shown++;
         html += en.kind === "fs" ? fsOrderCardHtml(en.o, localById) : localOrderCardHtml(en.o);
       });
-      if(!shown) html += '<p class="pgroup-empty">No orders here yet.</p>';
+      if(!shown) html += '<p class="pgroup-empty">' + (((g.hiddenCount || 0) > 0 && (open === "all" || open === "Completed" || open === "earned")) ? 'Completed orders older than 2 days are cleared from this board automatically — they still count in the Completed total and Total Earned above.' : 'No orders here yet.') + '</p>';
       html += '</div>';
     }
     html += '</div>';
@@ -3853,7 +4120,7 @@ function openOrdersDashboard(){
     else { window.PixelAccount.openAuth("seller"); }
     return;
   }
-  startFsWatch(); startDiscountWatch(); startCustomersWatch(); renderOrders(); renderNotifications(); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
+  startFsWatch(); startDiscountWatch(); startCustomersWatch(); renderOrders(); renderNotifications(); showDashView("home"); document.getElementById("ordersPage").classList.add("open"); document.getElementById("ordersPage").scrollTop = 0; document.body.style.overflow = "hidden";
   if(window.SellerNotify) window.SellerNotify.refreshBtn();
 }
 function closeOrdersDashboard(){ var el = document.getElementById("ordersPage"); if(el && el.classList.contains("open")){ el.classList.remove("open"); document.body.style.overflow = ""; } }
@@ -3866,20 +4133,65 @@ document.getElementById("ordersList").addEventListener("click", function(e){
   orders = orders.filter(function(o){ return o.id !== id; });
   saveOrders(); renderOrders(); showToast("Order " + id + " removed");
 });
-/* Status filter tabs — tapping a stat box filters the order list to
-   that status; tapping the same status again, or Total Orders, shows
-   all orders again. Keyboard: Enter/Space on a focused tab. */
+/* Dashboard pages — the overview's stat cards are links: tapping
+   one swaps the dashboard body to that card's own page, and every
+   page carries a "← Dashboard" button back to the overview, so
+   nothing expands downward on the overview itself. The orders
+   pages reuse the product-grouped order list: opening one
+   pre-opens the product groups for that slice (all orders / one
+   status / the orders that earned money), so the page arrives
+   already showing its orders — Completed is the seller's history
+   of finished orders. */
+function showDashView(name){
+  var views = { home: "dashHome", orders: "dashOrdersView", customers: "dashCustomersView", notifs: "dashNotifView", manual: "dashManualView" };
+  Object.keys(views).forEach(function(k){
+    var el = document.getElementById(views[k]);
+    if(el) el.hidden = (k !== name);
+  });
+  var pg = document.getElementById("ordersPage");
+  if(pg) pg.scrollTop = 0;
+}
+var dashOrdersMode = "all";
+var DASH_ORDERS_TITLES = { all: "All Orders", Pending: "Pending Orders", Active: "Active Orders", Completed: "Completed Orders", earned: "Total Earned" };
+var DASH_ORDERS_NOTES = {
+  all: "",
+  Pending: "Orders waiting for you — accept an order once its payment is confirmed and it becomes Active.",
+  Active: "Orders you have accepted and are working on — upload the delivery file to complete each one.",
+  Completed: "Your completed-orders history — every order you have finished and delivered.",
+  earned: "Every order that has earned money: accepted (Active) and Completed orders."
+};
+function openDashOrders(mode){
+  dashOrdersMode = mode || "all";
+  sellerStatusFilter = dashOrdersMode;
+  renderOrders();
+  productOpen = {};
+  lastGroups.forEach(function(g){
+    if(dashOrdersMode === "all"){ if(g.entries.length) productOpen[g.name] = "all"; }
+    else if(dashOrdersMode === "earned"){ if((g.counts.Active + g.counts.Completed) > 0) productOpen[g.name] = "earned"; }
+    else if(g.counts[dashOrdersMode] > 0) productOpen[g.name] = dashOrdersMode;
+  });
+  var t = document.getElementById("dashOrdersTitle"); if(t) t.textContent = DASH_ORDERS_TITLES[dashOrdersMode] || "Orders";
+  var nt = document.getElementById("dashOrdersNote");
+  if(nt){ var nv = DASH_ORDERS_NOTES[dashOrdersMode] || ""; nt.textContent = nv; nt.style.display = nv ? "" : "none"; }
+  var eb = document.getElementById("dashEarnedBanner"); if(eb) eb.style.display = dashOrdersMode === "earned" ? "" : "none";
+  renderOrders();
+  showDashView("orders");
+}
 document.getElementById("oStats").addEventListener("click", function(e){
-  var tab = e.target.closest ? e.target.closest("[data-ofilter]") : null;
-  if(!tab) return;
-  setSellerFilter(tab.getAttribute("data-ofilter"));
+  var card = e.target.closest ? e.target.closest("[data-dashview]") : null;
+  if(!card) return;
+  var v = card.getAttribute("data-dashview");
+  if(v === "orders") openDashOrders(card.getAttribute("data-dashmode") || "all");
+  else if(v === "customers"){ startCustomersWatch(); renderCustomers(); showDashView("customers"); }
+  else if(v === "notifs"){ renderNotifications(); showDashView("notifs"); }
 });
-document.getElementById("oStats").addEventListener("keydown", function(e){
-  if(e.key !== "Enter" && e.key !== " ") return;
-  var tab = e.target.closest ? e.target.closest("[data-ofilter]") : null;
-  if(!tab) return;
-  e.preventDefault(); setSellerFilter(tab.getAttribute("data-ofilter"));
-});
+(function(){
+  document.querySelectorAll("[data-dashback]").forEach(function(b){
+    b.addEventListener("click", function(){ showDashView("home"); });
+  });
+  var mb = document.getElementById("dashManualBtn");
+  if(mb) mb.addEventListener("click", function(){ showDashView("manual"); });
+})();
 /* Seller delivery upload — file picker change inside the dashboard.
    Uploads to the free file host via PixelDelivery, which then marks
    the order Completed with the files attached. */
@@ -4992,7 +5304,7 @@ window.PixelOrders = (function(){
      what is private is each customer's orders and the dashboard.
    - The seller uploads finished files from the dashboard (any
      product, not just wall art): files go to a free file host
-     (gofile.io, with catbox.moe as fallback — no Blaze plan, no
+     (gofile.io only — no Blaze plan, no
      card, no billing), the returned file URLs are added to the order's deliveryFiles, and the order
      becomes Completed (Delivered) automatically — the customer sees
      download buttons live in My Orders and on the Track Order page.
@@ -5323,6 +5635,10 @@ window.PixelAccount = (function(){
        out or in as a customer removes the class again, instantly,
        with no reload. */
     if(document.body) document.body.classList.toggle("is-seller-view", sellerOn);
+    /* The cart belongs to the signed-in account: re-point it at
+       this account's own saved cart (or the guest cart when signed
+       out), so one account never sees another account's items. */
+    if(typeof window.syncCartToAccount === "function") window.syncCartToAccount(currentUser);
     var ol = $("openOrders"); if(ol) ol.style.display = sellerOn ? "" : "none";
     var sb2 = $("acctSellerBtn"); if(sb2) sb2.style.display = "";
     if(!si || !ab) return;
@@ -5740,19 +6056,14 @@ window.PixelAccount = (function(){
      through its public API (POST https://api.gofile.io/accounts,
      then POST https://<server>.gofile.io/uploadfile — no sign-up,
      no card, no billing) and saves the returned download-page link
-     (https://gofile.io/d/…) to the order. The earlier single-host
-     setup (catbox.moe only) failed outright for the seller — the
-     catbox API is unreachable from many networks and its endpoint
-     drops browser uploads — so catbox is now only the FALLBACK:
-     if gofile fails for any reason, the same file is retried
-     against catbox (POST https://catbox.moe/user/api.php,
-     reqtype=fileupload) before anything is given up. Whichever
-     host answers, its link is saved to the order exactly like a
-     Storage URL before: the customer gets a download button and
-     the order becomes Completed. If both hosts fail (offline,
-     host error, a file type a host refuses) the upload rejects
-     with code "upload-failed" and the dashboard shows the clear
-     WhatsApp fallback message — an upload never hangs silently. */
+     (https://gofile.io/d/…) to the order. gofile is the ONLY
+     host — a delivery file is never sent to any other host. Its
+     link is saved to the order exactly like a Storage URL
+     before: the customer gets a download button and the order
+     becomes Completed. If the upload fails (offline, host error,
+     a file type the host refuses) it rejects with code
+     "upload-failed" and the dashboard shows the clear WhatsApp
+     fallback message — an upload never hangs silently. */
   var UPLOAD_FAILED = "upload-failed";
   function uploadFailedError(){
     var e = new Error("The file could not be uploaded — send this file on WhatsApp for now");
@@ -5762,37 +6073,12 @@ window.PixelAccount = (function(){
   function isUploadFailedError(err){
     return !!err && err.code === UPLOAD_FAILED;
   }
-  /* Upload ONE file to catbox.moe; resolves with its direct URL.
-     XMLHttpRequest is used (not fetch) so the dashboard can show
-     real upload progress. A generous timeout keeps a stalled
-     upload from hanging forever on a slow connection. */
-  function uploadOneFile(file, onFrac){
-    return new Promise(function(resolve, reject){
-      var fd = new FormData();
-      fd.append("reqtype", "fileupload");
-      fd.append("fileToUpload", file, file.name);
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "https://catbox.moe/user/api.php", true);
-      xhr.timeout = 900000;
-      if(xhr.upload) xhr.upload.onprogress = function(ev){
-        if(ev.lengthComputable && onFrac) onFrac(ev.loaded / ev.total);
-      };
-      xhr.onload = function(){
-        var url = String(xhr.responseText || "").trim();
-        if(xhr.status >= 200 && xhr.status < 300 && /^https?:\/\//i.test(url)) resolve(url);
-        else reject(uploadFailedError());
-      };
-      xhr.onerror = function(){ reject(uploadFailedError()); };
-      xhr.ontimeout = function(){ reject(uploadFailedError()); };
-      try { xhr.send(fd); } catch(e){ reject(uploadFailedError()); }
-    });
-  }
   /* Upload ONE file to gofile.io (the PRIMARY host); resolves with
      the file's download-page link. A free guest session (token +
      upload server) is created once and reused for the rest of the
      page session — it lives only in memory, never in storage.
      XMLHttpRequest is used for the file itself so the dashboard
-     can show real upload progress, same as the catbox path. */
+     can show real upload progress. */
   var gfToken = null, gfServer = null;
   function gfEnsureSession(){
     if(gfToken && gfServer) return Promise.resolve();
@@ -5838,14 +6124,16 @@ window.PixelAccount = (function(){
       });
     });
   }
-  /* One file, either host: gofile first; if it fails for any
-     reason, the same file is retried against catbox before the
-     failure is reported. The gofile session is dropped on failure
-     so the next file or batch starts from a fresh guest session. */
+  /* One delivery file: gofile.io only — the one host the store
+     uses for deliveries. If gofile fails, the failure is reported
+     (the dashboard shows the WhatsApp fallback message); the file
+     is never sent to any other host. The gofile session is
+     dropped on failure so the next file or batch starts from a
+     fresh guest session. */
   function uploadOneFileAny(file, onFrac){
-    return uploadOneFileGoFile(file, onFrac).catch(function(){
+    return uploadOneFileGoFile(file, onFrac).catch(function(err){
       gfToken = null; gfServer = null;
-      return uploadOneFile(file, onFrac);
+      throw isUploadFailedError(err) ? err : uploadFailedError();
     });
   }
   /* Order-delivery email: when a delivery upload completes an
@@ -6521,5 +6809,293 @@ window.SellerNotify = (function(){
   else setTimeout(startWatch, 300);
 })();
 </script>
+<!-- PixelNest Assistant — store-wide support chat (violet). Rule-based
+     and fully on-device: it answers from the store's own live data
+     (the PRODUCTS catalogue on this page, prices, delivery times,
+     the LAUNCH10 code, the payment numbers) and explains ordering,
+     payment (Pakistan + foreigner), delivery and tracking in the
+     language the visitor writes in — English, Urdu or Roman Urdu. -->
+<button id="pnChatBtn" type="button" aria-label="Help — chat with the PixelNest assistant" aria-expanded="false" aria-controls="pnChatPanel">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  <span>Help — Ask Us</span>
+</button>
+<div id="pnChatPanel" role="dialog" aria-modal="false" aria-label="PixelNest assistant chat" hidden>
+  <div class="pnc-head">
+    <div>
+      <b>PixelNest Assistant</b>
+      <span>VIP support — instant answers, in your language</span>
+    </div>
+    <button id="pnChatClose" type="button" aria-label="Close chat">✕</button>
+  </div>
+  <div class="pnc-msgs" id="pnMsgs" aria-live="polite"></div>
+  <div class="pnc-chips" id="pnChips" aria-label="Quick questions"></div>
+  <form class="pnc-input" id="pnForm">
+    <input id="pnText" type="text" placeholder="Ask about orders, payment, delivery…" autocomplete="off" aria-label="Type your question">
+    <button type="submit" aria-label="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.7 21.3 23.2 12 2.7 2.7l-.01 7.11L17.5 12 2.69 14.19z"/></svg></button>
+  </form>
+</div>
+<script>
+/* ================= PixelNest Assistant =================
+   Answers from the store's real data: the PRODUCTS catalogue (names,
+   prices, delivery times, formats, what's included), the Easypaisa
+   number 03361520429, the seller's WhatsApp 0335 5290894, the
+   LAUNCH10 code (10% off, first 20 orders) and the store's order /
+   delivery / tracking / refund flow — including the foreigner flow:
+   choose "Foreigner" at checkout, place the order, then pay manually
+   through WhatsApp (e.g. Western Union), share the payment proof,
+   and the seller confirms and processes the order. Replies follow
+   the visitor's language: Urdu script in → Urdu out, Roman Urdu in →
+   Roman Urdu out, otherwise English. */
+(function(){
+  var btn = document.getElementById("pnChatBtn");
+  var panel = document.getElementById("pnChatPanel");
+  if(!btn || !panel) return;
+  var msgs = document.getElementById("pnMsgs");
+  var chipsBox = document.getElementById("pnChips");
+  var form = document.getElementById("pnForm");
+  var input = document.getElementById("pnText");
+  var welcomed = false;
+  var BASE = /\/assets\/[^\/]+\.html$/.test(location.pathname) ? "" : "assets/";
+  var WA_LINK = '<a href="https://wa.me/923355290894" target="_blank" rel="noopener">WhatsApp 0335 5290894</a>';
+  var TRACK_LINK = '<a href="' + BASE + 'track-order.html">Track Order page</a>';
+
+  function esc(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function money(n){ return (typeof fmt === "function") ? fmt(n) : ("Rs. " + Number(n || 0).toLocaleString("en-PK")); }
+  function priceOf(p){ return p.price === 0 ? "FREE" : money(p.price); }
+  function catalogue(){ return (typeof PRODUCTS !== "undefined" && PRODUCTS) ? PRODUCTS : []; }
+  function productList(){
+    return catalogue().map(function(p){ return "• " + p.name + " — " + priceOf(p) + " · delivery " + p.delivery; }).join("\n");
+  }
+  function productDetail(p, lang){
+    var L = { en: ["What's included", "Format", "Delivery"], ru: ["Is mein shamil hai", "Format", "Delivery"], ur: ["اس میں شامل ہے", "فارمیٹ", "ڈیلیوری"] }[lang];
+    var out = p.name + " — " + priceOf(p) + "\n" + p.desc;
+    if(p.includes && p.includes.length) out += "\n\n" + L[0] + ": " + p.includes.join(" · ");
+    if(p.format) out += "\n" + L[1] + ": " + p.format + (p.contents ? " · " + p.contents : "");
+    out += "\n" + L[2] + ": " + p.delivery + " (in the app, after the seller accepts your order)";
+    return esc(out);
+  }
+
+  var A = {
+    welcome: { en: "Welcome to PixelNest ✦ Premium digital products — wall art, planners, CVs, Excel tools and more — delivered right here in the app within 1–3 days.\n\nI'm your PixelNest assistant. Ask me about:\n• How to order\n• Payment — Pakistan (Easypaisa) or foreign buyers (WhatsApp + Western Union)\n• Delivery times\n• Tracking your order\n• Prices, the FREE sample and the LAUNCH10 10% discount\n\nTip: I reply in your language — English, اردو or Roman Urdu. Tap a quick question below, or type your own." },
+    greeting: {
+      en: "Hello! Welcome to PixelNest ✦ Ask me how to order, how to pay (Pakistan or foreigner), delivery times, tracking, prices or the LAUNCH10 discount — or tap a quick question below.",
+      ru: "Assalam o Alaikum! PixelNest mein khush aamdeed ✦ Mujh se poochein: order kesay karein, payment (Pakistan ya foreigner), delivery time, tracking, prices ya LAUNCH10 discount — ya neechay quick sawal dabayein.",
+      ur: "السلام علیکم! PixelNest میں خوش آمدید ✦ مجھ سے پوچھیں: آرڈر کیسے کریں، ادائیگی (پاکستان یا فارنر)، ڈیلیوری کا وقت، ٹریکنگ، قیمتیں یا LAUNCH10 رعایت — یا نیچے فوری سوال دبائیں۔"
+    },
+    order: {
+      en: "How to order — 4 simple steps:\n1. Add a product to the cart, or tap Buy Now on it.\n2. Open the cart and fill in your name, WhatsApp number and email.\n3. Answer “Are you from Pakistan or a foreigner?” and pay your way (Pakistan: Easypaisa + Trx ID — Foreigner: manual payment on WhatsApp).\n4. Tap Place Order — you get an Order ID right away.\n\nYour order starts as Pending. The seller checks your payment and accepts it (Active), uploads your file, and it becomes Completed — the download button then appears in My Orders and on the Track Order page.\n\nNote: ordering needs a free account, so your files stay private — tap Sign In at the top to make one, and verify your email.",
+      ru: "Order karna — 4 asaan steps:\n1. Product cart mein add karein, ya us par Buy Now dabayein.\n2. Cart khol kar apna naam, WhatsApp number aur email likhein.\n3. “Are you from Pakistan or a foreigner?” ka jawab dein aur apne tareeqay se payment karein (Pakistan: Easypaisa + Trx ID — Foreigner: WhatsApp par manual payment).\n4. Place Order dabayein — foran Order ID mil jayega.\n\nOrder pehle Pending hota hai. Seller payment check karke accept karta hai (Active), file upload karta hai to Completed ho jata hai — download button My Orders aur Track Order page par aa jata hai.\n\nNote: order ke liye free account zaroori hai taake aapki files private rahen — upar Sign In dabakar account banayein aur email verify karein.",
+      ur: "آرڈر کرنے کا طریقہ — 4 آسان steps:\n1. پروڈکٹ کارٹ میں شامل کریں یا اس پر Buy Now دبائیں۔\n2. کارٹ کھول کر اپنا نام، واٹس ایپ نمبر اور ای میل لکھیں۔\n3. “Are you from Pakistan or a foreigner?” کا جواب دیں اور اپنے طریقے سے ادائیگی کریں (پاکستان: Easypaisa + Trx ID — فارنر: واٹس ایپ پر دستی ادائیگی)۔\n4. Place Order دبائیں — فوراً Order ID مل جائے گا۔\n\nآرڈر پہلے Pending ہوتا ہے۔ سیلر ادائیگی چیک کر کے قبول کرتا ہے (Active)، فائل اپ لوڈ کرتا ہے تو Completed ہو جاتا ہے — ڈاؤن لوڈ بٹن My Orders اور Track Order صفحے پر آ جاتا ہے۔\n\nنوٹ: آرڈر کے لیے مفت اکاؤنٹ ضروری ہے تاکہ آپ کی فائلیں نجی رہیں — اوپر Sign In دبا کر اکاؤنٹ بنائیں اور ای میل کی تصدیق کریں۔"
+    },
+    paypk: {
+      en: "Payment from Pakistan — Easypaisa:\n1. Open your Easypaisa app and send the exact total to 03361520429.\n2. Copy the Transaction ID (Trx ID) from that payment.\n3. Paste the Trx ID in the checkout form and tap Place Order.\n\nPay first, then order — a paid order cannot be placed without a Trx ID. Your order stays Pending until the seller confirms your payment, then it becomes Active.\nThe FREE Starter Sample Pack (Rs. 0) needs no payment and no Trx ID.",
+      ru: "Pakistan se payment — Easypaisa:\n1. Easypaisa app khol kar exact total 03361520429 par bhejein.\n2. Us payment ki Transaction ID (Trx ID) copy karein.\n3. Checkout form mein Trx ID paste karke Place Order dabayein.\n\nPehle pay karein, phir order — paid order Trx ID ke baghair place nahi hota. Order Pending rehta hai jab tak seller payment confirm na kare, phir Active ho jata hai.\nFREE Starter Sample Pack (Rs. 0) ke liye na payment hai, na Trx ID.",
+      ur: "پاکستان سے ادائیگی — Easypaisa:\n1. Easypaisa ایپ کھول کر درست رقم 03361520429 پر بھیجیں۔\n2. اس ادائیگی کی Transaction ID (Trx ID) کاپی کریں۔\n3. چیک آؤٹ فارم میں Trx ID لگا کر Place Order دبائیں۔\n\nپہلے ادائیگی کریں، پھر آرڈر — ادا شدہ آرڈر Trx ID کے بغیر نہیں لگتا۔ آرڈر Pending رہتا ہے جب تک سیلر ادائیگی کی تصدیق نہ کرے، پھر Active ہو جاتا ہے۔\nFREE Starter Sample Pack (Rs. 0) کے لیے نہ ادائیگی ہے، نہ Trx ID۔"
+    },
+    payforeign: {
+      en: "Foreign buyers — how you order and pay:\n1. Add your product to the cart and open checkout.\n2. At “Are you from Pakistan or a foreigner?”, choose Foreigner.\n3. Fill the form and tap Place Order — no Easypaisa and no Trx ID needed. Your order is created as Pending, with an Order ID.\n4. Message the seller on WhatsApp — 0335 5290894 — and quote your Order ID.\n5. Pay the total manually, e.g. by Western Union (or another way you and the seller agree on).\n6. Share your payment proof (receipt or reference number) in that WhatsApp chat.\n7. The seller confirms your payment, accepts your order, and your file is delivered in the app within 1–3 days after confirmation, depending on the product — download it from My Orders or the Track Order page.",
+      ru: "Foreigner buyers — order aur payment ka tareeqa:\n1. Product cart mein add karke checkout kholein.\n2. “Are you from Pakistan or a foreigner?” mein Foreigner choose karein.\n3. Form bhar kar Place Order dabayein — Easypaisa ya Trx ID ki zaroorat nahi. Order Pending ban jayega aur Order ID mil jayega.\n4. Seller ko WhatsApp — 0335 5290894 — par message karein aur apna Order ID batayein.\n5. Total manually bhejein, masalan Western Union se (ya jo tareeqa aap aur seller agree kar lein).\n6. Apna payment proof (receipt ya reference number) usi WhatsApp chat mein share karein.\n7. Seller payment confirm karke order accept kar lega, aur confirmation ke baad product ke hisaab se 1–3 din mein file app mein deliver ho jayegi — My Orders ya Track Order page se download karein.",
+      ur: "غیر ملکی خریدار — آرڈر اور ادائیگی کا طریقہ:\n1. پروڈکٹ کارٹ میں شامل کر کے چیک آؤٹ کھولیں۔\n2. “Are you from Pakistan or a foreigner?” میں Foreigner منتخب کریں۔\n3. فارم بھر کر Place Order دبائیں — Easypaisa یا Trx ID کی ضرورت نہیں۔ آرڈر Pending بن جائے گا اور Order ID مل جائے گا۔\n4. سیلر کو واٹس ایپ — 0335 5290894 — پر پیغام بھیجیں اور اپنا Order ID بتائیں۔\n5. رقم دستی طور پر بھیجیں، مثلاً Western Union سے (یا جو طریقہ آپ اور سیلر طے کر لیں)۔\n6. اپنی ادائیگی کا ثبوت (رسید یا ریفرنس نمبر) اسی واٹس ایپ چیٹ میں بھیجیں۔\n7. سیلر ادائیگی کی تصدیق کر کے آرڈر قبول کر لے گا، اور تصدیق کے بعد پروڈکٹ کے حساب سے 1–3 دن میں فائل ایپ میں ڈیلیور ہو جائے گی — My Orders یا Track Order صفحے سے ڈاؤن لوڈ کریں۔"
+    },
+    delivery: {
+      en: "Delivery is inside the app — nothing is sent by post. When the seller uploads your file, your order shows Completed and the download button appears in My Orders and on the Track Order page.\n\nDelivery times:\nLIST\nCustom orders: within 2–3 days, depending on the work.",
+      ru: "Delivery app ke andar hoti hai — post se kuch nahi aata. Seller file upload kare to order Completed show hota hai aur download button My Orders aur Track Order page par aa jata hai.\n\nDelivery times:\nLIST\nCustom orders: 2–3 din mein, kaam ke hisaab se.",
+      ur: "ڈیلیوری ایپ کے اندر ہوتی ہے — ڈاک سے کچھ نہیں آتا۔ سیلر فائل اپ لوڈ کرے تو آرڈر Completed دکھتا ہے اور ڈاؤن لوڈ بٹن My Orders اور Track Order صفحے پر آ جاتا ہے۔\n\nڈیلیوری اوقات:\nLIST\nکسٹم آرڈرز: 2–3 دن میں، کام کے حساب سے۔"
+    },
+    track: {
+      en: "Track your order with your Order ID (it looks like DS-XXXXXX):\n• Open the TRACKPAGE and enter your Order ID, or\n• Sign in and open My Orders.\n\nStatuses: Pending (order placed, payment being checked) → Active (seller accepted, your file is being prepared) → Completed (file uploaded — the download button is there).",
+      ru: "Apna order Order ID se track karein (Order ID is tarah hota hai: DS-XXXXXX):\n• TRACKPAGE khol kar Order ID likhein, ya\n• Sign in karke My Orders kholein.\n\nStatuses: Pending (order place ho gaya, payment check ho rahi hai) → Active (seller ne accept kar liya, file tayyar ho rahi hai) → Completed (file upload ho gayi — download button wahi milega).",
+      ur: "اپنا آرڈر Order ID سے ٹریک کریں (Order ID اس طرح ہوتا ہے: DS-XXXXXX):\n• TRACKPAGE کھول کر Order ID لکھیں، یا\n• سائن ان کر کے My Orders کھولیں۔\n\nاسٹیٹس: Pending (آرڈر لگ گیا، ادائیگی چیک ہو رہی ہے) → Active (سیلر نے قبول کر لیا، فائل تیار ہو رہی ہے) → Completed (فائل اپ لوڈ ہو گئی — ڈاؤن لوڈ بٹن وہیں ملے گا)۔"
+    },
+    discount: {
+      en: "Yes — use code LAUNCH10 for 10% off. It is limited to the first 20 orders only. In the cart, type LAUNCH10 in the “Discount code” box and tap Apply — the discount line and the reduced total show before you pay. One code per order, and the code is checked again when the order is placed.",
+      ru: "Ji haan — code LAUNCH10 se 10% off milta hai. Yeh sirf pehle 20 orders ke liye hai. Cart mein “Discount code” wale box mein LAUNCH10 likh kar Apply dabayein — discount line aur kam total payment se pehle show ho jayega. Ek order par ek code, aur order place karte waqt code dobara check hota hai.",
+      ur: "جی ہاں — کوڈ LAUNCH10 سے 10% رعایت ملتی ہے۔ یہ صرف پہلے 20 آرڈرز کے لیے ہے۔ کارٹ میں “Discount code” والے خانے میں LAUNCH10 لکھ کر Apply دبائیں — رعایت کی لائن اور کم رقم ادائیگی سے پہلے نظر آ جائے گی۔ ایک آرڈر پر ایک کوڈ، اور آرڈر لگاتے وقت کوڈ دوبارہ چیک ہوتا ہے۔"
+    },
+    sample: {
+      en: "The FREE Starter Sample Pack costs Rs. 0 — sample pages from the best packs: 2 printable wall art posters, 5 kids colouring pages, 1 planner page and 1 Excel budget sheet.\nOrder it like any product (add to cart → checkout → Place Order). No payment and no Trx ID. The seller accepts it and uploads the sample files in the app within 1 day — download from My Orders or the Track Order page.",
+      ru: "FREE Starter Sample Pack bilkul Rs. 0 hai — best packs ke sample pages: 2 printable wall art posters, 5 kids colouring pages, 1 planner page aur 1 Excel budget sheet.\nIsay kisi bhi product ki tarah order karein (cart → checkout → Place Order). Na payment, na Trx ID. Seller accept karke 1 din ke andar sample files app mein upload kar deta hai — My Orders ya Track Order se download karein.",
+      ur: "FREE Starter Sample Pack بالکل Rs. 0 ہے — بہترین پیکس کے نمونہ صفحات: 2 پرنٹ ایبل وال آرٹ پوسٹرز، 5 بچوں کے کلرنگ صفحات، 1 پلانر صفحہ اور 1 Excel بجٹ شیٹ۔\nاسے کسی بھی پروڈکٹ کی طرح آرڈر کریں (کارٹ ← چیک آؤٹ ← Place Order)۔ نہ ادائیگی، نہ Trx ID۔ سیلر قبول کر کے 1 دن کے اندر نمونہ فائلیں ایپ میں اپ لوڈ کر دیتا ہے — My Orders یا Track Order سے ڈاؤن لوڈ کریں۔"
+    },
+    custom: {
+      en: "Custom orders are welcome — a poster or wall art with your photo or name, social media posts with your business name and logo, a colouring pack with a child's name, an invoice or budget sheet for your shop, YouTube thumbnails, CVs, planners — almost anything digital.\nUse the Custom Order form on the home page: describe what you need, attach one file if you like, and pay like a normal order. Custom work is delivered within 2–3 days, depending on the work.",
+      ru: "Custom order bhi ho jata hai — aapki photo ya naam wala poster/wall art, business ke naam aur logo ke saath social media posts, bachay ke naam wali colouring pack, dukaan ke liye invoice ya budget sheet, YouTube thumbnails, CV, planner — taqreeban har digital cheez.\nHome page par Custom Order form use karein: jo chahiye woh likhein, chahein to ek file attach kar dein, aur normal order ki tarah pay karein. Custom kaam 2–3 din mein deliver hota hai.",
+      ur: "کسٹم آرڈر بھی ہو جاتا ہے — آپ کی تصویر یا نام والا پوسٹر/وال آرٹ، کاروبار کے نام اور لوگو کے ساتھ سوشل میڈیا پوسٹس، بچے کے نام والی کلرنگ پیک، دکان کے لیے انوائس یا بجٹ شیٹ، YouTube تھمب نیلز، CV، پلانر — تقریباً ہر ڈیجیٹل چیز۔\nہوم پیج پر Custom Order فارم استعمال کریں: جو چاہیے وہ لکھیں، چاہیں تو ایک فائل منسلک کر دیں، اور عام آرڈر کی طرح ادائیگی کریں۔ کسٹم کام 2–3 دن میں ڈیلیور ہوتا ہے۔"
+    },
+    refund: {
+      en: "Refunds are fair and simple:\n• File not delivered within the promised time → full refund.\n• Delivered file is wrong and cannot be fixed → full refund (mistakes are always fixed free first).\n• A correctly delivered file cannot be returned, because digital files can be copied — so try the FREE Sample Pack first.\nTo ask, message the seller on WhatsApp or email shakircadet1@gmail.com with your Order ID. Approved refunds are sent back by Easypaisa within 3 working days.",
+      ru: "Refund ka rule simple aur fair hai:\n• File promised time mein deliver na ho → full refund.\n• Delivered file ghalat ho aur fix na ho sakay → full refund (ghalti pehle hamesha free fix hoti hai).\n• Sahi deliver hui file wapas nahi ho sakti, kyunke digital files copy ho jati hain — is liye pehle FREE Sample Pack try karein.\nMangne ke liye seller ko WhatsApp par ya shakircadet1@gmail.com par email karein, Order ID ke saath. Approved refund 3 working days mein Easypaisa se wapas bheja jata hai.",
+      ur: "ریفنڈ کا اصول سادہ اور منصفانہ ہے:\n• فائل وعدے کے وقت میں ڈیلیور نہ ہو ← مکمل ریفنڈ۔\n• ڈیلیور شدہ فائل غلط ہو اور درست نہ ہو سکے ← مکمل ریفنڈ (غلطی پہلے ہمیشہ مفت درست ہوتی ہے)۔\n• درست ڈیلیور شدہ فائل واپس نہیں ہو سکتی، کیونکہ ڈیجیٹل فائلیں کاپی ہو جاتی ہیں — اس لیے پہلے FREE Sample Pack آزمائیں۔\nمانگنے کے لیے سیلر کو واٹس ایپ پر یا shakircadet1@gmail.com پر ای میل کریں، Order ID کے ساتھ۔ منظور شدہ ریفنڈ 3 ورکنگ دنوں میں Easypaisa سے واپس بھیجا جاتا ہے۔"
+    },
+    contact: {
+      en: "Talk to the seller directly:\n• WALINK\n• Email: shakircadet1@gmail.com\nFor order questions, please quote your Order ID so the seller can find your order fast.",
+      ru: "Seller se seedha rabta karein:\n• WALINK\n• Email: shakircadet1@gmail.com\nOrder ke sawal mein apna Order ID zaroor batayein, seller ko order foran mil jayega.",
+      ur: "سیلر سے براہِ راست رابطہ کریں:\n• WALINK\n• ای میل: shakircadet1@gmail.com\nآرڈر کے سوال میں اپنا Order ID ضرور بتائیں، سیلر کو آرڈر فوراً مل جائے گا۔"
+    },
+    account: {
+      en: "You need a free account to order — it keeps your orders and files private: only you and the seller can see them.\nTap Sign In at the top, create your account, then open the verification link we email you. After that, sign in and order normally. Browsing, prices and tracking work without an account.",
+      ru: "Order ke liye free account zaroori hai — is se aapke orders aur files private rehte hain: sirf aap aur seller dekh sakte hain.\nUpar Sign In dabayein, account banayein, phir email mein aayi verification link kholein. Uske baad sign in karke normal order karein. Browsing, prices aur tracking baghair account ke bhi chalti hai.",
+      ur: "آرڈر کے لیے مفت اکاؤنٹ ضروری ہے — اس سے آپ کے آرڈرز اور فائلیں نجی رہتے ہیں: صرف آپ اور سیلر دیکھ سکتے ہیں۔\nاوپر Sign In دبائیں، اکاؤنٹ بنائیں، پھر ای میل میں آئی تصدیقی لنک کھولیں۔ اس کے بعد سائن ان کر کے عام آرڈر کریں۔ براؤزنگ، قیمتیں اور ٹریکنگ بغیر اکاؤنٹ کے بھی چلتی ہے۔"
+    },
+    products: {
+      en: "Here is everything in the store right now:\nLIST\n\nOpen Shop in the menu for pictures and full details — or ask me about any product by name.",
+      ru: "Store mein is waqt yeh sab hai:\nLIST\n\nPictures aur full details ke liye menu mein Shop kholein — ya kisi ek product ka naam likh kar mujh se poochein.",
+      ur: "اسٹور میں اس وقت یہ سب ہے:\nLIST\n\nتصاویر اور مکمل تفصیل کے لیے مینو میں Shop کھولیں — یا کسی ایک پروڈکٹ کا نام لکھ کر مجھ سے پوچھیں۔"
+    },
+    thanks: {
+      en: "You're welcome! If anything else comes up — ordering, payment, delivery or tracking — just ask. Happy shopping at PixelNest ✦",
+      ru: "Koi baat nahi — khushi hui! Aur koi sawal ho — order, payment, delivery ya tracking — bas pooch lein. PixelNest par khush khareedari ✦",
+      ur: "آپ کا شکریہ! اور کوئی سوال ہو — آرڈر، ادائیگی، ڈیلیوری یا ٹریکنگ — بس پوچھ لیں۔ PixelNest پر خوش خریداری ✦"
+    },
+    fallback: {
+      en: "I can help with ordering, payment (Easypaisa for Pakistan — WhatsApp + Western Union for foreign buyers), delivery times, tracking, product prices, the FREE sample, custom orders and refunds. Try one of the quick questions below — or talk to the seller on WALINK.",
+      ru: "Main in cheezon mein madad kar sakta hun: order karna, payment (Pakistan ke liye Easypaisa — foreign buyers ke liye WhatsApp + Western Union), delivery times, tracking, product prices, FREE sample, custom orders aur refunds. Neechay quick sawal try karein — ya seller se baat karein: WALINK.",
+      ur: "میں ان چیزوں میں مدد کر سکتا ہوں: آرڈر کرنا، ادائیگی (پاکستان کے لیے Easypaisa — غیر ملکی خریداروں کے لیے واٹس ایپ + Western Union)، ڈیلیوری اوقات، ٹریکنگ، پروڈکٹ قیمتیں، مفت نمونہ، کسٹم آرڈرز اور ریفنڈز۔ نیچے فوری سوالات آزمائیں — یا سیلر سے بات کریں: WALINK۔"
+    }
+  };
+
+  var ALIAS = [
+    ["free-sample", ["sample pack", "starter pack", "نمونہ پیک"]],
+    ["wall-art", ["wall art", "poster", "islamic art", "وال آرٹ", "پوسٹر"]],
+    ["colouring", ["colouring", "coloring", "colour", "کلرنگ"]],
+    ["planner", ["planner", "journal", "پلانر"]],
+    ["budget", ["budget", "excel sheet", "ایکسل"]],
+    ["invoice-bundle", ["invoice", "salary", "attendance", "انوائس"]],
+    ["social", ["social media", "instagram", "facebook post", "سوشل"]],
+    ["cv", ["cv", "resume", "سی وی", "رزومے"]],
+    ["ebook-guide", ["ebook", "e-book", "book", "guide", "freelancing", "کتاب"]],
+    ["thumbnail", ["thumbnail", "youtube", "تھمب نیل"]]
+  ];
+  function findProduct(s){
+    for(var i = 0; i < ALIAS.length; i++){
+      for(var j = 0; j < ALIAS[i][1].length; j++){
+        if(s.indexOf(ALIAS[i][1][j]) >= 0){
+          var list = catalogue();
+          for(var k = 0; k < list.length; k++) if(list[k].id === ALIAS[i][0]) return list[k];
+        }
+      }
+    }
+    return null;
+  }
+  function detectLang(t){
+    if(/[\u0600-\u06FF]/.test(t)) return "ur";
+    var s = " " + t.toLowerCase().replace(/[^a-z\s]/g, " ") + " ";
+    var marks = [" hai ", " hay ", " ka ", " ki ", " ke ", " mein ", " mujhe ", " chahiye ", " kese ", " kesay ", " kaisay ", " kitne ", " kitna ", " kab ", " milega ", " bhejna ", " karna ", " karein ", " batao ", " samjhao ", " paisa ", " paise ", " nahi ", " sakta ", " sakti ", " wala ", " wali ", " shukriya ", " salam ", " acha ", " theek ", " chahye ", " mera ", " meri ", " aap ", " tum ", " kya ", " bhi ", " aur ", " se ", " par ", " ko "];
+    var score = 0;
+    for(var i = 0; i < marks.length; i++) if(s.indexOf(marks[i]) >= 0) score++;
+    return score >= 2 ? "ru" : "en";
+  }
+  function intentOf(t){
+    var s = t.toLowerCase();
+    if(/ds-[a-z0-9]{4,}/i.test(t) || /track|tracking|status|where is my order|mera order|order kahan|ٹریک|اسٹیٹس/.test(s)) return "track";
+    if(/foreign|outside pakistan|not from pakistan|abroad|overseas|western union|international|pardesi|bahir|غیر ملکی|فارنر|بیرون/.test(s)) return "payforeign";
+    if(/discount|coupon|promo|launch10|رعایت|کوپن/.test(s)) return "discount";
+    if(/sample|free|مفت|نمونہ|سیمپل/.test(s)) return "sample";
+    if(/custom|کسٹم/.test(s)) return "custom";
+    if(/refund|money back|واپس|ریفنڈ/.test(s)) return "refund";
+    if(/deliver|delivery|kab mile|receive|download|ship|ملے گا|ڈیلیوری|موصول|ڈاؤن لوڈ/.test(s)) return "delivery";
+    if(/easypaisa|trx|transaction|\bpay|payment|pais|ادائیگی|پیسے|رقم/.test(s)) return "paypk";
+    if(/sign in|log ?in|account|register|اکاؤنٹ|سائن ان/.test(s)) return "account";
+    if(/human|seller|contact|whatsapp|رابطہ|نمبر|بات کر|واٹس/.test(s)) return "contact";
+    if(/price|cost|rate|list|products|قیمت|دام/.test(s)) return "products";
+    if(/order|buy|purchase|خرید|آرڈر|shopping/.test(s)) return "order";
+    if(/thank|shukriya|شکریہ/.test(s)) return "thanks";
+    if(/^(hi+|hello|hey|salam|aoa|assalam|ہیلو|سلام)/.test(s.trim())) return "greeting";
+    return "fallback";
+  }
+  function answerFor(text){
+    var lang = detectLang(text);
+    var intent = intentOf(text);
+    var p = findProduct(text.toLowerCase());
+    if(p && (intent === "products" || intent === "fallback" || intent === "delivery")) return productDetail(p, lang);
+    var a = A[intent] || A.fallback;
+    var out = esc(a[lang] || a.en);
+    out = out.split("LIST").join(esc(productList()));
+    out = out.split("TRACKPAGE").join(TRACK_LINK);
+    out = out.split("WALINK").join(WA_LINK);
+    if(intent === "track"){
+      var m = text.match(/ds-[a-z0-9]{4,}/i);
+      if(m){
+        var pre = { en: "Your Order ID is " + m[0].toUpperCase() + " — enter it on the Track Order page for the live status.\n\n", ru: "Aapka Order ID " + m[0].toUpperCase() + " hai — live status ke liye isay Track Order page par likhein.\n\n", ur: "آپ کا Order ID " + m[0].toUpperCase() + " ہے — لائیو اسٹیٹس کے لیے اسے Track Order صفحے پر لکھیں۔\n\n" }[lang];
+        out = esc(pre) + out;
+      }
+    }
+    return out;
+  }
+
+  function addMsg(html, who){
+    var d = document.createElement("div");
+    d.className = "pnc-msg " + who;
+    d.innerHTML = html;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    return d;
+  }
+  function botReply(text){
+    var typing = document.createElement("div");
+    typing.className = "pnc-typing";
+    typing.textContent = "PixelNest Assistant is typing…";
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(function(){
+      if(typing.parentNode) typing.parentNode.removeChild(typing);
+      addMsg(answerFor(text), "bot");
+    }, 480);
+  }
+  function send(text){
+    var t = String(text || "").trim();
+    if(!t) return;
+    addMsg(esc(t), "me");
+    botReply(t);
+  }
+
+  var CHIPS = [
+    ["How do I order?", "How do I order?"],
+    ["Payment — Pakistan", "How do I pay from Pakistan?"],
+    ["I'm a foreigner — how do I pay?", "I am a foreigner, how do I pay?"],
+    ["Delivery times", "What are the delivery times?"],
+    ["Track my order", "How do I track my order?"],
+    ["LAUNCH10 discount", "Is there a discount code?"],
+    ["FREE sample pack", "Tell me about the free sample"],
+    ["Custom orders", "Can I place a custom order?"],
+    ["Talk to the seller", "How do I contact the seller?"]
+  ];
+  CHIPS.forEach(function(c){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "pnc-chip";
+    b.textContent = c[0];
+    b.addEventListener("click", function(){ send(c[1]); });
+    chipsBox.appendChild(b);
+  });
+
+  function openChat(){
+    panel.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    if(!welcomed){
+      welcomed = true;
+      setTimeout(function(){ addMsg(esc(A.welcome.en), "bot"); }, 150);
+    }
+    setTimeout(function(){ try { input.focus(); } catch(e){} }, 60);
+  }
+  function closeChat(){
+    panel.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  }
+  btn.addEventListener("click", function(){ panel.hidden ? openChat() : closeChat(); });
+  document.getElementById("pnChatClose").addEventListener("click", closeChat);
+  document.querySelectorAll("[data-help-open]").forEach(function(el){
+    el.addEventListener("click", function(){ openChat(); });
+  });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !panel.hidden) closeChat(); });
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = input.value;
+    input.value = "";
+    send(v);
+  });
+})();
+</script>
+
 </body>
 </html>

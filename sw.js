@@ -8,25 +8,25 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v18: 2 small fixes vs live #52 — auto-switch now shows a clear
-   "No account found for this email. Create your account below."
-   message on the Sign Up form (instead of repeating the old
-   sign-in error), and the Track Order per-order message now says
-   "within 1 day after payment is confirmed" for paid 1-day
-   products (rest: "within 1–3 days after payment is confirmed,
-   depending on the product"). OneSignal REST key restored
-   verbatim (sendNewOrder works again). Same cart drawer 440px
-   Remove fix, header loading state in the HTML itself, footer
-   delivery wording, auto-switch on ANY sign-in error, LAUNCH10
-   stale state fix, checkout gate on Sign In, banner typo fixed,
-   EmailJS comment LIVE, seller dashboard LTR, delivery email
+   v19: 4 fixes vs live #53 — distinct professional colours (teal
+   action buttons, violet PixelNest Assistant chatbot), PixelNest
+   Assistant chatbot on the whole store (foreigner flow explained),
+   checkout now asks "Are you from Pakistan or a foreigner?"
+   (Foreigner = WhatsApp manual payment, no Trx ID), and completed
+   orders leave the seller board automatically 2 days after
+   completion (counts and Total Earned keep the full totals).
+   OneSignal REST key is ABSENT in this static build (closed-app
+   push disabled by design); in-app notifications and email still
+   work. Same cart drawer 440px Remove fix, header loading state,
+   footer delivery wording, auto-switch on ANY sign-in error,
+   LAUNCH10 stale state fix, checkout gate on Sign In, EmailJS
+   comment LIVE, seller dashboard LTR, delivery email
    (template_8bmn0gq), persistent sign-in, seller exclusion,
    sign-up name, email verification, WhatsApp-style notification
-   read/unread as v17.
+   read/unread as v18.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
-   worker code first, so pushes arrive even when the app is fully
-   closed. Same shell, new cache version so phones pick up the new
-   build.
+   worker code first. Same shell, new cache version so phones pick
+   up the new build.
    Caches the store page and its static assets (cache-first for
    same-origin files, network-first for page navigations with a
    cached fallback), so the store opens fast on repeat visits and
@@ -49,7 +49,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v18";
+var CACHE_VERSION = "pixelnest-shell-v19";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
