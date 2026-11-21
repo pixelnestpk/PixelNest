@@ -1451,14 +1451,14 @@ a{color:#7C6213}
 #pnChatBtn{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:95;background:var(--chat);color:#fff;border:0;border-radius:999px;min-height:52px;padding:0 20px;display:flex;align-items:center;gap:9px;font-weight:800;font-size:.95rem;box-shadow:0 14px 34px rgba(109,40,217,.42);cursor:pointer;font-family:inherit}
 #pnChatBtn:hover{background:var(--chat-dark)}
 #pnChatBtn svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
-#pnChatPanel{position:fixed;right:16px;bottom:calc(152px + env(safe-area-inset-bottom,0px));z-index:96;width:min(384px,calc(100vw - 24px));height:min(560px,calc(100dvh - 200px));background:#fff;border:1px solid #E3E0F5;border-radius:18px;box-shadow:0 30px 70px rgba(16,19,24,.32);display:flex;flex-direction:column;overflow:hidden}
+#pnChatPanel{position:fixed;inset:0;z-index:200;width:100%;height:100dvh;background:#fff;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:contain}
 #pnChatPanel[hidden]{display:none}
 .pnc-head{background:linear-gradient(135deg,#6D28D9,#4C1D95);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;flex:none}
 .pnc-head b{font-size:1rem;display:block;line-height:1.25;font-family:'Playfair Display',Georgia,serif}
 .pnc-head span{font-size:.78rem;color:rgba(255,255,255,.88);display:block}
 #pnChatClose{margin-left:auto;background:rgba(255,255,255,.16);color:#fff;border:0;width:36px;height:36px;border-radius:10px;font-size:1rem;cursor:pointer;flex:none;line-height:1}
 #pnChatClose:hover{background:rgba(255,255,255,.3)}
-.pnc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:#FBFAFF}
+.pnc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:#FBFAFF;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .pnc-msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:.9rem;line-height:1.55;white-space:pre-wrap;word-break:break-word}
 .pnc-msg.bot{background:#fff;border:1px solid #E7E2F7;border-bottom-left-radius:4px;color:#1E222B;align-self:flex-start;box-shadow:0 2px 8px rgba(76,29,149,.05)}
 .pnc-msg.me{background:var(--chat);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
@@ -1468,15 +1468,15 @@ a{color:#7C6213}
 .pnc-chips{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid #EEEAF9;background:#fff;flex:none;max-height:118px;overflow-y:auto}
 .pnc-chip{border:1.5px solid #C9BFF2;background:var(--chat-soft);color:#4C1D95;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
 .pnc-chip:hover{background:#E3D9FA}
-.pnc-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #EEEAF9;background:#fff;flex:none}
+.pnc-input{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid #EEEAF9;background:#fff;flex:none}
 .pnc-input input{flex:1;min-width:0;min-height:46px;border:1.5px solid #D9D2F2;border-radius:12px;padding:0 13px;font-size:.92rem;color:#1E222B;background:#fff;font-family:inherit}
 .pnc-input input:focus{outline:2px solid var(--chat)}
 .pnc-input button{flex:none;width:46px;height:46px;border:0;border-radius:12px;background:var(--chat);cursor:pointer;display:grid;place-items:center}
 .pnc-input button:hover{background:var(--chat-dark)}
 .pnc-input button svg{width:19px;height:19px;fill:#fff}
-@media (max-width:640px){
-  #pnChatPanel{right:12px;left:12px;width:auto;bottom:calc(148px + env(safe-area-inset-bottom,0px));height:min(540px,calc(100dvh - 190px))}
-}
+/* While the chat page is open, the store behind it stays frozen:
+   scrolling inside the chat never moves the page underneath. */
+body.pn-chat-open{overflow:hidden}
 </style>
 </head>
 <body id="top" class="auth-pending">
@@ -1509,7 +1509,6 @@ a{color:#7C6213}
         <a href="contact.html" data-route="contact">Contact</a>
         <a href="track-order.html" data-route="track">Track Order</a>
         <button type="button" class="help-tab" data-help-open>Help</button>
-        <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
       </nav>
       <button class="search-toggle" id="searchToggle" type="button" aria-label="Search products" aria-expanded="false" aria-controls="searchPanel">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -1533,7 +1532,6 @@ a{color:#7C6213}
       <a href="track-order.html" data-route="track">Track Order</a>
       <a href="contact.html" data-route="contact">Contact</a>
       <button type="button" class="help-tab" data-help-open>Help</button>
-        <a class="chat-link" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
     </nav>
   </div>
 </header>
@@ -1596,7 +1594,7 @@ a{color:#7C6213}
       <div>
         <h4>Contact</h4>
         <ul>
-          <li><a href="whatsapp://send?phone=923355290894" data-wa-web="https://wa.me/923355290894">WhatsApp: 0335 5290894</a></li>
+          <li>WhatsApp: 0335 5290894</li>
           <li><a href="mailto:shakircadet1@gmail.com">Email: shakircadet1@gmail.com</a></li>
           <li><a href="about.html">About the Seller</a></li>
           <li><a href="index.html#faq">FAQ</a></li>
@@ -1612,7 +1610,6 @@ a{color:#7C6213}
     <div class="foot-bottom">© PixelNest — digital products, delivered in the app within 1–3 days after payment is confirmed, depending on the product. No physical shipping. <button class="seller-link" id="openOrders" type="button" style="display:none">Seller Orders</button></div>
   </div>
 </footer>
-<a class="wa-float" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20a%20product%20on%20PixelNest.">Chat on WhatsApp</a>
 <!-- POLICIES — Refund Policy, Terms of Service, Privacy Policy.
      One overlay page with three sections; the footer links open it
      scrolled to the chosen section. -->
@@ -1627,7 +1624,7 @@ a{color:#7C6213}
         <li><b>Wrong file:</b> if the delivered file is wrong, or has a mistake we cannot fix, you get a <b>full refund</b>. Mistakes are always fixed free first — message us and the corrected file is re-uploaded in the app.</li>
         <li><b>Custom orders:</b> if we cannot make what was agreed with you, you get a full refund. A preview is shown before final delivery on custom work.</li>
         <li><b>Correctly delivered files:</b> because digital files can be copied, a file that was delivered correctly cannot be returned, so change-of-mind refunds are not possible after delivery. Please use the <b>FREE Sample Pack</b> to check the quality before you buy.</li>
-        <li><b>How to ask:</b> message on WhatsApp or email <b>shakircadet1@gmail.com</b> with your Order ID. Approved refunds are sent back by Easypaisa within 3 working days.</li>
+        <li><b>How to ask:</b> email <b>shakircadet1@gmail.com</b> with your Order ID. Approved refunds are sent back by Easypaisa within 3 working days.</li>
       </ul>
       <h3 id="polTerms">Terms of Service</h3>
       <ul>
@@ -1668,10 +1665,10 @@ a{color:#7C6213}
     <p class="discount-feedback"><span id="discountFeedbackText"></span><button type="button" class="discount-remove" id="discountRemoveBtn" style="display:none">Remove</button></p>
     <form class="checkout-form" id="checkoutForm">
       <label>Full Name <input required id="fName" placeholder="e.g. Ahmed Khan" autocomplete="name"></label>
-      <label>Your Mobile / WhatsApp Number <input required id="fPhone" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="tel"><span class="field-hint">This is YOUR number — the seller may contact you on it if needed. Your file itself is delivered in the app (My Orders / Track Order); ordering happens right here on the website, and WhatsApp is only for chat if you have a question.</span></label>
+      <label>Your Mobile / WhatsApp Number <input required id="fPhone" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="tel"><span class="field-hint">This is YOUR number — the seller may contact you on it if needed. Your file itself is delivered in the app (My Orders / Track Order); ordering happens right here on the website, and the Help chat at the top of the page is there if you have a question.</span></label>
       <label>Email <input required type="email" id="fEmail" placeholder="you@email.com" autocomplete="email"></label>
       <div id="cvDetailsWrap" style="display:none">
-        <label>Your CV details <textarea id="fCvDetails" placeholder="Your full name, city, education, work experience, skills, languages — and the kind of job you want. The seller makes both your Europass CV templates from exactly these details."></textarea><span class="field-hint">You are ordering the <b>Professional Europass CV — 2 Templates</b> — the seller needs these details to make both templates. Write them here, or send them on WhatsApp chat after ordering, quoting your Order ID.</span></label>
+        <label>Your CV details <textarea id="fCvDetails" placeholder="Your full name, city, education, work experience, skills, languages — and the kind of job you want. The seller makes both your Europass CV templates from exactly these details."></textarea><span class="field-hint">You are ordering the <b>Professional Europass CV — 2 Templates</b> — the seller needs these details to make both templates. Write them here, or email them to shakircadet1@gmail.com after ordering, quoting your Order ID.</span></label>
       </div>
       <div id="paySection">
         <p style="font-weight:800;font-size:.95rem;margin:4px 0 8px;color:var(--navy)">Are you from Pakistan or a foreigner?</p>
@@ -1720,7 +1717,6 @@ a{color:#7C6213}
         <p id="successPayInfo" style="margin:10px 0 0;font-size:.9rem"></p>
         <button type="button" class="btn track-btn" id="trackThisOrder">Track Your Order — live status →</button>
         <div id="freeDownloads" style="display:none"></div>
-        <a class="chat-btn" id="successChatLink" href="whatsapp://send?phone=923355290894&amp;text=Hello!%20I%20have%20a%20question%20about%20my%20order%20on%20PixelNest." data-wa-web="https://wa.me/923355290894?text=Hello!%20I%20have%20a%20question%20about%20my%20order%20on%20PixelNest.">Chat on WhatsApp (optional — only for questions)</a>
       </div>
       <p class="order-flow-note"><b>How ordering works:</b> fill in the form, pay the amount shown to <b>03361520429</b> via Easypaisa in your own app <b>first</b>, paste the <b>Trx ID (required for paid orders)</b> and tap “Place Order” — your order completes <b>right here</b> with an Order ID, no WhatsApp step, and is placed as <b>Pending</b>; the seller accepts it once your payment is confirmed. <b>A paid order will not be placed without a Trx ID.</b> Sign in first (button at the top) — an account is required to order, so your files stay private: only you can see your orders and downloads. The FREE sample pack (Rs. 0) needs no payment and no Trx ID — it is placed as Pending like every order, and the seller accepts it and delivers the sample files in the app.</p>
       <div id="verifyGate" style="display:none;background:#FEF3C7;border:1px solid #E7D9A8;border-radius:12px;padding:14px">
@@ -2870,7 +2866,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
     } else if(trxId){
       payInfo.innerHTML = "Payment received via <b>" + escHtml(payMethod) + "</b> — Trx ID: <b>" + escHtml(trxId) + "</b>. Your order is now <b>Pending</b> — the seller will accept it shortly, and your file will then be delivered in the app within 1–3 days after payment is confirmed, depending on the product — download it from My Orders or track it live with your Order ID.";
     } else {
-      payInfo.innerHTML = "Your order is <b>Pending — payment pending</b>. Pay <b>" + fmt(orderTotal) + "</b> via " + escHtml(payMethod) + " to <b>03361520429</b> in your payment app, then share the Trx ID with the seller on chat (button below). Your file is delivered within 1–3 days after payment is confirmed, depending on the product.";
+      payInfo.innerHTML = "Your order is <b>Pending — payment pending</b>. Pay <b>" + fmt(orderTotal) + "</b> via " + escHtml(payMethod) + " to <b>03361520429</b> in your payment app, then share the Trx ID with the seller through the Help chat (Help button at the top of the page). Your file is delivered within 1–3 days after payment is confirmed, depending on the product.";
     }
   }
   var chatLink = document.getElementById("successChatLink");
@@ -6515,12 +6511,12 @@ window.SellerNotify = (function(){
      (the PRODUCTS catalogue on this page, prices, delivery times,
      the LAUNCH10 code, the payment numbers) and explains ordering,
      payment (Pakistan + foreigner), delivery and tracking in the
-     language the visitor writes in — English, Urdu or Roman Urdu. -->
+     language the visitor writes in — English, Urdu, Roman Urdu, Spanish, French, German, Arabic, Hindi, Russian, Chinese and many more. -->
 <button id="pnChatBtn" type="button" aria-label="Help — chat with the PixelNest assistant" aria-expanded="false" aria-controls="pnChatPanel">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
   <span>Help — Ask Us</span>
 </button>
-<div id="pnChatPanel" role="dialog" aria-modal="false" aria-label="PixelNest assistant chat" hidden>
+<div id="pnChatPanel" role="dialog" aria-modal="true" aria-label="PixelNest assistant chat" hidden>
   <div class="pnc-head">
     <div>
       <b>PixelNest Assistant</b>
@@ -6568,7 +6564,7 @@ window.SellerNotify = (function(){
     return catalogue().map(function(p){ return "• " + p.name + " — " + priceOf(p) + " · delivery " + p.delivery; }).join("\n");
   }
   function productDetail(p, lang){
-    var L = { en: ["What's included", "Format", "Delivery"], ru: ["Is mein shamil hai", "Format", "Delivery"], ur: ["اس میں شامل ہے", "فارمیٹ", "ڈیلیوری"] }[lang];
+    var L = { en: ["What's included", "Format", "Delivery"], ru: ["Is mein shamil hai", "Format", "Delivery"], ur: ["اس میں شامل ہے", "فارمیٹ", "ڈیلیوری"], es: ["Qué incluye", "Formato", "Entrega"] }[lang] || ["What's included", "Format", "Delivery"];
     var out = p.name + " — " + priceOf(p) + "\n" + p.desc;
     if(p.includes && p.includes.length) out += "\n\n" + L[0] + ": " + p.includes.join(" · ");
     if(p.format) out += "\n" + L[1] + ": " + p.format + (p.contents ? " · " + p.contents : "");
@@ -6577,7 +6573,7 @@ window.SellerNotify = (function(){
   }
 
   var A = {
-    welcome: { en: "Welcome to PixelNest ✦ Premium digital products — wall art, planners, CVs, Excel tools and more — delivered right here in the app within 1–3 days.\n\nI'm your PixelNest assistant. Ask me about:\n• How to order\n• Payment — Pakistan (Easypaisa) or foreign buyers (WhatsApp + Western Union)\n• Delivery times\n• Tracking your order\n• Prices, the FREE sample and the LAUNCH10 10% discount\n\nTip: I reply in your language — English, اردو or Roman Urdu. Tap a quick question below, or type your own." },
+    welcome: { en: "Welcome to PixelNest ✦ Premium digital products — wall art, planners, CVs, Excel tools and more — delivered right here in the app within 1–3 days.\n\nI'm your PixelNest assistant. Ask me about:\n• How to order\n• Payment — Pakistan (Easypaisa) or foreign buyers (WhatsApp + Western Union)\n• Delivery times\n• Tracking your order\n• Prices, the FREE sample and the LAUNCH10 10% discount\n\nTip: I reply in your language — English, اردو, Roman Urdu, Español, Français, Deutsch, Português, Italiano, Türkçe, العربية, हिन्दी, Русский, 中文, 日本語, 한국어 and more. Just write to me in your language. Tap a quick question below, or type your own." },
     greeting: {
       en: "Hello! Welcome to PixelNest ✦ Ask me how to order, how to pay (Pakistan or foreigner), delivery times, tracking, prices or the LAUNCH10 discount — or tap a quick question below.",
       ru: "Assalam o Alaikum! PixelNest mein khush aamdeed ✦ Mujh se poochein: order kesay karein, payment (Pakistan ya foreigner), delivery time, tracking, prices ya LAUNCH10 discount — ya neechay quick sawal dabayein.",
@@ -6624,14 +6620,14 @@ window.SellerNotify = (function(){
       ur: "کسٹم آرڈر بھی ہو جاتا ہے — آپ کی تصویر یا نام والا پوسٹر/وال آرٹ، کاروبار کے نام اور لوگو کے ساتھ سوشل میڈیا پوسٹس، بچے کے نام والی کلرنگ پیک، دکان کے لیے انوائس یا بجٹ شیٹ، YouTube تھمب نیلز، CV، پلانر — تقریباً ہر ڈیجیٹل چیز۔\nہوم پیج پر Custom Order فارم استعمال کریں: جو چاہیے وہ لکھیں، چاہیں تو ایک فائل منسلک کر دیں، اور عام آرڈر کی طرح ادائیگی کریں۔ کسٹم کام 2–3 دن میں ڈیلیور ہوتا ہے۔"
     },
     refund: {
-      en: "Refunds are fair and simple:\n• File not delivered within the promised time → full refund.\n• Delivered file is wrong and cannot be fixed → full refund (mistakes are always fixed free first).\n• A correctly delivered file cannot be returned, because digital files can be copied — so try the FREE Sample Pack first.\nTo ask, message the seller on WhatsApp or email shakircadet1@gmail.com with your Order ID. Approved refunds are sent back by Easypaisa within 3 working days.",
-      ru: "Refund ka rule simple aur fair hai:\n• File promised time mein deliver na ho → full refund.\n• Delivered file ghalat ho aur fix na ho sakay → full refund (ghalti pehle hamesha free fix hoti hai).\n• Sahi deliver hui file wapas nahi ho sakti, kyunke digital files copy ho jati hain — is liye pehle FREE Sample Pack try karein.\nMangne ke liye seller ko WhatsApp par ya shakircadet1@gmail.com par email karein, Order ID ke saath. Approved refund 3 working days mein Easypaisa se wapas bheja jata hai.",
-      ur: "ریفنڈ کا اصول سادہ اور منصفانہ ہے:\n• فائل وعدے کے وقت میں ڈیلیور نہ ہو ← مکمل ریفنڈ۔\n• ڈیلیور شدہ فائل غلط ہو اور درست نہ ہو سکے ← مکمل ریفنڈ (غلطی پہلے ہمیشہ مفت درست ہوتی ہے)۔\n• درست ڈیلیور شدہ فائل واپس نہیں ہو سکتی، کیونکہ ڈیجیٹل فائلیں کاپی ہو جاتی ہیں — اس لیے پہلے FREE Sample Pack آزمائیں۔\nمانگنے کے لیے سیلر کو واٹس ایپ پر یا shakircadet1@gmail.com پر ای میل کریں، Order ID کے ساتھ۔ منظور شدہ ریفنڈ 3 ورکنگ دنوں میں Easypaisa سے واپس بھیجا جاتا ہے۔"
+      en: "Refunds are fair and simple:\n• File not delivered within the promised time → full refund.\n• Delivered file is wrong and cannot be fixed → full refund (mistakes are always fixed free first).\n• A correctly delivered file cannot be returned, because digital files can be copied — so try the FREE Sample Pack first.\nTo ask, email shakircadet1@gmail.com with your Order ID. Approved refunds are sent back by Easypaisa within 3 working days.",
+      ru: "Refund ka rule simple aur fair hai:\n• File promised time mein deliver na ho → full refund.\n• Delivered file ghalat ho aur fix na ho sakay → full refund (ghalti pehle hamesha free fix hoti hai).\n• Sahi deliver hui file wapas nahi ho sakti, kyunke digital files copy ho jati hain — is liye pehle FREE Sample Pack try karein.\nMangne ke liye seller ko shakircadet1@gmail.com par email karein, Order ID ke saath. Approved refund 3 working days mein Easypaisa se wapas bheja jata hai.",
+      ur: "ریفنڈ کا اصول سادہ اور منصفانہ ہے:\n• فائل وعدے کے وقت میں ڈیلیور نہ ہو ← مکمل ریفنڈ۔\n• ڈیلیور شدہ فائل غلط ہو اور درست نہ ہو سکے ← مکمل ریفنڈ (غلطی پہلے ہمیشہ مفت درست ہوتی ہے)۔\n• درست ڈیلیور شدہ فائل واپس نہیں ہو سکتی، کیونکہ ڈیجیٹل فائلیں کاپی ہو جاتی ہیں — اس لیے پہلے FREE Sample Pack آزمائیں۔\nمانگنے کے لیے سیلر کو shakircadet1@gmail.com پر ای میل کریں، Order ID کے ساتھ۔ منظور شدہ ریفنڈ 3 ورکنگ دنوں میں Easypaisa سے واپس بھیجا جاتا ہے۔"
     },
     contact: {
-      en: "Talk to the seller directly:\n• WALINK\n• Email: shakircadet1@gmail.com\nFor order questions, please quote your Order ID so the seller can find your order fast.",
-      ru: "Seller se seedha rabta karein:\n• WALINK\n• Email: shakircadet1@gmail.com\nOrder ke sawal mein apna Order ID zaroor batayein, seller ko order foran mil jayega.",
-      ur: "سیلر سے براہِ راست رابطہ کریں:\n• WALINK\n• ای میل: shakircadet1@gmail.com\nآرڈر کے سوال میں اپنا Order ID ضرور بتائیں، سیلر کو آرڈر فوراً مل جائے گا۔"
+      en: "Talk to the seller directly:\n• Email: shakircadet1@gmail.com\nFor order questions, please quote your Order ID so the seller can find your order fast.",
+      ru: "Seller se seedha rabta karein:\n• Email: shakircadet1@gmail.com\nOrder ke sawal mein apna Order ID zaroor batayein, seller ko order foran mil jayega.",
+      ur: "سیلر سے براہِ راست رابطہ کریں:\n• ای میل: shakircadet1@gmail.com\nآرڈر کے سوال میں اپنا Order ID ضرور بتائیں، سیلر کو آرڈر فوراً مل جائے گا۔"
     },
     account: {
       en: "You need a free account to order — it keeps your orders and files private: only you and the seller can see them.\nTap Sign In at the top, create your account, then open the verification link we email you. After that, sign in and order normally. Browsing, prices and tracking work without an account.",
@@ -6649,9 +6645,9 @@ window.SellerNotify = (function(){
       ur: "آپ کا شکریہ! اور کوئی سوال ہو — آرڈر، ادائیگی، ڈیلیوری یا ٹریکنگ — بس پوچھ لیں۔ PixelNest پر خوش خریداری ✦"
     },
     fallback: {
-      en: "I can help with ordering, payment (Easypaisa for Pakistan — WhatsApp + Western Union for foreign buyers), delivery times, tracking, product prices, the FREE sample, custom orders and refunds. Try one of the quick questions below — or talk to the seller on WALINK.",
-      ru: "Main in cheezon mein madad kar sakta hun: order karna, payment (Pakistan ke liye Easypaisa — foreign buyers ke liye WhatsApp + Western Union), delivery times, tracking, product prices, FREE sample, custom orders aur refunds. Neechay quick sawal try karein — ya seller se baat karein: WALINK.",
-      ur: "میں ان چیزوں میں مدد کر سکتا ہوں: آرڈر کرنا، ادائیگی (پاکستان کے لیے Easypaisa — غیر ملکی خریداروں کے لیے واٹس ایپ + Western Union)، ڈیلیوری اوقات، ٹریکنگ، پروڈکٹ قیمتیں، مفت نمونہ، کسٹم آرڈرز اور ریفنڈز۔ نیچے فوری سوالات آزمائیں — یا سیلر سے بات کریں: WALINK۔"
+      en: "I can help with ordering, payment (Easypaisa for Pakistan — WhatsApp + Western Union for foreign buyers), delivery times, tracking, product prices, the FREE sample, custom orders and refunds. Try one of the quick questions below — or email the seller at shakircadet1@gmail.com.",
+      ru: "Main in cheezon mein madad kar sakta hun: order karna, payment (Pakistan ke liye Easypaisa — foreign buyers ke liye WhatsApp + Western Union), delivery times, tracking, product prices, FREE sample, custom orders aur refunds. Neechay quick sawal try karein — ya seller ko email karein: shakircadet1@gmail.com.",
+      ur: "میں ان چیزوں میں مدد کر سکتا ہوں: آرڈر کرنا، ادائیگی (پاکستان کے لیے Easypaisa — غیر ملکی خریداروں کے لیے واٹس ایپ + Western Union)، ڈیلیوری اوقات، ٹریکنگ، پروڈکٹ قیمتیں، مفت نمونہ، کسٹم آرڈرز اور ریفنڈز۔ نیچے فوری سوالات آزمائیں — یا سیلر کو ای میل کریں: shakircadet1@gmail.com۔"
     }
   };
 
@@ -6678,13 +6674,248 @@ window.SellerNotify = (function(){
     }
     return null;
   }
+
+  /* ================= Multi-language packs =================
+     Spanish carries the FULL answer set; the other languages carry a
+     core pack (greeting, order tracking, contact, thanks, a fallback
+     that summarises ordering / payment / delivery, and the Order-ID
+     line) — so whatever language a visitor writes in, the assistant
+     answers in that same language. */
+  var LANGX = {
+    es: {
+      greeting: "¡Hola! Bienvenido a PixelNest ✦ Pregúntame cómo hacer un pedido, cómo pagar (Pakistán o extranjero), los tiempos de entrega, el seguimiento, los precios o el descuento LAUNCH10 — o toca una pregunta rápida abajo.",
+      order: "Cómo hacer un pedido — 4 pasos sencillos:\n1. Añade un producto al carrito, o toca «Buy Now» en el producto.\n2. Abre el carrito y escribe tu nombre, número de WhatsApp y correo electrónico.\n3. Responde «¿Eres de Pakistán o extranjero?» y paga a tu manera (Pakistán: Easypaisa + Trx ID — Extranjero: pago manual por WhatsApp).\n4. Toca «Place Order» — recibirás un Order ID enseguida.\n\nTu pedido empieza como Pending. El vendedor comprueba tu pago y lo acepta (Active), sube tu archivo y pasa a Completed — el botón de descarga aparece entonces en My Orders y en la página Track Order.\n\nNota: para pedir necesitas una cuenta gratuita, para que tus archivos sean privados — toca Sign In arriba para crear una y verifica tu correo.",
+      paypk: "Pago desde Pakistán — Easypaisa:\n1. Abre tu app Easypaisa y envía el total exacto a 03361520429.\n2. Copia el ID de transacción (Trx ID) de ese pago.\n3. Pega el Trx ID en el formulario de pago y toca «Place Order».\n\nPaga primero y luego haz el pedido — un pedido pagado no se puede crear sin Trx ID. Tu pedido queda Pending hasta que el vendedor confirme tu pago, y luego pasa a Active.\nEl FREE Starter Sample Pack (Rs. 0) no necesita pago ni Trx ID.",
+      payforeign: "Compradores extranjeros — cómo pedir y pagar:\n1. Añade tu producto al carrito y abre la página de pago.\n2. En «¿Eres de Pakistán o extranjero?», elige Foreigner.\n3. Rellena el formulario y toca «Place Order» — no necesitas Easypaisa ni Trx ID. Tu pedido se crea como Pending, con un Order ID.\n4. Escribe al vendedor por WhatsApp — 0335 5290894 — indicando tu Order ID.\n5. Paga el total manualmente, por ejemplo con Western Union (u otro método que acordéis).\n6. Comparte tu comprobante de pago (recibo o número de referencia) en ese chat de WhatsApp.\n7. El vendedor confirma tu pago, acepta tu pedido, y tu archivo se entrega en la app en 1–3 días tras la confirmación, según el producto — descárgalo desde My Orders o la página Track Order.",
+      delivery: "La entrega es dentro de la app — no se envía nada por correo postal. Cuando el vendedor sube tu archivo, tu pedido muestra Completed y el botón de descarga aparece en My Orders y en la página Track Order.\n\nTiempos de entrega:\nLIST\nPedidos personalizados: en 2–3 días, según el trabajo.",
+      track: "Sigue tu pedido con tu Order ID (es así: DS-XXXXXX):\n• Abre TRACKPAGE e introduce tu Order ID, o\n• Inicia sesión y abre My Orders.\n\nEstados: Pending (pedido realizado, pago en comprobación) → Active (el vendedor lo aceptó, tu archivo se está preparando) → Completed (archivo subido — ahí está el botón de descarga).",
+      discount: "Sí — usa el código LAUNCH10 para un 10% de descuento. Está limitado a los primeros 20 pedidos. En el carrito, escribe LAUNCH10 en la casilla «Discount code» y toca Apply — la línea de descuento y el total reducido se muestran antes de pagar. Un código por pedido, y el código se comprueba de nuevo al hacer el pedido.",
+      sample: "El FREE Starter Sample Pack cuesta Rs. 0 — páginas de muestra de los mejores paquetes: 2 pósteres de arte mural para imprimir, 5 páginas para colorear para niños, 1 página de planificador y 1 hoja de presupuesto de Excel.\nPídelo como cualquier producto (carrito → pago → Place Order). Sin pago y sin Trx ID. El vendedor lo acepta y sube los archivos de muestra en la app en 1 día — descárgalos desde My Orders o la página Track Order.",
+      custom: "Los pedidos personalizados son bienvenidos — un póster o arte mural con tu foto o tu nombre, publicaciones para redes sociales con el nombre y el logotipo de tu negocio, un paquete para colorear con el nombre de un niño, una hoja de factura o presupuesto para tu tienda, miniaturas de YouTube, CV, planificadores — casi cualquier cosa digital.\nUsa el formulario Custom Order de la página principal: describe lo que necesitas, adjunta un archivo si quieres, y paga como un pedido normal. El trabajo personalizado se entrega en 2–3 días, según el trabajo.",
+      refund: "Los reembolsos son justos y sencillos:\n• Archivo no entregado en el plazo prometido → reembolso completo.\n• Archivo entregado incorrecto y que no se puede corregir → reembolso completo (los errores siempre se corrigen gratis primero).\n• Un archivo entregado correctamente no se puede devolver, porque los archivos digitales se pueden copiar — por eso prueba primero el paquete de muestra gratuito.\nPara pedirlo, escribe a shakircadet1@gmail.com con tu Order ID. Los reembolsos aprobados se devuelven por Easypaisa en 3 días laborables.",
+      account: "Necesitas una cuenta gratuita para pedir — así tus pedidos y archivos son privados: solo tú y el vendedor podéis verlos.\nToca Sign In arriba, crea tu cuenta y luego abre el enlace de verificación que te enviamos por correo. Después, inicia sesión y pide con normalidad. Navegar, ver precios y seguir pedidos funciona sin cuenta.",
+      contact: "Habla directamente con el vendedor:\n• Correo: shakircadet1@gmail.com\nPara preguntas sobre un pedido, indica tu Order ID para que el vendedor encuentre tu pedido rápidamente.",
+      products: "Esto es todo lo que hay en la tienda ahora mismo:\nLIST\n\nAbre Shop en el menú para ver fotos y detalles completos — o pregúntame por cualquier producto por su nombre.",
+      thanks: "¡De nada! Si surge cualquier otra cosa — pedidos, pago, entrega o seguimiento — solo pregunta. ¡Felices compras en PixelNest ✦!",
+      fallback: "Puedo ayudarte con pedidos, pagos (Easypaisa para Pakistán — WhatsApp + Western Union para compradores extranjeros), tiempos de entrega, seguimiento, precios de productos, la muestra gratuita, pedidos personalizados y reembolsos. Prueba una de las preguntas rápidas de abajo — o escribe al vendedor a shakircadet1@gmail.com.",
+      trackpre: "Tu número de pedido es DSID — ingrésalo en la página Track Order para ver el estado en vivo.\n\n"
+    },
+
+    fr: {
+      greeting: "Bonjour ! Bienvenue chez PixelNest ✦ Posez-moi vos questions sur les commandes, le paiement (Pakistan ou étranger), les délais de livraison, le suivi, les prix ou la réduction LAUNCH10 — ou touchez une question rapide ci-dessous.",
+      track: "Suivez votre commande avec votre numéro de commande (au format DS-XXXXXX) :\n• Ouvrez TRACKPAGE et saisissez votre numéro, ou\n• Connectez-vous et ouvrez My Orders.\n\nStatuts : Pending (commande passée, paiement en vérification) → Active (le vendeur a accepté, votre fichier est en préparation) → Completed (fichier déposé — le bouton de téléchargement est là).",
+      contact: "Parlez directement au vendeur :\n• E-mail : shakircadet1@gmail.com\nPour toute question sur une commande, indiquez votre numéro de commande pour que le vendeur retrouve votre commande rapidement.",
+      thanks: "Avec plaisir ! Si autre chose vous vient — commande, paiement, livraison ou suivi — demandez simplement. Bon shopping chez PixelNest ✦",
+      fallback: "Je peux vous aider pour : commander, payer (Easypaisa pour le Pakistan — WhatsApp + Western Union pour les acheteurs étrangers ; les étrangers choisissent « Foreigner » à la caisse, passent la commande, puis paient manuellement), les délais de livraison (1 à 3 jours dans l'application), le suivi, les prix, l'échantillon gratuit, les commandes personnalisées et les remboursements. Essayez une question rapide ci-dessous — ou écrivez au vendeur : shakircadet1@gmail.com.",
+      trackpre: "Votre numéro de commande est DSID — saisissez-le sur la page Track Order pour voir le statut en direct.\n\n"
+    },
+    de: {
+      greeting: "Hallo! Willkommen bei PixelNest ✦ Fragen Sie mich zu Bestellung, Zahlung (Pakistan oder Ausland), Lieferzeiten, Sendungsverfolgung, Preisen oder dem LAUNCH10-Rabatt — oder tippen Sie unten auf eine Schnellfrage.",
+      track: "Verfolgen Sie Ihre Bestellung mit Ihrer Bestellnummer (sie sieht so aus: DS-XXXXXX):\n• Öffnen Sie TRACKPAGE und geben Sie Ihre Bestellnummer ein, oder\n• Melden Sie sich an und öffnen Sie My Orders.\n\nStatus: Pending (bestellt, Zahlung wird geprüft) → Active (Verkäufer hat angenommen, Ihre Datei wird vorbereitet) → Completed (Datei hochgeladen — dort ist der Download-Button).",
+      contact: "Sprechen Sie direkt mit dem Verkäufer:\n• E-Mail: shakircadet1@gmail.com\nBei Fragen zu einer Bestellung nennen Sie bitte Ihre Bestellnummer, damit der Verkäufer Ihre Bestellung schnell findet.",
+      thanks: "Gern geschehen! Wenn noch etwas ist — Bestellung, Zahlung, Lieferung oder Verfolgung — fragen Sie einfach. Viel Spaß beim Einkaufen bei PixelNest ✦",
+      fallback: "Ich helfe bei Bestellung, Zahlung (Easypaisa für Pakistan — WhatsApp + Western Union für ausländische Käufer; Ausländer wählen an der Kasse „Foreigner“, bestellen und zahlen dann manuell), Lieferzeiten (1–3 Tage in der App), Sendungsverfolgung, Preisen, dem kostenlosen Musterpaket, Sonderanfertigungen und Rückerstattungen. Tippen Sie unten auf eine Schnellfrage — oder schreiben Sie dem Verkäufer: shakircadet1@gmail.com.",
+      trackpre: "Ihre Bestellnummer ist DSID — geben Sie sie auf der Seite Track Order ein, um den Live-Status zu sehen.\n\n"
+    },
+    pt: {
+      greeting: "Olá! Bem-vindo à PixelNest ✦ Pergunte-me como fazer um pedido, como pagar (Paquistão ou estrangeiro), prazos de entrega, rastreio, preços ou o desconto LAUNCH10 — ou toque numa pergunta rápida abaixo.",
+      track: "Acompanhe o seu pedido com o seu número de pedido (é assim: DS-XXXXXX):\n• Abra TRACKPAGE e introduza o seu número de pedido, ou\n• Inicie sessão e abra My Orders.\n\nEstados: Pending (pedido feito, pagamento em verificação) → Active (vendedor aceitou, o seu ficheiro está a ser preparado) → Completed (ficheiro carregado — o botão de download está lá).",
+      contact: "Fale diretamente com o vendedor:\n• E-mail: shakircadet1@gmail.com\nPara perguntas sobre um pedido, indique o seu número de pedido para o vendedor encontrar o seu pedido rapidamente.",
+      thanks: "De nada! Se surgir mais alguma coisa — pedidos, pagamento, entrega ou rastreio — é só perguntar. Boas compras na PixelNest ✦",
+      fallback: "Posso ajudar com pedidos, pagamento (Easypaisa para o Paquistão — WhatsApp + Western Union para compradores estrangeiros; os estrangeiros escolhem «Foreigner» no checkout, fazem o pedido e pagam manualmente), prazos de entrega (1–3 dias na app), rastreio, preços, a amostra grátis, pedidos personalizados e reembolsos. Toque numa pergunta rápida abaixo — ou envie e-mail ao vendedor: shakircadet1@gmail.com.",
+      trackpre: "O seu número de pedido é DSID — introduza-o na página Track Order para ver o estado ao vivo.\n\n"
+    },
+    it: {
+      greeting: "Ciao! Benvenuto su PixelNest ✦ Chiedimi come ordinare, come pagare (Pakistan o estero), i tempi di consegna, il tracciamento, i prezzi o lo sconto LAUNCH10 — oppure tocca una domanda rapida qui sotto.",
+      track: "Traccia il tuo ordine con il tuo numero d'ordine (è così: DS-XXXXXX):\n• Apri TRACKPAGE e inserisci il tuo numero d'ordine, oppure\n• Accedi e apri My Orders.\n\nStati: Pending (ordine effettuato, pagamento in verifica) → Active (il venditore ha accettato, il tuo file è in preparazione) → Completed (file caricato — lì trovi il pulsante di download).",
+      contact: "Parla direttamente con il venditore:\n• E-mail: shakircadet1@gmail.com\nPer domande su un ordine, indica il tuo numero d'ordine così il venditore trova subito il tuo ordine.",
+      thanks: "Prego! Se serve altro — ordini, pagamento, consegna o tracciamento — chiedi pure. Buoni acquisti su PixelNest ✦",
+      fallback: "Posso aiutarti con ordini, pagamenti (Easypaisa per il Pakistan — WhatsApp + Western Union per gli acquirenti esteri; gli stranieri scelgono «Foreigner» alla cassa, ordinano e poi pagano manualmente), tempi di consegna (1–3 giorni nell'app), tracciamento, prezzi, il campione gratuito, ordini personalizzati e rimborsi. Tocca una domanda rapida qui sotto — o scrivi al venditore: shakircadet1@gmail.com.",
+      trackpre: "Il tuo numero d'ordine è DSID — inseriscilo nella pagina Track Order per vedere lo stato in tempo reale.\n\n"
+    },
+    tr: {
+      greeting: "Merhaba! PixelNest'e hoş geldiniz ✦ Bana sipariş vermeyi, ödemeyi (Pakistan veya yabancı), teslimat sürelerini, takibi, fiyatları veya LAUNCH10 indirimini sorun — ya da aşağıdaki hızlı sorulardan birine dokunun.",
+      track: "Siparişinizi Sipariş Numaranızla takip edin (şöyle görünür: DS-XXXXXX):\n• TRACKPAGE sayfasını açıp Sipariş Numaranızı girin, ya da\n• Giriş yapıp My Orders sayfasını açın.\n\nDurumlar: Pending (sipariş verildi, ödeme kontrol ediliyor) → Active (satıcı kabul etti, dosyanız hazırlanıyor) → Completed (dosya yüklendi — indirme düğmesi orada).",
+      contact: "Satıcıyla doğrudan konuşun:\n• E-posta: shakircadet1@gmail.com\nSipariş sorularınızda lütfen Sipariş Numaranızı belirtin, böylece satıcı siparişinizi hızlıca bulur.",
+      thanks: "Rica ederim! Başka bir şey olursa — sipariş, ödeme, teslimat veya takip — sormanız yeterli. PixelNest'te keyifli alışverişler ✦",
+      fallback: "Şu konularda yardımcı olabilirim: sipariş, ödeme (Pakistan için Easypaisa — yabancı alıcılar için WhatsApp + Western Union; yabancılar kasada «Foreigner» seçeneğini seçer, siparişi verir ve manuel ödeme yapar), teslimat süreleri (uygulamada 1–3 gün), takip, fiyatlar, ücretsiz numune, özel siparişler ve iadeler. Aşağıdaki hızlı sorulardan birine dokunun — ya da satıcıya e-posta gönderin: shakircadet1@gmail.com.",
+      trackpre: "Sipariş numaranız DSID — canlı durumu görmek için Track Order sayfasına girin.\n\n"
+    },
+    ar: {
+      greeting: "مرحبًا! أهلًا بك في PixelNest ✦ اسألني عن كيفية الطلب، والدفع (باكستان أو أجنبي)، ومواعيد التسليم، والتتبع، والأسعار، أو خصم LAUNCH10 — أو اضغط على سؤال سريع أدناه.",
+      track: "تتبّع طلبك برقم الطلب (يبدو هكذا: DS-XXXXXX):\n• افتح TRACKPAGE وأدخل رقم طلبك، أو\n• سجّل الدخول وافتح My Orders.\n\nالحالات: Pending (تم الطلب، وجارٍ التحقق من الدفع) ← Active (قبل البائع، ويجري تجهيز ملفك) ← Completed (تم رفع الملف — زر التنزيل موجود هناك).",
+      contact: "تحدّث مع البائع مباشرة:\n• البريد الإلكتروني: shakircadet1@gmail.com\nلأسئلة الطلبات، اذكر رقم طلبك ليعثر البائع على طلبك بسرعة.",
+      thanks: "على الرحب والسعة! إذا احتجت أي شيء آخر — طلب، دفع، تسليم أو تتبع — فقط اسأل. تسوّق سعيد في PixelNest ✦",
+      fallback: "يمكنني المساعدة في الطلب، والدفع (Easypaisa لباكستان — واتساب + Western Union للمشترين الأجانب؛ يختار الأجنبي «Foreigner» عند الدفع، ويقدّم الطلب، ثم يدفع يدويًا)، ومواعيد التسليم (1–3 أيام داخل التطبيق)، والتتبع، والأسعار، والعينة المجانية، والطلبات المخصصة، والاسترداد. جرّب سؤالًا سريعًا أدناه — أو راسل البائع: shakircadet1@gmail.com.",
+      trackpre: "رقم طلبك هو DSID — أدخله في صفحة Track Order لعرض الحالة مباشرة.\n\n"
+    },
+    fa: {
+      greeting: "سلام! به PixelNest خوش آمدید ✦ از من درباره نحوه سفارش، پرداخت (پاکستان یا خارجی)، زمان تحویل، پیگیری، قیمت‌ها یا تخفیف LAUNCH10 بپرسید — یا روی یک سؤال سریع در پایین بزنید.",
+      track: "سفارش خود را با شماره سفارش (به این شکل است: DS-XXXXXX) پیگیری کنید:\n• TRACKPAGE را باز کنید و شماره سفارش را وارد کنید، یا\n• وارد شوید و My Orders را باز کنید.\n\nوضعیت‌ها: Pending (سفارش ثبت شد، پرداخت در حال بررسی است) ← Active (فروشنده پذیرفت، فایل شما در حال آماده‌سازی است) ← Completed (فایل بارگذاری شد — دکمه دانلود آنجاست).",
+      contact: "مستقیم با فروشنده صحبت کنید:\n• ایمیل: shakircadet1@gmail.com\nبرای سؤالات سفارش، شماره سفارش خود را ذکر کنید تا فروشنده سریع سفارش شما را پیدا کند.",
+      thanks: "خواهش می‌کنم! اگر چیز دیگری پیش آمد — سفارش، پرداخت، تحویل یا پیگیری — فقط بپرسید. خرید خوبی در PixelNest داشته باشید ✦",
+      fallback: "می‌توانم در این موارد کمک کنم: سفارش، پرداخت (Easypaisa برای پاکستان — واتساپ + Western Union برای خریداران خارجی؛ خارجی‌ها در پرداخت گزینه «Foreigner» را انتخاب می‌کنند، سفارش می‌دهند و دستی پرداخت می‌کنند)، زمان تحویل (۱ تا ۳ روز در برنامه)، پیگیری، قیمت‌ها، نمونه رایگان، سفارش‌های سفارشی و بازپرداخت. یک سؤال سریع در پایین بزنید — یا به فروشنده ایمیل بزنید: shakircadet1@gmail.com.",
+      trackpre: "شماره سفارش شما DSID است — آن را در صفحه Track Order وارد کنید تا وضعیت زنده را ببینید.\n\n"
+    },
+    hi: {
+      greeting: "नमस्ते! PixelNest में आपका स्वागत है ✦ मुझसे पूछें: ऑर्डर कैसे करें, भुगतान (पाकिस्तान या विदेशी), डिलीवरी का समय, ट्रैकिंग, कीमतें या LAUNCH10 छूट — या नीचे दिए गए त्वरित प्रश्नों पर टैप करें।",
+      track: "अपने ऑर्डर को अपने Order ID से ट्रैक करें (यह ऐसा दिखता है: DS-XXXXXX):\n• TRACKPAGE खोलकर अपना Order ID डालें, या\n• साइन इन करके My Orders खोलें।\n\nस्थितियाँ: Pending (ऑर्डर हो गया, भुगतान जाँचा जा रहा है) → Active (विक्रेता ने स्वीकार किया, आपकी फ़ाइल तैयार हो रही है) → Completed (फ़ाइल अपलोड हो गई — डाउनलोड बटन वहीं है)।",
+      contact: "विक्रेता से सीधे बात करें:\n• ईमेल: shakircadet1@gmail.com\nऑर्डर के सवालों में अपना Order ID ज़रूर बताएँ, ताकि विक्रेता आपका ऑर्डर जल्दी ढूँढ सके।",
+      thanks: "आपका स्वागत है! अगर कुछ और चाहिए — ऑर्डर, भुगतान, डिलीवरी या ट्रैकिंग — बस पूछ लें। PixelNest पर खुश खरीदारी ✦",
+      fallback: "मैं इनमें मदद कर सकता हूँ: ऑर्डर करना, भुगतान (पाकिस्तान के लिए Easypaisa — विदेशी खरीदारों के लिए WhatsApp + Western Union; विदेशी चेकआउट पर «Foreigner» चुनते हैं, ऑर्डर करते हैं और मैन्युअल भुगतान करते हैं), डिलीवरी समय (ऐप में 1–3 दिन), ट्रैकिंग, कीमतें, मुफ़्त सैंपल, कस्टम ऑर्डर और रिफ़ंड। नीचे दिए त्वरित प्रश्नों को आज़माएँ — या विक्रेता को ईमेल करें: shakircadet1@gmail.com।",
+      trackpre: "आपका Order ID DSID है — लाइव स्थिति देखने के लिए इसे Track Order पेज पर डालें।\n\n"
+    },
+    bn: {
+      greeting: "হ্যালো! PixelNest-এ স্বাগতম ✦ আমাকে জিজ্ঞাসা করুন: কীভাবে অর্ডার করবেন, পেমেন্ট (পাকিস্তান বা বিদেশি), ডেলিভারির সময়, ট্র্যাকিং, দাম বা LAUNCH10 ছাড় — অথবা নিচের দ্রুত প্রশ্নগুলোতে ট্যাপ করুন।",
+      track: "আপনার Order ID দিয়ে অর্ডার ট্র্যাক করুন (এটি দেখতে এমন: DS-XXXXXX):\n• TRACKPAGE খুলে আপনার Order ID লিখুন, অথবা\n• সাইন ইন করে My Orders খুলুন।\n\nঅবস্থা: Pending (অর্ডার হয়েছে, পেমেন্ট যাচাই হচ্ছে) → Active (বিক্রেতা গ্রহণ করেছেন, আপনার ফাইল তৈরি হচ্ছে) → Completed (ফাইল আপলোড হয়েছে — ডাউনলোড বোতাম সেখানেই)।",
+      contact: "বিক্রেতার সঙ্গে সরাসরি কথা বলুন:\n• ইমেল: shakircadet1@gmail.com\nঅর্ডারের প্রশ্নে আপনার Order ID উল্লেখ করুন, যাতে বিক্রেতা দ্রুত আপনার অর্ডার খুঁজে পান।",
+      thanks: "স্বাগতম! আর কিছু লাগলে — অর্ডার, পেমেন্ট, ডেলিভারি বা ট্র্যাকিং — শুধু জিজ্ঞাসা করুন। PixelNest-এ সুখী কেনাকাটা ✦",
+      fallback: "আমি এসব বিষয়ে সাহায্য করতে পারি: অর্ডার, পেমেন্ট (পাকিস্তানের জন্য Easypaisa — বিদেশি ক্রেতাদের জন্য WhatsApp + Western Union; বিদেশিরা চেকআউটে «Foreigner» বেছে নেন, অর্ডার করেন এবং ম্যানুয়ালি পেমেন্ট করেন), ডেলিভারির সময় (অ্যাপে ১–৩ দিন), ট্র্যাকিং, দাম, ফ্রি স্যাম্পল, কাস্টম অর্ডার এবং রিফান্ড। নিচের দ্রুত প্রশ্নগুলো চেষ্টা করুন — অথবা বিক্রেতাকে ইমেল করুন: shakircadet1@gmail.com।",
+      trackpre: "আপনার Order ID DSID — লাইভ অবস্থা দেখতে Track Order পেজে এটি লিখুন।\n\n"
+    },
+
+    rus: {
+      greeting: "Здравствуйте! Добро пожаловать в PixelNest ✦ Спросите меня, как заказать, как оплатить (Пакистан или иностранец), о сроках доставки, отслеживании, ценах или скидке LAUNCH10 — или нажмите быстрый вопрос ниже.",
+      track: "Отслеживайте заказ по номеру заказа (он выглядит так: DS-XXXXXX):\n• Откройте TRACKPAGE и введите номер заказа, или\n• Войдите и откройте My Orders.\n\nСтатусы: Pending (заказ оформлен, оплата проверяется) → Active (продавец принял, ваш файл готовится) → Completed (файл загружен — там кнопка скачивания).",
+      contact: "Свяжитесь с продавцом напрямую:\n• Электронная почта: shakircadet1@gmail.com\nПо вопросам заказа укажите номер заказа, чтобы продавец быстро нашёл ваш заказ.",
+      thanks: "Пожалуйста! Если что-то ещё понадобится — заказ, оплата, доставка или отслеживание — просто спросите. Приятных покупок в PixelNest ✦",
+      fallback: "Я могу помочь с заказом, оплатой (Easypaisa для Пакистана — WhatsApp + Western Union для иностранных покупателей; иностранцы выбирают «Foreigner» при оформлении, делают заказ и платят вручную), сроками доставки (1–3 дня в приложении), отслеживанием, ценами, бесплатным образцом, индивидуальными заказами и возвратами. Нажмите быстрый вопрос ниже — или напишите продавцу: shakircadet1@gmail.com.",
+      trackpre: "Номер вашего заказа — DSID — введите его на странице Track Order, чтобы увидеть статус в реальном времени.\n\n"
+    },
+    uk: {
+      greeting: "Вітаю! Ласкаво просимо до PixelNest ✦ Запитайте мене, як замовити, як оплатити (Пакистан чи іноземець), про строки доставки, відстеження, ціни або знижку LAUNCH10 — або натисніть швидке запитання нижче.",
+      track: "Відстежуйте замовлення за номером замовлення (він виглядає так: DS-XXXXXX):\n• Відкрийте TRACKPAGE і введіть номер замовлення, або\n• Увійдіть і відкрийте My Orders.\n\nСтатуси: Pending (замовлення оформлено, оплата перевіряється) → Active (продавець прийняв, ваш файл готується) → Completed (файл завантажено — там кнопка завантаження).",
+      contact: "Зв'яжіться з продавцем напряму:\n• Електронна пошта: shakircadet1@gmail.com\nУ питаннях про замовлення вказуйте номер замовлення, щоб продавець швидко знайшов ваше замовлення.",
+      thanks: "Будь ласка! Якщо щось ще знадобиться — замовлення, оплата, доставка чи відстеження — просто запитайте. Вдалих покупок у PixelNest ✦",
+      fallback: "Я можу допомогти із замовленням, оплатою (Easypaisa для Пакистану — WhatsApp + Western Union для іноземних покупців; іноземці обирають «Foreigner» під час оформлення, роблять замовлення та платять вручну), строками доставки (1–3 дні в застосунку), відстеженням, цінами, безкоштовним зразком, індивідуальними замовленнями та поверненнями. Натисніть швидке запитання нижче — або напишіть продавцю: shakircadet1@gmail.com.",
+      trackpre: "Номер вашого замовлення — DSID — введіть його на сторінці Track Order, щоб побачити статус наживо.\n\n"
+    },
+    zh: {
+      greeting: "您好！欢迎来到 PixelNest ✦ 您可以问我：如何下单、如何付款（巴基斯坦或外国买家）、配送时间、订单跟踪、价格或 LAUNCH10 折扣 — 或点击下方快捷问题。",
+      track: "用您的订单号（Order ID，格式如 DS-XXXXXX）跟踪订单：\n• 打开 TRACKPAGE 并输入您的订单号，或\n• 登录后打开 My Orders。\n\n状态：Pending（已下单，正在核对付款）→ Active（卖家已接受，正在准备您的文件）→ Completed（文件已上传 — 下载按钮就在那里）。",
+      contact: "直接联系卖家：\n• 邮箱：shakircadet1@gmail.com\n咨询订单时请提供您的订单号，以便卖家快速找到您的订单。",
+      thanks: "不客气！如果还有其他问题 — 下单、付款、配送或跟踪 — 随时问我。祝您在 PixelNest 购物愉快 ✦",
+      fallback: "我可以帮助您：下单、付款（巴基斯坦用 Easypaisa — 外国买家用 WhatsApp + 西联汇款；外国买家在结账时选择“Foreigner”，下单后手动付款）、配送时间（应用内 1–3 天）、订单跟踪、价格、免费样品、定制订单和退款。点击下方快捷问题 — 或给卖家发邮件：shakircadet1@gmail.com。",
+      trackpre: "您的订单号是 DSID — 在 Track Order 页面输入它即可查看实时状态。\n\n"
+    },
+    ja: {
+      greeting: "こんにちは！PixelNestへようこそ ✦ 注文方法、お支払い（パキスタンまたは海外）、配送時間、追跡、価格、LAUNCH10割引について何でも聞いてください。下のクイック質問をタップしてもOKです。",
+      track: "注文番号（Order ID、例：DS-XXXXXX）で注文を追跡できます：\n• TRACKPAGEを開いて注文番号を入力、または\n• サインインして My Orders を開いてください。\n\nステータス：Pending（注文済み、お支払い確認中）→ Active（販売者が承諾、ファイル準備中）→ Completed（ファイルアップロード済み — ダウンロードボタンがあります）。",
+      contact: "販売者への直接連絡：\n• メール：shakircadet1@gmail.com\n注文に関するご質問では、注文番号をお知らせください。販売者がすぐに注文を見つけられます。",
+      thanks: "どういたしまして！他にもご不明点があれば — 注文、お支払い、配送、追跡 — お気軽にどうぞ。PixelNestで楽しいお買い物を ✦",
+      fallback: "お手伝いできること：注文、お支払い（パキスタンはEasypaisa — 海外のお客様はWhatsApp＋Western Union；海外のお客様はチェックアウトで「Foreigner」を選び、注文後に手動でお支払いください）、配送時間（アプリ内で1〜3日）、追跡、価格、無料サンプル、カスタム注文、返金。下のクイック質問をタップ — または販売者へメール：shakircadet1@gmail.com。",
+      trackpre: "あなたの注文番号は DSID です — Track Order ページに入力すると、リアルタイムのステータスが確認できます。\n\n"
+    },
+    ko: {
+      greeting: "안녕하세요! PixelNest에 오신 것을 환영합니다 ✦ 주문 방법, 결제(파키스탄 또는 해외), 배송 기간, 배송 조회, 가격, LAUNCH10 할인에 대해 무엇이든 물어보세요. 아래 빠른 질문을 눌러도 됩니다.",
+      track: "주문 번호(Order ID, 예: DS-XXXXXX)로 주문을 조회하세요:\n• TRACKPAGE를 열고 주문 번호를 입력하거나\n• 로그인 후 My Orders를 여세요.\n\n상태: Pending(주문 완료, 결제 확인 중) → Active(판매자 수락, 파일 준비 중) → Completed(파일 업로드 완료 — 다운로드 버튼이 있습니다).",
+      contact: "판매자에게 직접 연락:\n• 이메일: shakircadet1@gmail.com\n주문 관련 문의 시 주문 번호를 알려주시면 판매자가 빠르게 찾을 수 있습니다.",
+      thanks: "천만에요! 다른 궁금한 점이 있으면 — 주문, 결제, 배송, 조회 — 언제든 물어보세요. PixelNest에서 즐거운 쇼핑 되세요 ✦",
+      fallback: "도와드릴 수 있는 것: 주문, 결제(파키스탄은 Easypaisa — 해외 구매자는 WhatsApp + Western Union; 해외 구매자는 결제 시 'Foreigner'를 선택하고 주문한 뒤 수동으로 결제합니다), 배송 기간(앱에서 1–3일), 조회, 가격, 무료 샘플, 맞춤 주문, 환불. 아래 빠른 질문을 눌러보세요 — 또는 판매자에게 이메일: shakircadet1@gmail.com.",
+      trackpre: "주문 번호는 DSID 입니다 — Track Order 페이지에 입력하면 실시간 상태를 확인할 수 있습니다.\n\n"
+    },
+    id: {
+      greeting: "Halo! Selamat datang di PixelNest ✦ Tanyakan kepada saya cara memesan, cara membayar (Pakistan atau asing), waktu pengiriman, pelacakan, harga, atau diskon LAUNCH10 — atau ketuk pertanyaan cepat di bawah.",
+      track: "Lacak pesanan Anda dengan Nomor Pesanan (bentuknya seperti DS-XXXXXX):\n• Buka TRACKPAGE dan masukkan Nomor Pesanan Anda, atau\n• Masuk dan buka My Orders.\n\nStatus: Pending (pesanan dibuat, pembayaran sedang diperiksa) → Active (penjual menerima, file Anda sedang disiapkan) → Completed (file diunggah — tombol unduh ada di sana).",
+      contact: "Hubungi penjual langsung:\n• Email: shakircadet1@gmail.com\nUntuk pertanyaan pesanan, sebutkan Nomor Pesanan Anda agar penjual cepat menemukan pesanan Anda.",
+      thanks: "Sama-sama! Jika ada hal lain — pesanan, pembayaran, pengiriman, atau pelacakan — tanyakan saja. Selamat berbelanja di PixelNest ✦",
+      fallback: "Saya bisa membantu: pemesanan, pembayaran (Easypaisa untuk Pakistan — WhatsApp + Western Union untuk pembeli asing; pembeli asing memilih 'Foreigner' saat checkout, membuat pesanan, lalu membayar manual), waktu pengiriman (1–3 hari di aplikasi), pelacakan, harga, sampel gratis, pesanan khusus, dan pengembalian dana. Ketuk pertanyaan cepat di bawah — atau email penjual: shakircadet1@gmail.com.",
+      trackpre: "Nomor pesanan Anda adalah DSID — masukkan di halaman Track Order untuk melihat status langsung.\n\n"
+    },
+    nl: {
+      greeting: "Hallo! Welkom bij PixelNest ✦ Vraag me hoe je bestelt, hoe je betaalt (Pakistan of buitenland), levertijden, tracking, prijzen of de LAUNCH10-korting — of tik hieronder op een snelle vraag.",
+      track: "Volg je bestelling met je bestelnummer (het ziet er zo uit: DS-XXXXXX):\n• Open TRACKPAGE en voer je bestelnummer in, of\n• Log in en open My Orders.\n\nStatussen: Pending (besteld, betaling wordt gecontroleerd) → Active (verkoper heeft geaccepteerd, je bestand wordt voorbereid) → Completed (bestand geüpload — daar is de downloadknop).",
+      contact: "Spreek rechtstreeks met de verkoper:\n• E-mail: shakircadet1@gmail.com\nVermeld bij vragen over een bestelling je bestelnummer, zodat de verkoper je bestelling snel vindt.",
+      thanks: "Graag gedaan! Als er nog iets is — bestellen, betalen, levering of tracking — vraag het gerust. Veel winkelplezier bij PixelNest ✦",
+      fallback: "Ik kan helpen met bestellen, betalen (Easypaisa voor Pakistan — WhatsApp + Western Union voor buitenlandse kopers; buitenlanders kiezen 'Foreigner' bij het afrekenen, plaatsen de bestelling en betalen daarna handmatig), levertijden (1–3 dagen in de app), tracking, prijzen, het gratis proefpakket, maatwerk en terugbetalingen. Tik hieronder op een snelle vraag — of mail de verkoper: shakircadet1@gmail.com.",
+      trackpre: "Je bestelnummer is DSID — voer het in op de pagina Track Order om de live status te zien.\n\n"
+    },
+    th: {
+      greeting: "สวัสดี! ยินดีต้อนรับสู่ PixelNest ✦ ถามฉันได้เลย: วิธีสั่งซื้อ, วิธีชำระเงิน (ปากีสถานหรือต่างชาติ), เวลาจัดส่ง, การติดตาม, ราคา หรือส่วนลด LAUNCH10 — หรือแตะคำถามด่วนด้านล่าง",
+      fallback: "ฉันช่วยได้ในเรื่อง: การสั่งซื้อ, การชำระเงิน (Easypaisa สำหรับปากีสถาน — WhatsApp + Western Union สำหรับผู้ซื้อต่างชาติ; ผู้ซื้อต่างชาติเลือก 'Foreigner' ตอนชำระเงิน สั่งซื้อ แล้วชำระเงินด้วยตนเอง), เวลาจัดส่ง (1–3 วันในแอป), การติดตาม, ราคา, ตัวอย่างฟรี, งานสั่งทำพิเศษ และการคืนเงิน แตะคำถามด่วนด้านล่าง — หรืออีเมลผู้ขาย: shakircadet1@gmail.com",
+      trackpre: "หมายเลขคำสั่งซื้อของคุณคือ DSID — กรอกในหน้า Track Order เพื่อดูสถานะแบบเรียลไทม์\n\n"
+    },
+    el: {
+      greeting: "Γεια σας! Καλώς ήρθατε στο PixelNest ✦ Ρωτήστε με πώς να παραγγείλετε, πώς να πληρώσετε (Πακιστάν ή εξωτερικό), χρόνους παράδοσης, παρακολούθηση, τιμές ή την έκπτωση LAUNCH10 — ή πατήστε μια γρήγορη ερώτηση παρακάτω.",
+      fallback: "Μπορώ να βοηθήσω με: παραγγελίες, πληρωμή (Easypaisa για το Πακιστάν — WhatsApp + Western Union για ξένους αγοραστές· οι ξένοι επιλέγουν «Foreigner» στο ταμείο, παραγγέλνουν και πληρώνουν χειροκίνητα), χρόνους παράδοσης (1–3 ημέρες στην εφαρμογή), παρακολούθηση, τιμές, το δωρεάν δείγμα, ειδικές παραγγελίες και επιστροφές. Πατήστε μια γρήγορη ερώτηση παρακάτω — ή στείλτε email στον πωλητή: shakircadet1@gmail.com.",
+      trackpre: "Ο αριθμός παραγγελίας σας είναι DSID — εισαγάγετέ τον στη σελίδα Track Order για να δείτε την κατάσταση σε πραγματικό χρόνο.\n\n"
+    },
+    he: {
+      greeting: "שלום! ברוכים הבאים ל-PixelNest ✦ שאלו אותי איך מזמינים, איך משלמים (פקיסטן או חו״ל), זמני משלוח, מעקב, מחירים או הנחת LAUNCH10 — או הקישו על שאלה מהירה למטה.",
+      fallback: "אני יכול לעזור עם: הזמנות, תשלום (Easypaisa לפקיסטן — WhatsApp + Western Union לקונים מחו״ל; קונים מחו״ל בוחרים 'Foreigner' בקופה, מזמינים ומשלמים ידנית), זמני משלוח (1–3 ימים באפליקציה), מעקב, מחירים, הדוגמה החינמית, הזמנות מיוחדות והחזרים. הקישו על שאלה מהירה למטה — או שלחו מייל למוכר: shakircadet1@gmail.com.",
+      trackpre: "מספר ההזמנה שלך הוא DSID — הזן אותו בעמוד Track Order כדי לראות את הסטטוס בזמן אמת.\n\n"
+    }
+  };
+
+  /* Extra intent keywords for the added languages — consulted only
+     when the English / Urdu matcher found nothing, so a question in
+     Spanish, French, German etc. still lands on the right topic. */
+  var INTL_INTENT = [
+    ["track", /seguimiento|suivi|sendungsverfolgung|rastreio|tracciamento|kargo takip|отслежив|配送状況|배송\s?조회|paket nerede/i],
+    ["payforeign", /extranjero|étranger|ausländer|estrangeiro|straniero|yabancı|विदेशी|外国人|fuera de pakistán|fuera de pakistan/i],
+    ["discount", /descuento|code promo|rabatt|desconto|sconto|indirim|промокод|скидк|割引|折扣|할인|كوبون|خصم/i],
+    ["sample", /muestra|échantillon|amostra|campione|ücretsiz örnek|образец|サンプル|样品|샘플|무료 샘플/i],
+    ["custom", /personalizad|personnalis|maßanfertigung|kişiye özel|на заказ|カスタム|定制|맞춤 주문/i],
+    ["refund", /reembolso|remboursement|rückerstattung|rimborso|para iade|возврат|返金|退款|환불/i],
+    ["delivery", /entrega|livraison|lieferzeit|consegna|teslimat süresi|доставк|配送|배송 기간|envío|envio/i],
+    ["paypk", /\bpagar\b|paiement|bezahlen|pagamento|ödeme nasıl|भुगतान|оплатить|支払い|支付|결제/i],
+    ["account", /cuenta|compte|konto|conta|hesab|حساب|حساب کاربری|खाता|аккаунт|アカウント|账户|계정/i],
+    ["contact", /contacto|kontakt|contato|contatto|iletişim|संपर्क|контакт|連絡先|联系方式|연락처/i],
+    ["products", /precio|prix|preis|preço|prezzo|fiyat|продукт|商品|製品|제품|lista de|liste des/i],
+    ["order", /pedido|commande|bestellung|ordine|sipariş|заказ|注文|订单|주문|comprar|acheter|kaufen/i],
+    ["thanks", /gracias|merci|danke|obrigad|grazie|teşekkür|धन्यवाद|спасибо|ありがとう|谢谢|감사/i],
+    ["greeting", /^(hola|bonjour|hallo|olá|ola|ciao|merhaba|привет|здравствуй|こんにちは|你好|您好|안녕|halo|hej)\b/i]
+  ];
+  function intentOf2(t, base){
+    if(base !== "fallback") return base;
+    for(var ii = 0; ii < INTL_INTENT.length; ii++) if(INTL_INTENT[ii][1].test(t)) return INTL_INTENT[ii][0];
+    return base;
+  }
+
   function detectLang(t){
-    if(/[\u0600-\u06FF]/.test(t)) return "ur";
-    var s = " " + t.toLowerCase().replace(/[^a-z\s]/g, " ") + " ";
+    var raw = String(t || "");
+    if(/[\u0600-\u06FF]/.test(raw)){
+      if(/[\u0679\u0688\u0691\u06BE\u06D2]/.test(raw)) return "ur";
+      var urWords = ["میرا", "میری", "مجھے", "چاہیے", "آرڈر", "شکریہ", "کتنے", "کتنا", "کیسے", "نہیں", "پیسے", "کہاں", "بھیج", "ملے"];
+      for(var ui = 0; ui < urWords.length; ui++) if(raw.indexOf(urWords[ui]) >= 0) return "ur";
+      if(/[\u0686\u067E\u06AF\u0698]/.test(raw)) return "fa";
+      return "ar";
+    }
+    if(/[\u3040-\u30FF]/.test(raw)) return "ja";
+    if(/[\u4E00-\u9FFF]/.test(raw)) return "zh";
+    if(/[\uAC00-\uD7A3]/.test(raw)) return "ko";
+    if(/[\u0400-\u04FF]/.test(raw)) return /[\u0490\u0491\u0404\u0454\u0407\u0457\u0406\u0456]/.test(raw) ? "uk" : "rus";
+    if(/[\u0900-\u097F]/.test(raw)) return "hi";
+    if(/[\u0980-\u09FF]/.test(raw)) return "bn";
+    if(/[\u0E00-\u0E7F]/.test(raw)) return "th";
+    if(/[\u0370-\u03FF]/.test(raw)) return "el";
+    if(/[\u0590-\u05FF]/.test(raw)) return "he";
+    var s = " " + raw.toLowerCase().replace(/[^a-z\u00C0-\u024F\u1E00-\u1EFF\s]/g, " ") + " ";
     var marks = [" hai ", " hay ", " ka ", " ki ", " ke ", " mein ", " mujhe ", " chahiye ", " kese ", " kesay ", " kaisay ", " kitne ", " kitna ", " kab ", " milega ", " bhejna ", " karna ", " karein ", " batao ", " samjhao ", " paisa ", " paise ", " nahi ", " sakta ", " sakti ", " wala ", " wali ", " shukriya ", " salam ", " acha ", " theek ", " chahye ", " mera ", " meri ", " aap ", " tum ", " kya ", " bhi ", " aur ", " se ", " par ", " ko "];
     var score = 0;
     for(var i = 0; i < marks.length; i++) if(s.indexOf(marks[i]) >= 0) score++;
-    return score >= 2 ? "ru" : "en";
+    if(score >= 2) return "ru";
+    var LANGS = [
+      ["es", [" hola ", " gracias ", " quiero ", " cuánto ", " cuanto ", " cuesta ", " precio ", " pedido ", " pedidos ", " entrega ", " envío ", " envio ", " comprar ", " pagar ", " pago ", " producto ", " productos ", " tienda ", " dónde ", " donde ", " cómo ", " como ", " puedo ", " necesito ", " por favor ", " descuento ", " gratis ", " muestra ", " extranjero ", " días ", " dias "]],
+      ["fr", [" bonjour ", " merci ", " je ", " vous ", " prix ", " commande ", " livraison ", " acheter ", " payer ", " produit ", " produits ", " boutique ", " combien ", " comment ", " besoin ", " réduction ", " gratuit ", " échantillon ", " pour ", " avec ", " votre ", " mon "]],
+      ["de", [" hallo ", " danke ", " ich ", " wie ", " viel ", " kostet ", " preis ", " bestellung ", " lieferung ", " kaufen ", " bezahlen ", " produkt ", " produkte ", " bitte ", " meine ", " mein ", " und ", " ist ", " kann ", " möchte ", " versand ", " gratis ", " rabatt "]],
+      ["pt", [" olá ", " ola ", " obrigado ", " obrigada ", " quero ", " quanto ", " custa ", " preço ", " preco ", " pedido ", " entrega ", " comprar ", " pagar ", " produto ", " produtos ", " loja ", " como ", " posso ", " preciso ", " por favor ", " desconto ", " grátis ", " gratis ", " amostra ", " você ", " voce "]],
+      ["it", [" ciao ", " grazie ", " voglio ", " quanto ", " costa ", " prezzo ", " ordine ", " consegna ", " comprare ", " pagare ", " prodotto ", " prodotti ", " negozio ", " come ", " posso ", " per favore ", " sconto ", " gratuito ", " campione ", " mio ", " spedizione "]],
+      ["tr", [" merhaba ", " teşekkürler ", " istiyorum ", " kaç ", " fiyat ", " sipariş ", " siparişim ", " teslimat ", " satın ", " ödeme ", " ürün ", " ürünler ", " mağaza ", " nasıl ", " lütfen ", " indirim ", " ücretsiz ", " kargo ", " için ", " bir "]],
+      ["id", [" halo ", " terima kasih ", " saya ", " ingin ", " berapa ", " harga ", " pesanan ", " pengiriman ", " membeli ", " membayar ", " produk ", " toko ", " bagaimana ", " bisa ", " tolong ", " diskon ", " gratis ", " sampel ", " untuk ", " dengan ", " yang "]],
+      ["nl", [" hallo ", " bedankt ", " dank ", " ik ", " wil ", " hoeveel ", " kost ", " prijs ", " bestelling ", " levering ", " kopen ", " betalen ", " product ", " producten ", " winkel ", " hoe ", " kan ", " graag ", " korting ", " gratis ", " mijn "]]
+    ];
+    var best = "en", bestScore = 0;
+    for(var li = 0; li < LANGS.length; li++){
+      var sc = 0, ws = LANGS[li][1];
+      for(var wi = 0; wi < ws.length; wi++) if(s.indexOf(ws[wi]) >= 0) sc++;
+      if(sc > bestScore){ bestScore = sc; best = LANGS[li][0]; }
+    }
+    if(bestScore >= 2) return best;
+    /* A very short message (a lone "Bonjour", "Gracias", "Danke"...)
+       carries only one marker word — that is still enough. */
+    if(bestScore === 1 && s.trim().split(/\s+/).length <= 3) return best;
+    return "en";
   }
   function intentOf(t){
     var s = t.toLowerCase();
@@ -6706,19 +6937,23 @@ window.SellerNotify = (function(){
   }
   function answerFor(text){
     var lang = detectLang(text);
-    var intent = intentOf(text);
+    var intent = intentOf2(text, intentOf(text));
     var p = findProduct(text.toLowerCase());
     if(p && (intent === "products" || intent === "fallback" || intent === "delivery")) return productDetail(p, lang);
     var a = A[intent] || A.fallback;
-    var out = esc(a[lang] || a.en);
+    var rawAns = a[lang] || null;
+    if(!rawAns && typeof LANGX !== "undefined" && LANGX[lang]) rawAns = LANGX[lang][intent] || LANGX[lang].fallback || null;
+    var out = esc(rawAns || a.en);
     out = out.split("LIST").join(esc(productList()));
     out = out.split("TRACKPAGE").join(TRACK_LINK);
     out = out.split("WALINK").join(WA_LINK);
     if(intent === "track"){
       var m = text.match(/ds-[a-z0-9]{4,}/i);
       if(m){
-        var pre = { en: "Your Order ID is " + m[0].toUpperCase() + " — enter it on the Track Order page for the live status.\n\n", ru: "Aapka Order ID " + m[0].toUpperCase() + " hai — live status ke liye isay Track Order page par likhein.\n\n", ur: "آپ کا Order ID " + m[0].toUpperCase() + " ہے — لائیو اسٹیٹس کے لیے اسے Track Order صفحے پر لکھیں۔\n\n" }[lang];
-        out = esc(pre) + out;
+        var preMap = { en: "Your Order ID is " + m[0].toUpperCase() + " — enter it on the Track Order page for the live status.\n\n", ru: "Aapka Order ID " + m[0].toUpperCase() + " hai — live status ke liye isay Track Order page par likhein.\n\n", ur: "آپ کا Order ID " + m[0].toUpperCase() + " ہے — لائیو اسٹیٹس کے لیے اسے Track Order صفحے پر لکھیں۔\n\n" };
+        var pre = preMap[lang] || null;
+        if(!pre && typeof LANGX !== "undefined" && LANGX[lang] && LANGX[lang].trackpre) pre = LANGX[lang].trackpre.split("DSID").join(m[0].toUpperCase());
+        out = esc(pre || preMap.en) + out;
       }
     }
     return out;
@@ -6772,6 +7007,7 @@ window.SellerNotify = (function(){
 
   function openChat(){
     panel.hidden = false;
+    document.body.classList.add("pn-chat-open");
     btn.setAttribute("aria-expanded", "true");
     if(!welcomed){
       welcomed = true;
@@ -6781,6 +7017,7 @@ window.SellerNotify = (function(){
   }
   function closeChat(){
     panel.hidden = true;
+    document.body.classList.remove("pn-chat-open");
     btn.setAttribute("aria-expanded", "false");
   }
   btn.addEventListener("click", function(){ panel.hidden ? openChat() : closeChat(); });
