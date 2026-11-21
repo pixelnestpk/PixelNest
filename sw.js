@@ -8,14 +8,17 @@
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
-   v22: Help chat ChatGPT-style + 3D intro once per session (sessionStorage flag, Home clicks
-   skip it), WhatsApp chat button removed (only the foreigner
-   checkout button + footer plain-text number remain), Help chat is a
-   full-screen page and the assistant answers in the visitor language
+   v23: Help chat suggestion pills flow in 2 marquee rows like ChatGPT
+   "Put ChatGPT to work" screen (row 1 one way, row 2 back, slow),
+   welcome first with the users own name. Same as v22 otherwise:
+   Help chat ChatGPT-style + 3D intro once per session (sessionStorage
+   flag, Home clicks skip it), WhatsApp chat button removed (only the
+   foreigner checkout button + footer plain-text number remain), Help
+   chat is a full-screen page and the assistant answers in the visitor
    language. 3D intro on the home page — full-screen THREE.js gold
    pixel-cube nest, Loading Store 0%->100% in ~7s, then Sign Up /
    View Store as Guest buttons into the real store (no demo text).
-   Same as v21 otherwise: distinct professional colours (teal
+   Distinct professional colours (teal
    action buttons, violet PixelNest Assistant chatbot), PixelNest
    Assistant chatbot on the whole store (foreigner flow explained),
    checkout now asks "Are you from Pakistan or a foreigner?"
@@ -30,7 +33,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    comment LIVE, seller dashboard LTR, delivery email
    (template_8bmn0gq), persistent sign-in, seller exclusion,
    sign-up name, email verification, WhatsApp-style notification
-   read/unread as v21.
+   read/unread as v22.
    OneSignal push (Web SDK v16) — the worker imports the OneSignal
    worker code first. Same shell, new cache version so phones pick
    up the new build.
@@ -56,7 +59,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v22";
+var CACHE_VERSION = "pixelnest-shell-v23";
 var SHELL_URLS = [
   "index.html",
   "shop.html",

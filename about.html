@@ -1457,16 +1457,33 @@ a{color:#7C6213}
 .pnc-head span{font-size:.78rem;color:rgba(255,255,255,.88);display:block}
 #pnChatClose{margin-left:auto;background:rgba(255,255,255,.16);color:#fff;border:0;width:36px;height:36px;border-radius:10px;font-size:1rem;cursor:pointer;flex:none;line-height:1}
 #pnChatClose:hover{background:rgba(255,255,255,.3)}
-.pnc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:#FBFAFF;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.pnc-msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;display:flex;flex-direction:column;gap:9px;background:#FBFAFF;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .pnc-msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:.9rem;line-height:1.55;white-space:pre-wrap;word-break:break-word}
 .pnc-msg.bot{background:#fff;border:1px solid #E7E2F7;border-bottom-left-radius:4px;color:#1E222B;align-self:flex-start;box-shadow:0 2px 8px rgba(76,29,149,.05)}
 .pnc-msg.me{background:var(--chat);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
 .pnc-msg a{color:#5B21B6;font-weight:800}
 .pnc-msg.me a{color:#fff}
 .pnc-typing{align-self:flex-start;background:#fff;border:1px solid #E7E2F7;color:#6B7280;border-radius:14px;border-bottom-left-radius:4px;padding:9px 13px;font-size:.85rem;font-style:italic}
-.pnc-chips{display:flex;gap:7px;flex-wrap:wrap;padding:4px 2px 2px;background:transparent;align-self:stretch;animation:pncIn .5s ease-out}
-.pnc-chip{border:1.5px solid #C9BFF2;background:var(--chat-soft);color:#4C1D95;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
+/* Suggestion pills — ChatGPT-style flowing marquee: right under the
+   welcome, the quick questions drift past in two horizontal rows that
+   loop forever. Each track holds two identical groups, so translating
+   it by -50% loops seamlessly; the pills slide under the faded edges
+   and appear half-cut there, exactly like the reference, while fresh
+   pills keep arriving from the other side. Row two flows back the
+   other way, a touch slower. Hovering (or tabbing into) the rows
+   pauses the flow so a pill is easy to tap. */
+.pnc-chips{display:block;padding:8px 0 4px;background:transparent;align-self:stretch;width:calc(100% + 28px);max-width:none;margin:2px -14px 0;overflow:hidden;animation:pncIn .5s ease-out;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.pnc-row{overflow:hidden;width:100%}
+.pnc-row+.pnc-row{margin-top:8px}
+.pnc-track{display:flex;width:max-content;animation:pncMarquee 30s linear infinite;will-change:transform}
+.pnc-row.reverse .pnc-track{animation-name:pncMarqueeRev;animation-duration:38s}
+.pnc-group{display:flex;gap:8px;padding-right:8px;flex:none;align-items:center}
+.pnc-chip{flex:none;white-space:nowrap;display:inline-flex;align-items:center;min-height:40px;border:1.5px solid #C9BFF2;background:var(--chat-soft);color:#4C1D95;border-radius:999px;padding:8px 15px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit}
 .pnc-chip:hover{background:#E3D9FA}
+@keyframes pncMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes pncMarqueeRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.pnc-chips:hover .pnc-track,.pnc-chips:focus-within .pnc-track{animation-play-state:paused}
+@media (prefers-reduced-motion: reduce){ .pnc-track{animation:none} .pnc-row{overflow-x:auto} .pnc-chips{-webkit-mask-image:none;mask-image:none} }
 .pnc-msg.welcome{animation:pncIn .5s ease-out}
 @keyframes pncIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .pnc-input{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid #EEEAF9;background:#fff;flex:none}
@@ -7098,14 +7115,38 @@ window.SellerNotify = (function(){
     ["Custom orders", "Can I place a custom order?"],
     ["Talk to the seller", "How do I contact the seller?"]
   ];
-  CHIPS.forEach(function(c){
+  /* The pills are built as two marquee rows (see the .pnc-chips CSS):
+     the first five questions flow one way, the rest flow back. Each
+     row's track carries the same group twice so the -50% loop never
+     shows a gap or a jump. Tapping any pill — original or loop copy —
+     sends its question, and send() hides the whole pill area at once,
+     exactly as before. */
+  function makeChip(c, dup){
     var b = document.createElement("button");
     b.type = "button";
     b.className = "pnc-chip";
     b.textContent = c[0];
+    if(dup) b.tabIndex = -1;
     b.addEventListener("click", function(){ send(c[1]); });
-    chipsBox.appendChild(b);
-  });
+    return b;
+  }
+  function buildRow(list, reverse){
+    var row = document.createElement("div");
+    row.className = "pnc-row" + (reverse ? " reverse" : "");
+    var track = document.createElement("div");
+    track.className = "pnc-track";
+    for(var copy = 0; copy < 2; copy++){
+      var g = document.createElement("div");
+      g.className = "pnc-group";
+      list.forEach(function(c){ g.appendChild(makeChip(c, copy === 1)); });
+      track.appendChild(g);
+    }
+    row.appendChild(track);
+    chipsBox.appendChild(row);
+  }
+  chipsBox.innerHTML = "";
+  buildRow(CHIPS.slice(0, 5), false);
+  buildRow(CHIPS.slice(5), true);
   chipsBox.style.display = "none";
 
   function showWelcome(){
@@ -7120,10 +7161,10 @@ window.SellerNotify = (function(){
       if(sess !== chatSession || panel.hidden) return;
       var w = addMsg(esc(welcomeText()), "bot");
       w.classList.add("welcome");
-      /* The suggestions live in the chat flow, right under the welcome
-         \u2014 never pinned over the text, never half cut. */
+      /* The suggestions live in the chat flow, right under the welcome:
+         two rows of pills flowing past in a loop, ChatGPT-style. */
       msgs.appendChild(chipsBox);
-      chipsBox.style.display = "flex";
+      chipsBox.style.display = "block";
       msgs.scrollTop = msgs.scrollHeight;
     }, 700);
   }
