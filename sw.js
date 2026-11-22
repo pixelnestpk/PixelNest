@@ -1,28 +1,12 @@
-/* v41: Fiverr-like seller + buyer — (1) seller dashboard shows Shakir's real
-   photo (not the gold S letter); (2) every product card now has a Fiverr-style
-   seller row (his photo + name + Level 1 Seller + Pakistan + SELLER badge);
-   (3) hero has a big Fiverr-style search bar that searches the shop;
-   (4) dashboard profile shows From Pakistan + Responds within 1 day.
-var CACHE_VERSION = "pixelnest-shell-v41";
-var SHELL_URLS = [
-  "index.html",
-  "shop.html",
-  "categories.html",
-  "why-us.html",
-  "about.html",
-  "contact.html",
-  "track-order.html",
-  "assets/manifest.webmanifest",
-  "assets/icon-192.png",
-  "assets/icon-512.png",
-  "assets/icon-maskable-512.png",
-  "assets/apple-touch-icon.png"
-];
-
-self.addEventListener("install", function(event){
-  event.waitUntil(
-    caches.open(CACHE_VERSION).then(function(cache){
-      /* Individual adds: one missing file must not fail the install. */
+/* v42: Package #75 — (1) seller photo REMOVED from product cards
+   (gold S avatar instead — buyer-facing cards show no face);
+   (2) Wall Art style pictures replaced with real poster designs
+   (floral roses poster + golden mosque poster); (3) Custom Order
+   section now shows in Buy mode (was hidden by a seller-view rule);
+   (4) notifications panel: ALL notifications stay visible, NEW on
+   top + Earlier below, each with its order status; (5) Fiverr-style
+   Profile strength 11/12 + Track your performance (LAST 30 DAYS);
+   (6) hero dots visible on white slides.
       return Promise.all(SHELL_URLS.map(function(u){
         return cache.add(u).catch(function(){});
       }));

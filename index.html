@@ -103,7 +103,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .hero-img .hs-slide.active{opacity:1;pointer-events:auto}
 .hero-img .hs-slide img{width:100%;height:100%;object-fit:cover;display:block}
 .hero-img .hs-dots{position:absolute;right:14px;top:12px;display:flex;gap:6px;z-index:3}
-.hero-img .hs-dots button{width:9px;height:9px;border-radius:50%;border:1px solid #fff;background:rgba(255,255,255,.45);cursor:pointer;padding:0}
+.hero-img .hs-dots button{width:9px;height:9px;border-radius:50%;border:1px solid rgba(0,0,0,.4);background:rgba(255,255,255,.7);box-shadow:0 1px 3px rgba(0,0,0,.4);cursor:pointer;padding:0}
 .hero-img .hs-dots button.on{background:#C9A227;border-color:#C9A227}
 
 
@@ -160,7 +160,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .card .thumb{position:relative;cursor:pointer;border:0;padding:0;background:none;width:100%}
 .card .thumb img{width:100%;aspect-ratio:4/3;object-fit:cover}
 .card-seller{display:flex;align-items:center;gap:9px;padding:12px 18px 0}
-.card-seller img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1.5px solid #C9A227;flex:none}
+.card-seller-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#C9A227,#8a6d1a);color:#fff;display:grid;place-items:center;font-size:.95rem;font-weight:800;font-family:'Playfair Display',serif;flex:none}
 .card-seller span b{display:block;font-size:.86rem;color:var(--navy);line-height:1.2}
 .card-seller span i{display:block;font-style:normal;font-size:.72rem;color:var(--muted);font-weight:600}
 .card-seller-tag{margin-left:auto;background:var(--navy);color:#F3C969;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px}
@@ -1060,9 +1060,19 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 #ordersPage .dash-level-head{display:flex;justify-content:space-between;gap:10px;font-size:.88rem;font-weight:800;color:var(--navy)}
 #ordersPage .dash-level-bar{height:8px;background:#EDEFF3;border-radius:999px;margin-top:10px;overflow:hidden}
 #ordersPage .dash-level-bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A227,#E7C65A);border-radius:999px;transition:width .4s ease}
-#ordersPage .dash-level-note{margin-top:8px;font-size:.82rem;color:var(--muted);font-weight:700}
+#ordersPage .dash-strength{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.dash-strength-head{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;color:var(--navy)}
+.dash-strength-head b{font-size:1.25rem}
+.dash-strength-head b span{font-size:.85rem;color:var(--muted);font-weight:700}
+.dash-strength-note{margin:4px 0 10px;color:var(--muted);font-size:.88rem}
+.dash-strength-missing{margin:10px 0 12px;font-size:.85rem;color:var(--muted)}
+.dash-strength-btn{background:none;border:1.5px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--navy);font:inherit}
+.dash-strength-btn:hover{border-color:var(--gold)}
+.dash-level-note{margin-top:8px;font-size:.82rem;color:var(--muted);font-weight:700}
 #ordersPage .dash-products{margin-top:14px}
-#ordersPage .dash-products h3{font-size:1rem;margin:0 0 8px}
+#ordersPage .dash-perf-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.dash-perf-range{font-size:.72rem;font-weight:800;letter-spacing:.05em;color:var(--muted)}
+.dash-products h3{font-size:1rem;margin:0 0 8px}
 #ordersPage .dash-prod-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
 #ordersPage .dash-prod-name{flex:1;min-width:0;font-weight:800;color:var(--navy);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ordersPage .dash-prod-stat{flex:none;text-align:right;font-size:.8rem;color:var(--muted);font-weight:700}
@@ -1426,7 +1436,7 @@ body.is-seller-view .card-rate,
 body.is-seller-view #ppStarsLine,
 body.is-seller-view .launch-badge,
 body.is-seller-view .free-band,
-body.is-seller-view #custom,
+body.is-seller-view:not(.is-seller-store) #custom,
 body.is-seller-view #openCart,
 body.is-seller-view #drawer,
 body.is-seller-view #overlay{display:none!important}
@@ -1469,6 +1479,13 @@ body.is-seller-view:not(.is-seller-store) #sellerHome{display:block}
 #ordersPage .notif-read-btn{margin-inline-start:auto;background:none;border:1.5px solid var(--line);border-radius:999px;padding:0 14px;min-height:36px;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--navy);font:inherit}
 #ordersPage .notif-read-btn:hover{border-color:var(--gold)}
 #ordersPage .notif-list{display:grid;gap:8px;margin-top:8px}
+#ordersPage .notif-section-head{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--muted);margin:10px 0 2px;text-transform:uppercase}
+#ordersPage .notif-section-head:first-child{margin-top:0}
+#ordersPage .notif-status{margin-left:auto;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+#ordersPage .notif-status.pill-Pending{background:#FEF3C7;color:#92400E}
+#ordersPage .notif-status.pill-Active{background:#DBEAFE;color:#1E40AF}
+#ordersPage .notif-status.pill-Completed{background:#D1FAE5;color:#065F46}
+#ordersPage .notif-item.is-read{opacity:.62}
 #ordersPage .notif-item{border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:#fff}
 #ordersPage .notif-item.is-unread{background:var(--gold-soft);border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
 #ordersPage .notif-item b{color:var(--navy);font-size:.92rem}
@@ -1803,13 +1820,13 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         <a class="strip-card" href="shop.html" data-sample="budget"><img src="assets/excel-real-budget.webp" alt="Excel Budget Tracker — monthly budget table filled with real amounts" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="planner"><img src="assets/planner-real-goals.webp" alt="Planner goals page — 10 goals filled in with reasons and dates" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail"><img src="assets/thumbnail-new.webp" alt="Laptop showing a bold Earn From Home YouTube thumbnail" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wall-art-floral.webp" alt="Pink roses and white peonies in a vase by a bright window" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wallart-floral-v2.webp" alt="Pink roses poster in a black frame on a bright wall" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide"><img src="assets/ebook-cover.webp" alt="Start Freelancing ebook with a navy and gold cover" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring"><img src="assets/gallery-colouring-v2.webp" alt="Cute kitten colouring page in bold line art" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
         <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/cv-t2-navy.webp" alt="Professional CV — two-column navy template, Sara Malik, fully filled" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
         <a class="strip-card" href="shop.html" data-sample="social"><img src="assets/social-real-posts.webp" alt="Social media post designs with real headlines and text" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="invoice-bundle"><img src="assets/invoice-real.webp" alt="Filled invoice INV-001 — data entry, product listing and design work, total Rs. 6,000" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wall-art-architecture.webp" alt="Carved Islamic stone arch with a turquoise tiled dome" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wallart-mosque-v2.webp" alt="Golden mosque poster in a black frame on a bright wall" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/gallery-wallart-v2.webp" alt="Gold Islamic geometric poster in a black frame" loading="lazy"><span>Islamic Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="free-sample"><img src="assets/free-sample-real.webp" alt="Free sample pack — wall art, colouring, planner and Excel samples" loading="lazy"><span>Free Sample Pack · FREE</span></a>
         <a class="strip-card" href="#custom"><img src="assets/custom-order-vip.webp" alt="Custom order — personalised poster, framed art and social media post" loading="lazy"><span>Custom Orders · Made for you</span></a>
@@ -1819,13 +1836,13 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         <a class="strip-card" href="shop.html" data-sample="budget" tabindex="-1"><img src="assets/excel-real-budget.webp" alt="" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="planner" tabindex="-1"><img src="assets/planner-real-goals.webp" alt="" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail" tabindex="-1"><img src="assets/thumbnail-new.webp" alt="" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wall-art-floral.webp" alt="" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wallart-floral-v2.webp" alt="" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide" tabindex="-1"><img src="assets/ebook-cover.webp" alt="" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring" tabindex="-1"><img src="assets/gallery-colouring-v2.webp" alt="" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
         <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/cv-t2-navy.webp" alt="" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
         <a class="strip-card" href="shop.html" data-sample="social" tabindex="-1"><img src="assets/social-real-posts.webp" alt="" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="invoice-bundle" tabindex="-1"><img src="assets/invoice-real.webp" alt="" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wall-art-architecture.webp" alt="" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wallart-mosque-v2.webp" alt="" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/gallery-wallart-v2.webp" alt="" loading="lazy"><span>Islamic Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="free-sample" tabindex="-1"><img src="assets/free-sample-real.webp" alt="" loading="lazy"><span>Free Sample Pack · FREE</span></a>
         <a class="strip-card" href="#custom" tabindex="-1"><img src="assets/custom-order-vip.webp" alt="" loading="lazy"><span>Custom Orders · Made for you</span></a>
@@ -1842,7 +1859,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       </div>
       <div class="cat-grid">
         <button type="button" class="cat-card" data-catlink="design">
-          <img src="assets/wall-art-architecture.webp" alt="Wall art and posters — carved Islamic architecture with a turquoise tiled dome" loading="lazy">
+          <img src="assets/wallart-mosque-v2.webp" alt="Wall art and posters — golden mosque poster in a black frame" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Wall Art &amp; Posters</span><p>20 high-resolution posters</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="printable">
@@ -1911,7 +1928,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       </div>
       <div class="sample-grid">
         <button class="sample" data-sample="wall-art-colouring-bundle" aria-label="View product: Wall Art + Colouring Bundle"><span class="duo"><img src="assets/bundle-wallart.webp" alt="Wall Art + Colouring Bundle — two framed Islamic posters" loading="lazy"><img src="assets/colouring-puppy.webp" alt="Wall Art + Colouring Bundle — cute puppy colouring page" loading="lazy"></span><span class="cap"><span>Wall Art + Colouring Bundle<small>Rs. 1,290 · was Rs. 1,480 · Save Rs. 190</small></span><span class="view">View →</span></span></button>
-        <button class="sample" data-sample="wall-art" aria-label="View product: Islamic Wall Art Pack"><span class="duo"><img src="assets/gallery-wallart-v2.webp" alt="Islamic Wall Art Pack — gold geometric poster in a black frame" loading="lazy"><img src="assets/wall-art-floral.webp" alt="Islamic Wall Art Pack — floral roses poster" loading="lazy"></span><span class="cap"><span>Islamic Wall Art Pack<small>Rs. 990 · 20 Posters</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="wall-art" aria-label="View product: Islamic Wall Art Pack"><span class="duo"><img src="assets/gallery-wallart-v2.webp" alt="Islamic Wall Art Pack — gold geometric poster in a black frame" loading="lazy"><img src="assets/wallart-floral-v2.webp" alt="Islamic Wall Art Pack — pink roses poster in a black frame" loading="lazy"></span><span class="cap"><span>Islamic Wall Art Pack<small>Rs. 990 · 20 Posters</small></span><span class="view">View →</span></span></button>
       </div>
       <div class="see-more-row"><a class="btn btn-dark" href="shop.html">Shop All Products →</a></div>
     </section>
@@ -2270,6 +2287,13 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <div class="dash-level-bar"><i id="dashLevelFill" style="width:0%"></i></div>
           <div class="dash-level-note" id="dashLevelNote">—</div>
         </div>
+        <div class="dash-strength">
+          <div class="dash-strength-head"><span>Profile strength</span><b>11<span>/12</span></b></div>
+          <p class="dash-strength-note">Build a stronger profile to stand out to potential buyers.</p>
+          <div class="dash-level-bar"><i style="width:92%"></i></div>
+          <p class="dash-strength-missing">Missing: a store intro video — add one to reach 12/12.</p>
+          <button type="button" class="dash-strength-btn" onclick="alert('To reach 12/12, add a short store intro video. Your profile is otherwise complete: photo, bio, 11 products, store rating, Easypaisa payment, contact info and delivery times are all set.')">Complete profile</button>
+        </div>
         <div class="o-stats dash-nav" id="oStats" role="group" aria-label="Seller dashboard — tap a card to open its page">
           <button type="button" class="o-stat is-link" data-dashview="orders" data-dashmode="all"><b id="oTotal">0</b><span>Total Orders</span><span class="o-stat-go" aria-hidden="true">›</span></button>
           <button type="button" class="o-stat is-link st-pending" data-dashview="orders" data-dashmode="Pending"><b id="oPending">0</b><span>Pending</span><span class="o-stat-go" aria-hidden="true">›</span></button>
@@ -2281,7 +2305,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         </div>
         <div class="dash-rating-row"><span>Store Rating</span><b id="dRating">—</b></div>
         <div class="dash-products">
-          <h3>My Products</h3>
+          <div class="dash-perf-head"><h3>Track your performance</h3><span class="dash-perf-range">LAST 30 DAYS</span></div>
           <div id="dashProductsTable"><p class="o-note">Loading products…</p></div>
         </div>
         <p class="discount-usage" id="discountUsage" style="display:none"></p>
@@ -2573,7 +2597,7 @@ function sendDeliveryReadyEmail(d){
 
 var PRODUCTS = [
   { id:"free-sample", cat:"printable", badge:"100% Free", name:"FREE Starter Sample Pack", desc:"Try the quality before you buy — sample pages from the wall art, colouring, planner and Excel packs, free to order right here on the website. No payment needed.", price:0, delivery:"within 1 day", dmax:1, img:"assets/free-sample-real.webp", img2:"assets/colouring-puppy.webp", img3:"assets/freesample-kitten.webp", img4:"assets/freesample-puppy2.webp", style1:"What's Inside — All 4 Packs", style2:"Colouring Samples", style3:"Cute Kitten", style4:"Happy Puppy", alt:"Free sample pack — wall art, colouring, planner and Excel samples, neatly shown", format:"Sample files", contents:"Sample pages from 4 packs", includes:["2 printable wall art posters (sample set)","5 kids colouring pages (PNG)","1 planner page + 1 Excel budget sheet sample","Delivered in the app like every order — no payment needed"] },
-  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/gallery-wallart-v2.webp", img2:"assets/wall-art-floral.webp", img3:"assets/wall-art-architecture.webp", img4:"assets/wallart-calligraphy.webp", style1:"Gold Geometric — Framed", style2:"Floral Roses", style3:"Islamic Architecture", style4:"Gold Calligraphy Mandala", alt:"Posters from the Wall Art Pack — a gold Islamic geometric poster in a black frame, pink roses, and a carved mosque dome design", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
+  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/gallery-wallart-v2.webp", img2:"assets/wallart-floral-v2.webp", img3:"assets/wallart-mosque-v2.webp", img4:"assets/wallart-calligraphy.webp", style1:"Gold Geometric — Framed", style2:"Floral Roses", style3:"Golden Mosque", style4:"Gold Calligraphy Mandala", alt:"Posters from the Wall Art Pack — a gold Islamic geometric poster in a black frame, a pink roses poster, and a golden mosque poster", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
   { id:"colouring", cat:"printable", badge:"For Kids", name:"Kids Colouring Pack — 50 Pages", desc:"Cute animals, flowers, cars and cartoon characters. Print at home and keep the kids busy and happy for hours.", price:490, delivery:"within 1 day", dmax:1, img:"assets/colouring-puppy.webp", img2:"assets/gallery-colouring-v2.webp", img3:"assets/colouring-elephant.webp", img4:"assets/colouring-butterfly.webp", style1:"Cute Puppy", style2:"Cute Kitten", style3:"Cute Elephant", style4:"Butterfly & Flowers", alt:"Kids colouring page from the 50-page pack — a cute puppy with a ball and a flower in bold black-and-white line art, ready to colour", format:"PNG", contents:"50 colouring pages · PNG files", includes:["50 colouring pages (PNG files)","Easy and hard levels included","Print as many copies as you like"] },
   { id:"wall-art-colouring-bundle", cat:"design", badge:"Bundle · Save Rs. 190", name:"Wall Art + Colouring Bundle", desc:"Two best-selling packs in one order: the Islamic Wall Art Pack (20 posters) plus the Kids Colouring Pack (50 pages) — together for Rs. 1,290 instead of Rs. 1,480 when bought separately.", price:1290, was:1480, delivery:"within 1 day", dmax:1, img:"assets/bundle-wallart.webp", img2:"assets/colouring-puppy.webp", img3:"assets/wall-art-abstract.webp", img4:"assets/bundle-colouring.webp", style1:"Wall Art Pair", style2:"Colouring Pack — 50 Pages", style3:"Abstract Marble Poster", style4:"Colouring + Wall Art", alt:"The Wall Art + Colouring Bundle — two framed Islamic posters from the Wall Art Pack and a cute puppy colouring page from the Colouring Pack", format:"PNG files", contents:"20 posters + 50 colouring pages", includes:["Islamic Wall Art Pack — all 20 posters (PNG files), exactly as sold separately","Kids Colouring Pack — all 50 pages (PNG files), exactly as sold separately","Both complete packs delivered together in the app for this one order","You save Rs. 190 compared with buying the two packs separately"] },
   { id:"planner", cat:"printable", badge:"Printable", name:"Ultimate Planner Bundle 2026", desc:"Daily, weekly and monthly planner plus habit tracker and journal pages — a full-year system in one PDF.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/planner-real-goals.webp", img2:"assets/planner-real-monthly.webp", img3:"assets/planner-real-weekly.webp", img4:"assets/planner-real-habits.webp", style1:"My 2026 Goals — Filled", style2:"Monthly Calendar — Filled", style3:"Weekly Spread — Filled", style4:"Habit Tracker — Filled", alt:"Planner pages filled with real goals, calendar plans, weekly tasks and habit ticks", format:"PDF", contents:"120+ pages", includes:["Daily + Weekly + Monthly planner","Habit tracker and goal pages","Journal / diary pages included free"] },
@@ -2851,7 +2875,7 @@ function renderProducts(){ if(!document.getElementById("productGrid")) return;
     var inCart = cart[p.id] ? " · In cart ("+cart[p.id]+")" : "";
     return '<article class="card'+(p.price===0?" free-card":"")+'">'
       + '<div class="thumb" data-sample="'+p.id+'" role="button" tabindex="0" aria-label="View product: '+p.name+'"><img src="'+p.img+'" alt="'+p.alt+'" loading="lazy"></div>'
-      + '<div class="card-seller"><img src="assets/seller-photo.webp" alt="Shakir Ullah"><span><b>Shakir Ullah</b><i>Level 1 Seller · Pakistan</i></span><span class="card-seller-tag">SELLER</span></div>'
+      + '<div class="card-seller"><span class="card-seller-ava" aria-hidden="true">S</span><span><b>Shakir Ullah</b><i>Level 1 Seller · Pakistan</i></span><span class="card-seller-tag">SELLER</span></div>'
       + '<div class="card-body">'
       + '<h3 data-sample="'+p.id+'">'+p.name+'</h3>'
       + starLine(p)
@@ -3831,6 +3855,13 @@ function notifDetailHtml(ev){
   ];
   return '<div class="notif-detail">' + rows.map(function(r){ return '<div class="nd-row"><span>' + escHtml(r[0]) + '</span><b>' + escHtml(r[1]) + '</b></div>'; }).join("") + '</div>';
 }
+/* Order status for a notification, so the seller can tell at a
+   glance whether the order behind it is new, in progress or done. */
+function notifOrderStatus(oid){
+  var st = "";
+  (fsOrders || []).forEach(function(o){ if(o && o.orderId === oid) st = o.status || ""; });
+  return st || "Pending";
+}
 function renderNotifications(){
   var box = document.getElementById("notifList");
   if(!box) return;
@@ -3839,24 +3870,30 @@ function renderNotifications(){
   var keys = notifReadKeys();
   var unread = 0;
   evs.forEach(function(ev){ if(!notifIsRead(ev, keys, readAt)) unread++; });
-  /* Only NEW (unread) notifications are shown here. Opening one
-     marks it read, so it leaves this panel at once — its full detail
-     stays on the order itself, in the dashboard under its status
-     (Pending / Active / Completed). The one currently open stays
-     visible until it is closed, so its detail can still be read. */
-  evs = evs.filter(function(ev){ return !notifIsRead(ev, keys, readAt) || notifOpenKey === notifKeyOf(ev); });
+  /* ALL notifications stay visible, newest first — NEW (unread) on
+     top with a gold highlight, then Earlier (read) greyed out.
+     Nothing disappears when it is opened, so the seller can always
+     tell which order is new, which is in progress and which is
+     completed. Each row carries the order's current status. */
+  var fresh = evs.filter(function(ev){ return !notifIsRead(ev, keys, readAt); });
+  var older = evs.filter(function(ev){ return notifIsRead(ev, keys, readAt); });
   var cnt = document.getElementById("notifCount");
   if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
   var ncc = document.getElementById("notifCardCount");
-  if(ncc) ncc.textContent = evs.length;
-  if(!evs.length){ box.innerHTML = '<p class="o-note">No new notifications \u2014 new orders will appear here.</p>'; return; }
+  if(ncc) ncc.textContent = unread;
+  if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet — new orders will appear here.</p>'; return; }
   var tick = '<span class="notif-tick" title="Read" aria-label="Read"><svg width="19" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true"><path d="M1 6.6 4.7 10 11.2 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 8.8 11.1 10.2 17.9 2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  box.innerHTML = evs.slice(0, 60).map(function(ev){
+  function rowHtml(ev){
     var key = notifKeyOf(ev);
     var open = notifOpenKey === key;
     var read = notifIsRead(ev, keys, readAt);
-    return '<div class="notif-item' + (read ? ' is-read' : ' is-unread') + (open ? ' is-open' : '') + '" data-notif="' + escHtml(key) + '" role="button" tabindex="0" aria-expanded="' + (open ? 'true' : 'false') + '"><div class="notif-top"><b>' + escHtml(ev.title) + '</b>' + (read ? tick : '<span class="notif-dot" title="Unread" aria-label="Unread"></span>') + '<span class="notif-chev" aria-hidden="true">\u25be</span></div><div class="notif-meta">' + escHtml(ev.meta) + '</div>' + (open ? notifDetailHtml(ev) : '') + '</div>';
-  }).join("");
+    var st = notifOrderStatus(ev.oid);
+    return '<div class="notif-item' + (read ? ' is-read' : ' is-unread') + (open ? ' is-open' : '') + '" data-notif="' + escHtml(key) + '" role="button" tabindex="0" aria-expanded="' + (open ? 'true' : 'false') + '"><div class="notif-top"><b>' + escHtml(ev.title) + '</b>' + (read ? tick : '<span class="notif-dot" title="Unread" aria-label="Unread"></span>') + '<span class="notif-status pill-' + escHtml(st) + '">' + escHtml(st) + '</span><span class="notif-chev" aria-hidden="true">\u25be</span></div><div class="notif-meta">' + escHtml(ev.meta) + '</div>' + (open ? notifDetailHtml(ev) : '') + '</div>';
+  }
+  var html = "";
+  if(fresh.length) html += '<div class="notif-section-head">NEW' + (fresh.length > 1 ? ' (' + fresh.length + ')' : '') + '</div>' + fresh.slice(0, 30).map(rowHtml).join("");
+  if(older.length) html += '<div class="notif-section-head">Earlier</div>' + older.slice(0, 30).map(rowHtml).join("");
+  box.innerHTML = html;
 }
 (function(){
   var cl = document.getElementById("customersList");
