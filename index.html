@@ -5605,9 +5605,31 @@ window.PixelAccount = (function(){
   function $(id){ return document.getElementById(id); }
   function appThere(){ return typeof window.firebase !== "undefined" && window.firebase.apps && window.firebase.apps.length > 0; }
 
+  /* If sign-in is tapped while auth is still null (slow connection),
+     try to finish initialising right now instead of only showing
+     "still loading". Returns true when auth is ready to use. */
+  function ensureAuth(){
+    if(auth) return true;
+    if(!appThere()) return false;
+    try {
+      auth = window.firebase.auth();
+      try { var persistP = auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL); if(persistP && persistP.catch) persistP.catch(function(){}); } catch(e){}
+      db = window.firebase.firestore();
+      readyFlag = true;
+      /* Attach the state listener if init() has not done it yet, so a
+         sign-in that starts from here still updates the account. */
+      try { auth.onAuthStateChanged(function(u){ currentUser = u || null; authStateKnown = true; if(document.body) document.body.classList.remove("auth-pending"); paintAccount(); paintVerifyBoxes(); }); } catch(e){}
+      return true;
+    } catch(e){ return false; }
+  }
+
   function init(){
     if(!appThere()){
-      if(++tries < 60) setTimeout(init, 250);
+      /* Keep retrying — on a slow phone connection the Firebase
+         scripts can take a while, and giving up after 15 seconds
+         left sign-in stuck on "still loading". Retry every 250ms
+         until the app is there. */
+      setTimeout(init, 250);
       return;
     }
     try {
@@ -6019,10 +6041,15 @@ window.PixelAccount = (function(){
     var pg = $("authPage");
     if(pg){ pg.classList.add("open"); pg.scrollTop = 0; }
     document.body.style.overflow = "hidden";
+    /* The Help chatbot button floats above the sign-in dialog and
+       covers the "Sign in with Google" button — hide it while the
+       dialog is open, and bring it back when the dialog closes. */
+    var cb = $("pnChatBtn"); if(cb) cb.style.display = "none";
   }
   function closeAuth(){
     var pg = $("authPage");
     if(pg && pg.classList.contains("open")){ pg.classList.remove("open"); document.body.style.overflow = ""; }
+    var cb = $("pnChatBtn"); if(cb) cb.style.display = "";
   }
   function afterSignIn(){
     /* Unverified email/password users may sign in, browse, rate and
@@ -6053,7 +6080,11 @@ window.PixelAccount = (function(){
   }
   function submitAuth(e){
     e.preventDefault();
-    if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
+    if(!auth && !ensureAuth()){
+      if(typeof window.firebase === "undefined") showErr("Could not reach Google sign-in — please check your internet connection and reload the page, then try again.");
+      else showErr("Sign-in is still loading — please wait a few seconds and try again.");
+      return;
+    }
     var email = $("authEmail").value.trim();
     var pass = $("authPass").value;
     if(!email || !pass){ showErr("Please enter your email and password."); return; }
@@ -6147,7 +6178,11 @@ window.PixelAccount = (function(){
     });
   }
   function resendVerificationFromForm(){
-    if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
+    if(!auth && !ensureAuth()){
+      if(typeof window.firebase === "undefined") showErr("Could not reach Google sign-in — please check your internet connection and reload the page, then try again.");
+      else showErr("Sign-in is still loading — please wait a few seconds and try again.");
+      return;
+    }
     var email = ($("authEmail").value || "").trim();
     var pass = $("authPass").value;
     if(!email || !pass){ showErr("Enter your email and password above, then tap Resend verification email."); return; }
@@ -6169,7 +6204,11 @@ window.PixelAccount = (function(){
     });
   }
   function googleSignIn(){
-    if(!auth){ showErr("Sign-in is still loading — please try again in a few seconds."); return; }
+    if(!auth && !ensureAuth()){
+      if(typeof window.firebase === "undefined") showErr("Could not reach Google sign-in — please check your internet connection and reload the page, then try again.");
+      else showErr("Sign-in is still loading — please wait a few seconds and try again.");
+      return;
+    }
     showErr("");
     var provider;
     try { provider = new window.firebase.auth.GoogleAuthProvider(); }
