@@ -1,10 +1,10 @@
-/* v43: Package #76 — (1) hero search bar REMOVED (only Install App
+/* v44: Package #76c — (1) hero search bar REMOVED (only Install App
    stays in the hero; header search remains); (2) Buy mode is now a
    TRUE buyer preview — Buy Now / Add to Cart, cart drawer, reviews,
    stars and the LAUNCH10 badge all show, and the cart works, so the
    seller sees the store exactly as a buyer does. */
 
-var CACHE_VERSION = "pixelnest-shell-v43";
+var CACHE_VERSION = "pixelnest-shell-v44";
 
 var SHELL_URLS = [
 
@@ -130,12 +130,15 @@ self.addEventListener("fetch", function(event){
   if(req.mode === "navigate"){
 
     /* Page: fresh copy first (prices/orders code stays current).
-       A 404 or a network failure falls back to the cached store
-       page, so the installed app never opens to an error page. */
+       cache:"reload" forces a real network fetch, bypassing the
+       browser HTTP cache — a refresh must show the newest version,
+       never a stale copy. A 404 or a network failure falls back to
+       the cached store page, so the installed app never opens to
+       an error page. */
 
     event.respondWith(
 
-      fetch(req).then(function(res){
+      fetch(req, { cache: "reload" }).then(function(res){
 
         if(res && res.ok){
 
