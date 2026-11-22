@@ -5603,7 +5603,7 @@ window.PixelAccount = (function(){
       if(document.body && document.body.classList.contains("is-seller-store")) return;
       var pg = document.getElementById("ordersPage");
       if(pg && pg.classList.contains("open")) return;
-      /* #87/#88/#89: never auto-open over product browsing — when the seller
+      /* #87/#88/#89/#90: never auto-open over product browsing — when the seller
          tapped a category (a filter is waiting in sessionStorage) or
          is on a browsing page (anything but home), he wants the
          products, not the dashboard. Auto-open only on the home page
@@ -5612,7 +5612,10 @@ window.PixelAccount = (function(){
       var pendingFilter = null;
       try { pendingFilter = sessionStorage.getItem("pixelnest_filter"); } catch(e){}
       if(pendingFilter) return;
-      if(typeof PAGE !== "undefined" && PAGE !== "home") return;
+            var onHome = false;
+      try { var pp2 = window.location.pathname || ""; onHome = (pp2 === "/" || pp2 === "/index.html" || pp2 === "/digital-store.html" || pp2.slice(-11) === "/index.html" || pp2.slice(-18) === "/digital-store.html"); } catch(e){}
+      if(!onHome) return;
+if(typeof PAGE !== "undefined" && PAGE !== "home") return;
       if(typeof openOrdersDashboard === "function") openOrdersDashboard();
     }, 400);
   }
@@ -5766,7 +5769,10 @@ window.PixelAccount = (function(){
     if(p === "checkout"){ if(typeof openCart === "function") openCart(); }
     else if(p === "custom"){ var cf = $("customForm"); if(cf) cf.scrollIntoView({ behavior: "smooth", block: "center" }); }
     else if(p === "seller"){
-      if(isSeller()){ if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
+      var _onHome = false;
+      try { var _pp = window.location.pathname || ""; _onHome = (_pp === "/" || _pp === "/index.html" || _pp === "/digital-store.html" || _pp.slice(-11) === "/index.html" || _pp.slice(-18) === "/digital-store.html"); } catch(e){}
+      if(isSeller() && _onHome){ if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
+      else if(isSeller()){ if(typeof showToast === "function") showToast("Signed in — open the dashboard from the home page"); }
       else if(typeof showToast === "function") showToast("Seller access only — this is not the seller’s account");
     }
     else if(p === "orders"){ openMyOrders(); }
