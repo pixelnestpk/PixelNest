@@ -1,4 +1,11 @@
-/* v37: Sign-in fixes — (1) the auth init no longer gives up after 15s:
+/* v38: Google sign-in on phones — the popup never opens the Google
+   account chooser on mobile / installed-app (PWA) phones, so Google
+   sign-in now goes straight to the full-page redirect flow there
+   (Google account page opens in the same tab and returns to the
+   store); desktop keeps popup-first with redirect fallback. Same
+   as v37 otherwise.
+
+   v37: Sign-in fixes — (1) the auth init no longer gives up after 15s:
    on a slow phone connection Firebase could still be loading when the
    60-retry cap expired, leaving every sign-in stuck on "Sign-in is
    still loading"; init() now retries every 250ms until Firebase is
@@ -99,7 +106,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v37";
+var CACHE_VERSION = "pixelnest-shell-v38";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
