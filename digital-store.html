@@ -2313,7 +2313,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
             <div class="dash-profile-name">Shakir Ullah <span class="dash-seller-badge">SELLER</span></div>
             <div class="dash-profile-handle">PixelNest · pixelnestpk.store</div>
             <p class="dash-profile-bio">Digital products seller — Wall Art, Planners, Excel trackers, CVs &amp; more. 3+ Years Experience.</p>
-            <div class="dash-profile-meta"><span>Level: <b id="dashLevel">New Seller</b></span><span>Store Rating: <b id="dashRatingTop">—</b></span><span>Products: <b>11</b></span><span>From: <b>Pakistan</b></span><span>Responds: <b>within 1 day</b></span></div>
+            <div class="dash-profile-meta"><span>Level: <b id="dashLevel">New Seller</b></span><span>Store Rating: <b id="dashRatingTop">—</b></span><span>Products: <b id="dashProdCount">13</b></span><span>From: <b>Pakistan</b></span><span>Responds: <b>within 1 day</b></span></div>
           </div>
         </div>
         <div class="dash-level">
@@ -2326,7 +2326,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <p class="dash-strength-note">Build a stronger profile to stand out to potential buyers.</p>
           <div class="dash-level-bar"><i style="width:92%"></i></div>
           <p class="dash-strength-missing">Missing: a store intro video — add one to reach 12/12.</p>
-          <button type="button" class="dash-strength-btn" onclick="alert('To reach 12/12, add a short store intro video. Your profile is otherwise complete: photo, bio, 11 products, store rating, Easypaisa payment, contact info and delivery times are all set.')">Complete profile</button>
+          <button type="button" class="dash-strength-btn" onclick="alert('To reach 12/12, add a short store intro video. Your profile is otherwise complete: photo, bio, 13 products, store rating, Easypaisa payment, contact info and delivery times are all set.')">Complete profile</button>
         </div>
         <div class="o-stats dash-nav" id="oStats" role="group" aria-label="Seller dashboard — tap a card to open its page">
           <button type="button" class="o-stat is-link" data-dashview="orders" data-dashmode="all"><b id="oTotal">0</b><span>Total Orders</span><span class="o-stat-go" aria-hidden="true">›</span></button>
@@ -4352,6 +4352,7 @@ function renderOrders(){
     var lnote = document.getElementById("dashLevelNote");
     if(lnote) lnote.textContent = comp >= 100 ? "You have completed " + comp + " orders — top level." : (comp + " of " + next + " completed orders (" + pct + "%) — " + (next - comp) + " more to reach the next level.");
     var rt = document.getElementById("dashRatingTop"); if(rt) rt.textContent = (document.getElementById("dRating") || {}).textContent || "—";
+    var pc = document.getElementById("dashProdCount"); if(pc) pc.textContent = (lastGroups || []).filter(function(g){ return g.product; }).length;
     renderDashProducts();
     var pt = document.getElementById("dashProductsTable");
     if(pt){
