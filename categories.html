@@ -448,6 +448,12 @@ footer a:hover{color:var(--teal)}
 .o-pill.pill-Pending{background:#FEF3C7;color:#92400E}
 .o-pill.pill-Active{background:var(--teal-soft);color:var(--teal)}
 .o-pill.pill-Completed{background:#DCFCE7;color:#14532D}
+.new-badge{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#C9A227;color:#0B0E13}
+.new-orders{border:2px solid #C9A227;border-radius:12px;background:#FFFBEB;padding:10px;margin-bottom:12px}
+.new-orders-head{font-weight:800;letter-spacing:.05em;font-size:.78rem;color:#92400E;margin-bottom:8px}
+.new-order-row{display:flex;align-items:center;gap:7px 14px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;font-size:.85rem;cursor:pointer}
+.launch-badge .lb-close{flex:none;width:20px;height:20px;line-height:18px;text-align:center;border-radius:50%;background:rgba(255,255,255,.14);color:#F3C969;font-size:15px;font-weight:800;cursor:pointer;margin-left:2px}
+.launch-badge .lb-close:hover{background:rgba(255,255,255,.28)}
 .o-del{background:none;border:0;color:var(--coral);font-weight:700;min-height:40px;padding:0 6px}
 @media (max-width:560px){ .o-stats{grid-template-columns:repeat(2,1fr)} .o-form{grid-template-columns:1fr} .o-body{padding:18px 18px 30px} }
 
@@ -1253,14 +1259,12 @@ a.strip-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.PixelPush = (function(){
   var APP_ID = "7b3f05b6-3f8b-47f0-8e9f-d113f896fecb";
-  /* No OneSignal REST API key ships in this page: that key can
-     send pushes as the store, so it belongs on a server, never in
-     client code. sendNewOrder below is therefore disabled in this
-     static build — restoring closed-app order pushes means
-     moving that one send behind a server-side holder for the key
-     (a server-backed build). The seller subscription above (App
-     ID only, no credential) is unaffected. */
-  var STORE_URL = "https://pixelnestpk.github.io/PixelNest/";
+  /* OneSignal REST API key below is present by the store owner's
+     explicit decision (22 Nov 2026): he was told it is visible
+     in the public repo and can only send pushes to his own
+     PixelNest app. Do not remove it in an audit without his say.
+     It powers sendNewOrder, the closed-app order push. */
+  var STORE_URL = "https://pixelnestpk.store/";
   var inAssets = /\/assets\//.test(window.location.pathname || "");
   window.OneSignalDeferred.push(function(OneSignal){
     try {
@@ -1294,15 +1298,26 @@ window.PixelPush = (function(){
     });
   }
   /* Buyer side - called the moment an order is placed (shop
-     checkout and the custom-order form). DISABLED in this static
-     build: posting to the OneSignal REST API needs the REST API
-     key, and that credential must not ship in client code (see
-     the note above). The order itself is saved exactly the same
-     either way, and the seller still gets the in-app order alert
-     (SellerNotify) while the store is open. Kept as a no-op so
-     the checkout call sites stay valid. */
+     checkout and the custom-order form). Sends a closed-app push
+     to the seller via the OneSignal REST API, using the REST key
+     above (owner's explicit decision). The order itself is saved
+     exactly the same either way, and the seller also gets the
+     in-app order alert (SellerNotify) while the store is open. */
+  var REST_KEY = "os_v2_app_pm7qlnr7rnd7bdu72ej7rfx6zmesbwzxqmyedenkc663pwfjsf4gztfsd2mt2wi5lpzqzws5xyhojqitpdz25xytnzsbclqj65s5v4i";
   function sendNewOrder(orderId, productName, total){
-    return;
+    try {
+      var msg = "New order " + orderId + ": " + productName + ", Rs. " + total;
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Basic " + REST_KEY },
+        body: JSON.stringify({
+          app_id: APP_ID,
+          filters: [{ field: "tag", key: "role", relation: "=", value: "seller" }],
+          headings: { en: "New PixelNest Order" },
+          contents: { en: msg }
+        })
+      }).catch(function(){});
+    } catch(e){}
   }
   return { subscribeSeller: subscribeSeller, sendNewOrder: sendNewOrder };
 })();
@@ -1615,31 +1630,31 @@ body.pn-chat-open{overflow:hidden}
           <span class="cc-body" style="display:block"><span class="cc-title">Wall Art &amp; Posters</span><p>20 high-resolution posters</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="printable">
-          <img src="assets/colouring-puppy.webp" alt="Kids colouring packs — cute puppy colouring page from the 50-page pack" loading="lazy">
+          <img src="assets/colouring-puppy-detail.webp" alt="Kids colouring packs — cute puppy colouring page from the 50-page pack" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Colouring Packs</span><p>50 pages for kids</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="printable">
-          <img src="assets/planner-new.webp" alt="Planners and journals — open planner with daily checklist pages" loading="lazy">
+          <img src="assets/planner-detail.webp" alt="Planners and journals — open planner with daily checklist pages" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Planners &amp; Journals</span><p>Full-year planner bundle</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="excel">
-          <img src="assets/excel-budget.webp" alt="Excel templates — budget tracker spreadsheet on a laptop" loading="lazy">
+          <img src="assets/excel-budget-detail.webp" alt="Excel templates — budget tracker spreadsheet on a laptop" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Excel Templates</span><p>Budget tracker with charts</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="excel">
-          <img src="assets/invoice-new.webp" alt="Business sheets — printed invoice template with calculator" loading="lazy">
+          <img src="assets/invoice-detail.webp" alt="Business sheets — printed invoice template with calculator" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Invoice &amp; Salary</span><p>Invoice, attendance, salary</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="design">
-          <img src="assets/social-post.webp" alt="Social media templates — ready-made post design on a phone" loading="lazy">
+          <img src="assets/social-post-detail.webp" alt="Social media templates — ready-made post design on a phone" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Social Media Posts</span><p>100 ready-made posts (JPG)</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="design">
-          <img src="assets/thumbnail-new.webp" alt="YouTube thumbnail templates — bold Earn From Home thumbnail design" loading="lazy">
+          <img src="assets/thumbnail-detail.webp" alt="YouTube thumbnail templates — bold Earn From Home thumbnail design" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">YouTube Thumbnails</span><p>30 high-CTR templates</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catgroup="business">
-          <img src="assets/cv-resume.webp" alt="Business and CV products — professional Europass CV template" loading="lazy">
+          <img src="assets/cv-resume-detail.webp" alt="Business and CV products — professional Europass CV template" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">CV &amp; Ebooks</span><p>Europass CV + freelancing guide</p><span class="go">View →</span></span>
         </button>
       </div>
@@ -2757,7 +2772,7 @@ function buildOrderText(){
   if(appliedDiscount && discountAmount() > 0) lines.push("","Discount ("+appliedDiscount.code+"): −"+fmt(discountAmount()));
   lines.push("","*Total: "+(cartSum()===0 ? "FREE" : fmt(payableTotal()))+"*","Payment method: "+pay,"Payment number: 03361520429","Trx ID: "+(trx || "not submitted"),"Delivery: within 1–3 days, depending on the product","","Customer: "+name,"Customer WhatsApp: "+phone,"Email: "+email,"");
   if(cvDet) lines.push("CV details (for my Europass CV):", cvDet, "");
-  lines.push(closing,"Store: https://aloneboy5186khan-creator.github.io/PixelNest/");
+  lines.push(closing,"Store: https://pixelnestpk.store/");
   return lines.join("\n");
 }
 
@@ -3452,11 +3467,17 @@ function renderNotifications(){
   var keys = notifReadKeys();
   var unread = 0;
   evs.forEach(function(ev){ if(!notifIsRead(ev, keys, readAt)) unread++; });
+  /* Only NEW (unread) notifications are shown here. Opening one
+     marks it read, so it leaves this panel at once — its full detail
+     stays on the order itself, in the dashboard under its status
+     (Pending / Active / Completed). The one currently open stays
+     visible until it is closed, so its detail can still be read. */
+  evs = evs.filter(function(ev){ return !notifIsRead(ev, keys, readAt) || notifOpenKey === notifKeyOf(ev); });
   var cnt = document.getElementById("notifCount");
   if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
   var ncc = document.getElementById("notifCardCount");
   if(ncc) ncc.textContent = evs.length;
-  if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet \u2014 new orders, payments and order updates will appear here.</p>'; return; }
+  if(!evs.length){ box.innerHTML = '<p class="o-note">No new notifications \u2014 new orders will appear here.</p>'; return; }
   var tick = '<span class="notif-tick" title="Read" aria-label="Read"><svg width="19" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true"><path d="M1 6.6 4.7 10 11.2 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 8.8 11.1 10.2 17.9 2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.innerHTML = evs.slice(0, 60).map(function(ev){
     var key = notifKeyOf(ev);
@@ -3882,6 +3903,19 @@ function renderOrders(){
   var oEarnedEl = document.getElementById("oEarned"); if(oEarnedEl) oEarnedEl.textContent = fmt(totalEarnedAll);
   var earnedBannerEl = document.getElementById("dashEarnedBanner"); if(earnedBannerEl) earnedBannerEl.textContent = "Total Earned: " + fmt(totalEarnedAll) + " — from all Active and Completed orders";
   var html = "";
+  /* NEW ORDERS — newest first, right on top, so a fresh order is
+     visible the moment the dashboard opens, without hunting through
+     product groups. An order counts as new for its first 24 hours. */
+  var nowMs = Date.now();
+  var fresh = fsOrders.filter(function(o){ return o && o.orderId && tsMillis(o.createdAt) && (nowMs - tsMillis(o.createdAt)) <= 24*60*60*1000; });
+  fresh.sort(function(a, b){ return tsMillis(b.createdAt) - tsMillis(a.createdAt); });
+  if(fresh.length){
+    html += '<div class="new-orders"><div class="new-orders-head">NEW ORDERS — latest first</div>';
+    fresh.forEach(function(o){
+      html += '<div class="new-order-row" data-orow="fs:' + escHtml(o.orderId) + '"><span class="new-badge">NEW</span><span class="oid">' + escHtml(o.orderId) + '</span><span class="o-pill pill-' + escHtml(o.status || "Pending") + '">' + escHtml(o.status || "Pending") + '</span><span class="ofield"><span>Product</span><b>' + escHtml(o.productName || "—") + '</b></span><span class="ofield"><span>Total</span><b>' + fmt(Number(o.total) || 0) + '</b></span>' + (fmtTs(o.createdAt) ? '<span class="orow-date">' + fmtTs(o.createdAt) + '</span>' : '') + '</div>';
+    });
+    html += '</div>';
+  }
   lastGroups.forEach(function(g, gi){
     var total = g.entries.length + (g.hiddenCount || 0);
     var open = productOpen[g.name];
@@ -6058,7 +6092,7 @@ window.PixelAccount = (function(){
           toName: c.name || "",
           orderId: orderId,
           productName: odata.productName || "",
-          trackLink: "https://pixelnestpk.github.io/PixelNest/track-order.html?order=" + encodeURIComponent(String(orderId))
+          trackLink: "https://pixelnestpk.store/track-order.html?order=" + encodeURIComponent(String(orderId))
         });
       }).catch(function(){ /* ignored — email is best-effort only */ });
     } catch(e){ /* ignored — email must never break a delivery */ }
@@ -6684,7 +6718,7 @@ window.SellerNotify = (function(){
      Visibility is driven live by Firestore
      "discountCodes/LAUNCH10": the badge shows only while a use
      remains and vanishes for good at 20/20. -->
-<button type="button" class="launch-badge" id="launchBadge" aria-label="Apply discount code LAUNCH10 for 10 percent off — for example, Rs. 990 becomes Rs. 891"><span class="lb-dot" aria-hidden="true"></span><span class="lb-main"><span class="lb-code" id="launchBadgeText">LAUNCH10 — 10% OFF</span><span class="lb-price" id="launchBadgePrice"><s>Rs. 990</s> → <b>Rs. 891</b></span></span></button>
+<button type="button" class="launch-badge" id="launchBadge" aria-label="Apply discount code LAUNCH10 for 10 percent off — for example, Rs. 990 becomes Rs. 891"><span class="lb-dot" aria-hidden="true"></span><span class="lb-main"><span class="lb-code" id="launchBadgeText">LAUNCH10 — 10% OFF</span><span class="lb-price" id="launchBadgePrice"><s>Rs. 990</s> → <b>Rs. 891</b></span></span><span class="lb-close" id="launchBadgeClose" role="button" aria-label="Hide this offer" title="Hide">×</span></button>
 <script>
 (function(){
   var badge = document.getElementById("launchBadge");
@@ -6696,7 +6730,7 @@ window.SellerNotify = (function(){
   function lsSet(k, v){ try { window.localStorage.setItem(k, v); } catch(e){} }
   var exhausted = lsGet(DONE_KEY) === "1";
   var decided = false; /* Firestore has given a verdict at least once */
-  function showBadge(){ if(!exhausted) badge.classList.add("show"); }
+  function showBadge(){ if(!exhausted && lsGet("pixelnest_launch10_hidden") !== "1") badge.classList.add("show"); }
   function hideForever(){ exhausted = true; lsSet(DONE_KEY, "1"); badge.classList.remove("show"); }
   function fmtRs(n){ return "Rs. " + Number(n || 0).toLocaleString("en-PK"); }
   /* Applied state: steady green, no blink, once LAUNCH10 is in the cart.
@@ -6723,6 +6757,43 @@ window.SellerNotify = (function(){
     } catch(e){}
   }
   setInterval(syncApplied, 800); syncApplied();
+  /* Close (x) and drag: the badge can cover content on small screens,
+     so it can be dismissed (remembered in this browser) or dragged
+     up/down to move it out of the way. Dragging never fires the
+     discount-apply click. */
+  var lbClose = document.getElementById("launchBadgeClose");
+  if(lbClose){
+    lbClose.addEventListener("click", function(e){
+      e.stopPropagation(); e.preventDefault();
+      lsSet("pixelnest_launch10_hidden", "1");
+      badge.classList.remove("show");
+    });
+  }
+  var dragging = false, dragMoved = false, startY = 0, startTop = 0;
+  badge.addEventListener("pointerdown", function(e){
+    if(e.target && e.target.id === "launchBadgeClose") return;
+    dragging = true; dragMoved = false;
+    startY = e.clientY;
+    startTop = badge.getBoundingClientRect().top;
+    badge.style.transition = "none";
+    try { badge.setPointerCapture(e.pointerId); } catch(err){}
+  });
+  badge.addEventListener("pointermove", function(e){
+    if(!dragging) return;
+    var dy = e.clientY - startY;
+    if(Math.abs(dy) > 4) dragMoved = true;
+    var nt = Math.max(60, Math.min(window.innerHeight - 70, startTop + dy));
+    badge.style.top = nt + "px";
+    badge.style.transform = "none";
+  });
+  function lbEndDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    badge.style.transition = "";
+  }
+  badge.addEventListener("pointerup", lbEndDrag);
+  badge.addEventListener("pointercancel", lbEndDrag);
+  badge.addEventListener("click", function(e){ if(dragMoved){ e.stopPropagation(); e.preventDefault(); dragMoved = false; } }, true);
   badge.addEventListener("click", function(){
     syncApplied();
     if(badge.classList.contains("applied")){ if(typeof openCart === "function") openCart(); return; }
