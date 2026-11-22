@@ -1,4 +1,16 @@
-/* OneSignal Web Push worker code — imported FIRST, inside this same
+/* v37: Sign-in fixes — (1) the auth init no longer gives up after 15s:
+   on a slow phone connection Firebase could still be loading when the
+   60-retry cap expired, leaving every sign-in stuck on "Sign-in is
+   still loading"; init() now retries every 250ms until Firebase is
+   there, and Sign In / Sign in with Google / Resend verification all
+   run ensureAuth() first so tapping the button itself retries the
+   init, with a clear "check your internet connection and reload"
+   message when the Firebase scripts did not load at all. (2) The
+   Help chatbot button no longer covers the "Sign in with Google"
+   button: it is hidden while the sign-in dialog is open and shown
+   again when the dialog closes. Same as v36 otherwise.
+
+   OneSignal Web Push worker code — imported FIRST, inside this same
    worker, so OneSignal push messages are received and displayed by
    the store's existing service worker even when the app is fully
    closed. The pages point OneSignal's serviceWorkerPath at this
@@ -87,7 +99,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v36";
+var CACHE_VERSION = "pixelnest-shell-v37";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
