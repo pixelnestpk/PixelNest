@@ -1028,6 +1028,27 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 #ordersPage .dash-rating-row b{color:var(--navy);font-size:1rem}
 #ordersPage .dash-manual-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font:inherit;font-weight:800;color:var(--navy);cursor:pointer;box-shadow:var(--shadow-sm)}
 #ordersPage .dash-manual-btn:hover{border-color:var(--gold)}
+/* Fiverr-style seller profile header — premium look. */
+#ordersPage .dash-profile{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+#ordersPage .dash-avatar{flex:none;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#C9A227,#8a6d1a);color:#fff;display:grid;place-items:center;font-size:1.9rem;font-weight:800;font-family:'Playfair Display',serif}
+#ordersPage .dash-profile-main{min-width:0;flex:1}
+#ordersPage .dash-profile-name{font-size:1.15rem;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#ordersPage .dash-seller-badge{background:var(--navy);color:var(--gold);font-size:.62rem;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
+#ordersPage .dash-profile-handle{font-size:.85rem;color:var(--muted);font-weight:700;margin-top:2px}
+#ordersPage .dash-profile-bio{margin:8px 0 0;font-size:.9rem;line-height:1.5;color:var(--ink)}
+#ordersPage .dash-profile-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:.83rem;color:var(--muted);font-weight:700}
+#ordersPage .dash-profile-meta b{color:var(--navy)}
+#ordersPage .dash-level{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+#ordersPage .dash-level-head{display:flex;justify-content:space-between;gap:10px;font-size:.88rem;font-weight:800;color:var(--navy)}
+#ordersPage .dash-level-bar{height:8px;background:#EDEFF3;border-radius:999px;margin-top:10px;overflow:hidden}
+#ordersPage .dash-level-bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A227,#E7C65A);border-radius:999px;transition:width .4s ease}
+#ordersPage .dash-level-note{margin-top:8px;font-size:.82rem;color:var(--muted);font-weight:700}
+#ordersPage .dash-products{margin-top:14px}
+#ordersPage .dash-products h3{font-size:1rem;margin:0 0 8px}
+#ordersPage .dash-prod-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+#ordersPage .dash-prod-name{flex:1;min-width:0;font-weight:800;color:var(--navy);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ordersPage .dash-prod-stat{flex:none;text-align:right;font-size:.8rem;color:var(--muted);font-weight:700}
+#ordersPage .dash-prod-stat b{display:block;color:var(--navy);font-size:.95rem}
 #ordersPage .dash-view[hidden]{display:none!important}
 #ordersPage .dash-view-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 #ordersPage .dash-view-head h3{margin:0;font-size:1.05rem;color:var(--navy)}
@@ -2214,6 +2235,22 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
     <div class="pp-top"><span class="o-top-title">Seller Orders</span><button class="icon-btn" id="ordersClose" aria-label="Close orders dashboard">✕</button></div>
     <div class="o-body">
       <div id="dashHome">
+        <!-- Fiverr-style seller profile — premium look: photo, name,
+             level, bio and store rating, like a Fiverr seller profile. -->
+        <div class="dash-profile">
+          <div class="dash-avatar" aria-hidden="true">S</div>
+          <div class="dash-profile-main">
+            <div class="dash-profile-name">Shakir Ullah <span class="dash-seller-badge">SELLER</span></div>
+            <div class="dash-profile-handle">PixelNest · pixelnestpk.store</div>
+            <p class="dash-profile-bio">Digital products seller — Wall Art, Planners, Excel trackers, CVs &amp; more. 3+ Years Experience.</p>
+            <div class="dash-profile-meta"><span>Level: <b id="dashLevel">New Seller</b></span><span>Store Rating: <b id="dashRatingTop">—</b></span><span>Products: <b>11</b></span></div>
+          </div>
+        </div>
+        <div class="dash-level">
+          <div class="dash-level-head"><span>Your path to the next level</span><b id="dashLevelNext">—</b></div>
+          <div class="dash-level-bar"><i id="dashLevelFill" style="width:0%"></i></div>
+          <div class="dash-level-note" id="dashLevelNote">—</div>
+        </div>
         <div class="o-stats dash-nav" id="oStats" role="group" aria-label="Seller dashboard — tap a card to open its page">
           <button type="button" class="o-stat is-link" data-dashview="orders" data-dashmode="all"><b id="oTotal">0</b><span>Total Orders</span><span class="o-stat-go" aria-hidden="true">›</span></button>
           <button type="button" class="o-stat is-link st-pending" data-dashview="orders" data-dashmode="Pending"><b id="oPending">0</b><span>Pending</span><span class="o-stat-go" aria-hidden="true">›</span></button>
@@ -2224,6 +2261,10 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <button type="button" class="o-stat is-link" data-dashview="notifs"><b id="notifCardCount">0</b><span>Notifications</span><span class="notif-count" id="notifCount" style="display:none">0</span><span class="o-stat-go" aria-hidden="true">›</span></button>
         </div>
         <div class="dash-rating-row"><span>Store Rating</span><b id="dRating">—</b></div>
+        <div class="dash-products">
+          <h3>My Products</h3>
+          <div id="dashProductsTable"><p class="o-note">Loading products…</p></div>
+        </div>
         <p class="discount-usage" id="discountUsage" style="display:none"></p>
                 <div class="notify-bar">
         <button type="button" class="notify-btn" id="notifyBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="notify-btn-txt">Enable order notifications</span></button>
@@ -4180,6 +4221,33 @@ function renderOrders(){
   var totalEarnedAll = 0;
   lastGroups.forEach(function(g){ totalEarnedAll += g.earned || 0; });
   var oEarnedEl = document.getElementById("oEarned"); if(oEarnedEl) oEarnedEl.textContent = fmt(totalEarnedAll);
+  /* Fiverr-style profile + level + products table. Level grows with
+     completed orders: New Seller under 10, Rising Seller 10–49,
+     Top Seller 50+. The level bar tracks completed orders toward
+     the next milestone (10, 25, 50, 100). The products table lists
+     every catalogue product with its real order count and earned. */
+  (function(){
+    var comp = counts.Completed || 0;
+    var level = comp >= 50 ? "Top Seller" : (comp >= 10 ? "Rising Seller" : "New Seller");
+    var next = comp >= 50 ? 100 : (comp >= 25 ? 50 : (comp >= 10 ? 25 : 10));
+    var lv = document.getElementById("dashLevel"); if(lv) lv.textContent = level;
+    var ln = document.getElementById("dashLevelNext"); if(ln) ln.textContent = comp >= 100 ? "Top level reached" : ("Next: " + next + " completed orders");
+    var pct = comp >= 100 ? 100 : Math.min(100, Math.round(comp / next * 100));
+    var lf = document.getElementById("dashLevelFill"); if(lf) lf.style.width = pct + "%";
+    var lnote = document.getElementById("dashLevelNote");
+    if(lnote) lnote.textContent = comp >= 100 ? "You have completed " + comp + " orders — top level." : (comp + " of " + next + " completed orders (" + pct + "%) — " + (next - comp) + " more to reach the next level.");
+    var rt = document.getElementById("dashRatingTop"); if(rt) rt.textContent = (document.getElementById("dRating") || {}).textContent || "—";
+    var pt = document.getElementById("dashProductsTable");
+    if(pt){
+      var rows = "";
+      lastGroups.forEach(function(g){
+        if(!g.product) return;
+        var n = (g.counts.Pending || 0) + (g.counts.Active || 0) + (g.counts.Completed || 0);
+        rows += '<div class="dash-prod-row"><span class="dash-prod-name">' + escHtml(g.name) + '</span><span class="dash-prod-stat"><b>' + n + '</b>orders</span><span class="dash-prod-stat"><b>' + fmt(g.earned || 0) + '</b>earned</span></div>';
+      });
+      pt.innerHTML = rows || '<p class="o-note">No products yet.</p>';
+    }
+  })();
   var earnedBannerEl = document.getElementById("dashEarnedBanner"); if(earnedBannerEl) earnedBannerEl.textContent = "Total Earned: " + fmt(totalEarnedAll) + " — from all Active and Completed orders";
   var html = "";
   /* NEW ORDERS — newest first, right on top, so a fresh order is
@@ -5703,7 +5771,11 @@ window.PixelAccount = (function(){
       authStateKnown = true;
       if(document.body) document.body.classList.remove("auth-pending");
       paintAccount();
-      if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); maybeAutoOpenSellerDash(); } else { stopOrderNotify(); sellerDashAutoOpened = false; }
+      if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else { stopOrderNotify(); sellerDashAutoOpened = false; }
+      /* No auto-open: the seller dashboard opens ONLY when he taps
+         Seller Orders / Seller Account. On a refresh he stays
+         exactly where he was (buyer view or seller view) instead of
+         being thrown into the dashboard. */
       paintVerifyBoxes();
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
@@ -5904,6 +5976,12 @@ window.PixelAccount = (function(){
        with no reload. */
     if(document.body) document.body.classList.toggle("is-seller-view", sellerOn);
     if(!sellerOn && document.body) document.body.classList.remove("is-seller-store");
+    /* Buyer view survives a refresh: if the seller switched to the
+       store view ("View Store"), the flag brings it back on the
+       next page load instead of dropping him into seller-only view. */
+    if(sellerOn && document.body){
+      try { if(window.localStorage.getItem("pixelnest_seller_store_view") === "1") document.body.classList.add("is-seller-store"); } catch(e){}
+    }
     /* The cart belongs to the signed-in account: re-point it at
        this account's own saved cart (or the guest cart when signed
        out), so one account never sees another account's items. */
@@ -6567,7 +6645,7 @@ window.PixelAccount = (function(){
     var asb = $("acctSellerBtn");
     if(asb) asb.addEventListener("click", function(){
       var m = $("acctMenu"); if(m) m.style.display = "none";
-      if(isSeller()){ if(document.body) document.body.classList.remove("is-seller-store"); if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
+      if(isSeller()){ if(document.body) document.body.classList.remove("is-seller-store"); try { window.localStorage.removeItem("pixelnest_seller_store_view"); } catch(e){} if(typeof openOrdersDashboard === "function") openOrdersDashboard(); }
       else if(typeof showToast === "function") showToast("Seller access only — this dashboard is for the seller only");
     });
     var abuy = $("acctBuyBtn");
@@ -6579,6 +6657,7 @@ window.PixelAccount = (function(){
            never buys from his own store). "Seller Account" in this
            same menu switches back to the dashboard-only view. */
         if(document.body) document.body.classList.add("is-seller-store");
+        try { window.localStorage.setItem("pixelnest_seller_store_view", "1"); } catch(e){}
         if(typeof closeOrdersDashboard === "function") closeOrdersDashboard();
         window.scrollTo(0, 0);
         return;
