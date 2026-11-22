@@ -2846,22 +2846,30 @@ function renderSamples(){ if(!document.getElementById("sampleGrid")) return;
   }).join("");
 }
 
-function openProduct(id){
+function openProduct(id, startSrc){
   var p = byId(id); if(!p) return;
   ppCurrentId = id; paintRateStars(0);
   var psl = document.getElementById("ppStarsLine");
   if(psl) psl.innerHTML = '<span class="row">★★★★★</span> No reviews yet';
   if(window.PixelRatings) window.PixelRatings.productOpened(id);
-  var img = document.getElementById("ppImg"); img.src = p.img; img.alt = p.alt;
-  var thumbs = document.getElementById("ppThumbs");
-  thumbs.innerHTML = "";
+  /* The card the buyer clicked decides which style opens first:
+     the mosque card opens on the mosque, the geometric card on the
+     geometric poster — so two cards for one pack never look like the
+     same product. Falls back to the pack's main image. */
   var ppStyles = [[p.img, p.style1],[p.img2, p.style2]];
   if(p.img3) ppStyles.push([p.img3, p.style3]);
   if(p.img4) ppStyles.push([p.img4, p.style4]);
+  var startIdx = 0;
+  if(startSrc){
+    ppStyles.forEach(function(t, i){ if(t[0] === startSrc) startIdx = i; });
+  }
+  var img = document.getElementById("ppImg"); img.src = ppStyles[startIdx][0]; img.alt = p.alt;
+  var thumbs = document.getElementById("ppThumbs");
+  thumbs.innerHTML = "";
   ppStyles.forEach(function(t, idx){
     var b = document.createElement("button");
     b.type = "button";
-    b.className = "pp-thumb" + (idx === 0 ? " active" : "");
+    b.className = "pp-thumb" + (idx === startIdx ? " active" : "");
     b.setAttribute("aria-label", "Show style " + (idx + 1) + ": " + t[1]);
     b.innerHTML = '<img src="' + t[0] + '" alt="" loading="lazy"><span>Style ' + (idx + 1) + ' — ' + t[1] + '</span>';
     b.addEventListener("click", function(){
@@ -2984,14 +2992,14 @@ document.addEventListener("click", function(e){
     addToCart(bn.getAttribute("data-buynow"), true); openCart(); return;
   }
   var s = e.target.closest("[data-sample]");
-  if(s){ e.preventDefault(); openProduct(s.getAttribute("data-sample")); return; }
+  if(s){ e.preventDefault(); var simg = s.querySelector("img"); openProduct(s.getAttribute("data-sample"), simg ? simg.getAttribute("src") : null); return; }
   var a = e.target.closest("[data-add]");
   if(a){ addToCart(a.getAttribute("data-add")); a.classList.add("added"); }
 });
 document.addEventListener("keydown", function(e){
   if(e.key==="Escape"){ closeProduct(); closeCart(); closeOrdersDashboard(); closeTrackPage(); closePolicyPage(); closeCustomer(); }
   if((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("thumb")){
-    e.preventDefault(); openProduct(e.target.getAttribute("data-sample"));
+    e.preventDefault(); var kimg = e.target.querySelector("img"); openProduct(e.target.getAttribute("data-sample"), kimg ? kimg.getAttribute("src") : null);
   }
 });
 
