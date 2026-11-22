@@ -6213,15 +6213,26 @@ window.PixelAccount = (function(){
     var provider;
     try { provider = new window.firebase.auth.GoogleAuthProvider(); }
     catch(e){ showErr("Google sign-in could not start — please try email/password instead."); return; }
-    /* Popup first; if the popup closes immediately, is blocked, or
-       the environment does not support popups (seen live: the popup
-       opened and closed 3 times without signing in), fall back to
-       the full-page redirect flow so Google sign-in still works. */
+    /* Mobile / installed-app (PWA) phones cannot open the Google
+       popup reliably — the account chooser simply never appears.
+       On those, go straight to the full-page redirect flow (the
+       Google account page opens in the same tab and returns here;
+       the pending purpose is restored from sessionStorage). On a
+       desktop browser the popup is tried first, with the same
+       redirect as fallback. */
+    function isMobileOrPwa(){
+      try {
+        if(window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
+        if(window.navigator && window.navigator.standalone) return true;
+      } catch(e){}
+      try { return /Android|iPhone|iPad|iPod|Mobile/i.test(window.navigator.userAgent || ""); } catch(e){ return false; }
+    }
     function fallBackToRedirect(){
       try { window.sessionStorage.setItem("pixelnest_auth_purpose", purpose || ""); } catch(e){}
       showErr("Opening Google sign-in…");
       auth.signInWithRedirect(provider).catch(function(err){ showErr(friendlyErr(err)); });
     }
+    if(isMobileOrPwa()){ fallBackToRedirect(); return; }
     try {
       auth.signInWithPopup(provider).then(function(){ afterSignIn(); })
         .catch(function(err){
