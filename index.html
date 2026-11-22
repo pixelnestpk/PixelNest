@@ -5989,10 +5989,13 @@ window.PixelAccount = (function(){
       if(document.body) document.body.classList.remove("auth-pending");
       paintAccount();
       if(isSeller()){ startOrderNotify(); if(window.SellerNotify && window.SellerNotify.refreshBtn) window.SellerNotify.refreshBtn(); } else { stopOrderNotify(); sellerDashAutoOpened = false; }
-      /* No auto-open: the seller dashboard opens ONLY when he taps
-         Seller Orders / Seller Account. On a refresh he stays
-         exactly where he was (buyer view or seller view) instead of
-         being thrown into the dashboard. */
+      /* Seller lands on his dashboard: on a page load or a sign-in
+         (auth changes only — never on clicks or repaints), if the
+         seller is signed in and NOT previewing as a buyer, his
+         dashboard opens directly — no "Open Seller Dashboard"
+         landing step. Once per page load; closing it keeps it
+         closed, and Buy mode never triggers it. */
+      if(isSeller()) maybeAutoOpenSellerDash();
       paintVerifyBoxes();
       if(currentUser) registerCustomer();
       if(!currentUser) stopMyOrders();
@@ -6175,6 +6178,7 @@ window.PixelAccount = (function(){
     sellerDashAutoOpened = true;
     setTimeout(function(){
       if(!isSeller()) return;
+      if(document.body && document.body.classList.contains("is-seller-store")) return;
       var pg = document.getElementById("ordersPage");
       if(pg && pg.classList.contains("open")) return;
       if(typeof openOrdersDashboard === "function") openOrdersDashboard();
