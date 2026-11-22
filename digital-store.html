@@ -89,6 +89,9 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .hero h1 em{font-style:normal;color:var(--teal)}
 .hero p.lead{font-size:1.12rem;color:var(--muted);max-width:52ch;margin:0 0 26px}
 .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-search{display:flex;gap:0;margin-top:20px;max-width:560px;border:2px solid #C9A227;border-radius:999px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+.hero-search input{flex:1;min-width:0;border:0;outline:0;padding:13px 18px;font-size:.95rem;font-family:inherit;color:var(--ink);background:transparent}
+.hero-search button{border:0;background:var(--navy);color:#F3C969;font-weight:800;font-size:.9rem;padding:0 22px;cursor:pointer}
 .hero-cta .btn{min-height:56px;padding:0 30px;font-size:1rem}
 .hero-img{border-radius:22px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);position:relative}
 .hero-img>img.main{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3.1}
@@ -156,6 +159,11 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .card .thumb{position:relative;cursor:pointer;border:0;padding:0;background:none;width:100%}
 .card .thumb img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.card-seller{display:flex;align-items:center;gap:9px;padding:12px 18px 0}
+.card-seller img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1.5px solid #C9A227;flex:none}
+.card-seller span b{display:block;font-size:.86rem;color:var(--navy);line-height:1.2}
+.card-seller span i{display:block;font-style:normal;font-size:.72rem;color:var(--muted);font-weight:600}
+.card-seller-tag{margin-left:auto;background:var(--navy);color:#F3C969;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px}
 .card-body{padding:18px;display:flex;flex-direction:column;gap:7px;flex:1}
 .badge{align-self:flex-start;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--teal-soft);color:var(--teal)}
 .card h3{font-size:1.13rem;cursor:pointer}
@@ -1040,6 +1048,7 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 /* Fiverr-style seller profile header — premium look. */
 #ordersPage .dash-profile{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
 #ordersPage .dash-avatar{flex:none;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#C9A227,#8a6d1a);color:#fff;display:grid;place-items:center;font-size:1.9rem;font-weight:800;font-family:'Playfair Display',serif}
+#ordersPage img.dash-avatar{object-fit:cover;border:2px solid #C9A227}
 #ordersPage .dash-profile-main{min-width:0;flex:1}
 #ordersPage .dash-profile-name{font-size:1.15rem;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #ordersPage .dash-seller-badge{background:var(--navy);color:var(--gold);font-size:.62rem;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
@@ -1750,6 +1759,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <div>
         <h1>Premium digital products, <em>delivered in 1–3 days.</em></h1>
         <p class="lead">Wall art, colouring packs, planners, Excel templates, CVs and social media posts — made by a working freelancer, from Rs. 490 a pack. Order and pay right here on the website, get an Order ID, and download your file right here in the app — from My Orders or the Track Order page. New here? Try the FREE Sample Pack first and check the quality before you spend anything.</p>
+        <form class="hero-search" id="heroSearchForm" role="search"><input type="search" id="heroSearchInput" placeholder="Search for a product — CV, budget, poster, planner…" aria-label="Search products"><button type="submit" aria-label="Search">Search</button></form>
         <div class="hero-cta">
           <button class="btn btn-primary" data-buynow="wall-art">Buy Now — Wall Art Pack · Rs. 990</button>
           <button class="btn btn-dark" data-sample="free-sample">Try the FREE Sample Pack</button>
@@ -2247,12 +2257,12 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         <!-- Fiverr-style seller profile — premium look: photo, name,
              level, bio and store rating, like a Fiverr seller profile. -->
         <div class="dash-profile">
-          <div class="dash-avatar" aria-hidden="true">S</div>
+          <img class="dash-avatar" src="assets/seller-photo.webp" alt="Shakir Ullah — PixelNest seller">
           <div class="dash-profile-main">
             <div class="dash-profile-name">Shakir Ullah <span class="dash-seller-badge">SELLER</span></div>
             <div class="dash-profile-handle">PixelNest · pixelnestpk.store</div>
             <p class="dash-profile-bio">Digital products seller — Wall Art, Planners, Excel trackers, CVs &amp; more. 3+ Years Experience.</p>
-            <div class="dash-profile-meta"><span>Level: <b id="dashLevel">New Seller</b></span><span>Store Rating: <b id="dashRatingTop">—</b></span><span>Products: <b>11</b></span></div>
+            <div class="dash-profile-meta"><span>Level: <b id="dashLevel">New Seller</b></span><span>Store Rating: <b id="dashRatingTop">—</b></span><span>Products: <b>11</b></span><span>From: <b>Pakistan</b></span><span>Responds: <b>within 1 day</b></span></div>
           </div>
         </div>
         <div class="dash-level">
@@ -2841,6 +2851,7 @@ function renderProducts(){ if(!document.getElementById("productGrid")) return;
     var inCart = cart[p.id] ? " · In cart ("+cart[p.id]+")" : "";
     return '<article class="card'+(p.price===0?" free-card":"")+'">'
       + '<div class="thumb" data-sample="'+p.id+'" role="button" tabindex="0" aria-label="View product: '+p.name+'"><img src="'+p.img+'" alt="'+p.alt+'" loading="lazy"></div>'
+      + '<div class="card-seller"><img src="assets/seller-photo.webp" alt="Shakir Ullah"><span><b>Shakir Ullah</b><i>Level 1 Seller · Pakistan</i></span><span class="card-seller-tag">SELLER</span></div>'
       + '<div class="card-body">'
       + '<h3 data-sample="'+p.id+'">'+p.name+'</h3>'
       + starLine(p)
@@ -3097,6 +3108,9 @@ var _ss=document.getElementById("sortSelect"); if(_ss) _ss.addEventListener("cha
 });
 /* Category cards are handled by the delegated [data-catlink] click handler above (works for every card, every tap). */
 var searchTimer = null;
+/* Hero search (Fiverr-style): go to the shop with the query in the URL. */
+(function(){ var f = document.getElementById("heroSearchForm"); if(!f) return; f.addEventListener("submit", function(e){ e.preventDefault(); var q = (document.getElementById("heroSearchInput").value || "").trim(); window.location.href = "shop.html" + (q ? "?q=" + encodeURIComponent(q) : ""); }); })();
+(function(){ var q = new URLSearchParams(window.location.search).get("q"); if(!q) return; var si = document.getElementById("searchInput"); if(si){ si.value = q; } })();
 document.getElementById("searchInput").addEventListener("input", function(){
   renderProducts();
   var v = this.value.trim();
