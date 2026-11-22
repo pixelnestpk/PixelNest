@@ -2382,7 +2382,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <div id="dashProductsView" class="dash-view" hidden>
         <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Products</h3><span class="dash-perf-range">LAST 30 DAYS</span></div>
         <div class="dash-prod-table" id="dashProdTable"><p class="o-note">Loading products…</p></div>
-        <p class="o-note" style="margin-top:10px">Impressions and clicks need a view counter — not tracked yet, so they show "—". Orders are real, from your orders. Price is the product's list price — earned money shows on the Earnings page.</p>
+        <p class="o-note" style="margin-top:10px">Impressions and clicks are real — a buyer clicking a product counts both. Orders are real, from your orders. Price is the product's list price — earned money shows on the Earnings page.</p>
       </div>
       <div id="dashProfileView" class="dash-view" hidden>
         <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Profile</h3></div>
@@ -2852,6 +2852,7 @@ function openProduct(id, startSrc){
   var psl = document.getElementById("ppStarsLine");
   if(psl) psl.innerHTML = '<span class="row">★★★★★</span> No reviews yet';
   if(window.PixelRatings) window.PixelRatings.productOpened(id);
+  if(window.PixelRatings && window.PixelRatings.recordStats) window.PixelRatings.recordStats(id);
   /* The card the buyer clicked decides which style opens first:
      the mosque card opens on the mosque, the geometric card on the
      geometric poster — so two cards for one pack never look like the
@@ -4449,9 +4450,10 @@ function renderOrders(){
 }
 /* Fiverr-style Products page (My Business → Products): one row per
    product, like Fiverr's Gigs table — Product | Impressions |
-   Clicks | Orders | Price. Impressions and clicks are "—" until a
-   view counter exists; Orders are real, from lastGroups; Price is the
-   product's list price (Earned lives on the Earnings page). */
+   Clicks | Orders | Price. Impressions and clicks are real, from
+   productStats (a buyer clicking a product counts both); Orders are
+   real, from lastGroups; Price is the product's list price
+   (Earned lives on the Earnings page). */
 function renderDashProducts(){
   var box = document.getElementById("dashProdTable");
   if(!box) return;
@@ -4461,7 +4463,8 @@ function renderDashProducts(){
     if(!g.product) return;
     total++;
     var n = (g.counts.Pending || 0) + (g.counts.Active || 0) + (g.counts.Completed || 0);
-    rows += '<div class="dash-prod-table-row"><span class="dash-prod-cell-name">' + escHtml(g.name) + '</span><span class="dash-prod-cell-num">—</span><span class="dash-prod-cell-num">—</span><span><b>' + n + '</b></span><span><b>' + fmt((g.product && g.product.price) || 0) + '</b></span></div>';
+    var st = (window.PixelRatings && window.PixelRatings.getStats) ? window.PixelRatings.getStats(g.product.id) : { impressions: 0, clicks: 0 };
+    rows += '<div class="dash-prod-table-row"><span class="dash-prod-cell-name">' + escHtml(g.name) + '</span><span class="dash-prod-cell-num">' + st.impressions + '</span><span class="dash-prod-cell-num">' + st.clicks + '</span><span><b>' + n + '</b></span><span><b>' + fmt((g.product && g.product.price) || 0) + '</b></span></div>';
   });
   var cnt = document.getElementById("dashProdCountAll");
   box.innerHTML = '<div class="dash-prod-table-head"><span>Product</span><span>Impressions</span><span>Clicks</span><span>Orders</span><span>Price</span></div>' + (rows || '<p class="o-note">No products yet.</p>');
@@ -5054,6 +5057,7 @@ window.PixelRatings = (function(){
     && FIREBASE_CONFIG.projectId !== "PASTE_PROJECT_ID";
   var db = null;
   var productData = {};            /* productId -> { total, count } */
+  var productStats = {};           /* productId -> { impressions, clicks } — real view/click counter */
   var storeData = { total: 0, count: 0 };
   var currentProductId = "";
 
@@ -5191,6 +5195,31 @@ window.PixelRatings = (function(){
     });
   }
 
+  /* ----- product view/click counter (productStats) ----- */
+  /* A buyer clicking a product counts BOTH an impression and a click
+     for that product — the seller asked for both to count on click.
+     Writes use FieldValue.increment() with merge, so the first click
+     creates the document atomically. Silent on failure: the popup
+     must never break because a count failed. */
+  function recordStats(id){
+    if(!id) return;
+    var d = productStats[id] || (productStats[id] = { impressions: 0, clicks: 0 });
+    d.impressions += 1; d.clicks += 1;
+    if(typeof renderDashProducts === "function"){ try { renderDashProducts(); } catch(e){} }
+    if(!configured || !db) return;
+    try {
+      var FV = window.firebase.firestore.FieldValue;
+      db.collection("productStats").doc(id).set({
+        impressions: FV.increment(1),
+        clicks: FV.increment(1)
+      }, { merge: true }).catch(function(){});
+    } catch(e){}
+  }
+  function getStats(id){
+    var d = productStats[id];
+    return d ? { impressions: d.impressions || 0, clicks: d.clicks || 0 } : { impressions: 0, clicks: 0 };
+  }
+
   /* ----- init ----- */
   function init(){
     if(typeof PRODUCTS !== "undefined"){
@@ -5212,6 +5241,13 @@ window.PixelRatings = (function(){
       });
       paintCards(); paintProductWidget();
     }).catch(function(){});
+    db.collection("productStats").get().then(function(snap){
+      snap.forEach(function(doc){
+        var v = doc.data() || {};
+        productStats[doc.id] = { impressions: Number(v.impressions) || 0, clicks: Number(v.clicks) || 0 };
+      });
+      if(typeof renderDashProducts === "function"){ try { renderDashProducts(); } catch(e){} }
+    }).catch(function(){});
     db.collection("storeRatings").doc("store").get().then(function(doc){
       if(doc.exists){
         var v = doc.data() || {};
@@ -5229,7 +5265,9 @@ window.PixelRatings = (function(){
     storePopupShown: paintStorePopup,
     storeRated: function(){ return !!lsGet("pixelnest_rated_store"); },
     rateProduct: rateProduct,
-    rateStore: rateStore
+    rateStore: rateStore,
+    recordStats: recordStats,
+    getStats: getStats
   };
 })();
 </script>
