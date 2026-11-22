@@ -1,40 +1,11 @@
-/* v39: Fiverr-style seller dashboard + refresh fix — (1) the dashboard
-   now opens like a Fiverr seller profile: seller profile header
-   (photo, name, SELLER badge, bio, level, store rating), "Your path
-   to the next level" progress bar (completed orders toward the next
-   milestone), and a My Products table with real orders + earned per
-   product. (2) Refresh fix: the seller dashboard no longer
-   auto-opens on page load/refresh — it opens only when he taps
-   Seller Orders / Seller Account — and the buyer ("View Store")
-   view now survives a refresh via localStorage. Same as v38
-   otherwise.
-
-   v38: Google sign-in on phones — the popup never opens the Google
-   account chooser on mobile / installed-app (PWA) phones, so Google
-   sign-in now goes straight to the full-page redirect flow there
-   (Google account page opens in the same tab and returns to the
-   store); desktop keeps popup-first with redirect fallback. Same
-   as v37 otherwise.
-
-   v37: Sign-in fixes — (1) the auth init no longer gives up after 15s:
-   on a slow phone connection Firebase could still be loading when the
-   60-retry cap expired, leaving every sign-in stuck on "Sign-in is
-   still loading"; init() now retries every 250ms until Firebase is
-   there, and Sign In / Sign in with Google / Resend verification all
-   run ensureAuth() first so tapping the button itself retries the
-   init, with a clear "check your internet connection and reload"
-   message when the Firebase scripts did not load at all. (2) The
-   Help chatbot button no longer covers the "Sign in with Google"
-   button: it is hidden while the sign-in dialog is open and shown
-   again when the dialog closes. Same as v36 otherwise.
-
-   OneSignal Web Push worker code — imported FIRST, inside this same
-   worker, so OneSignal push messages are received and displayed by
-   the store's existing service worker even when the app is fully
-   closed. The pages point OneSignal's serviceWorkerPath at this
-   file (sw.js), so no separate OneSignal worker fights over the
-   scope. If this import ever fails (offline first install), the
-   rest of the worker below still runs exactly as before. */
+/* v40: Full picture rebuild + Fiverr-style homepage — (1) ALL 11 products now show
+   FILLED real pictures (Excel/Invoice/Planner/CV/Ebook/Social/Free Sample/Clear Wall Art
+   built from real data, no blank pages, no placeholder bars, no cluttered shots);
+   (2) hero is a VIP auto-rotating slideshow (Wall Art, Excel, CV, Planner, Invoice)
+   with dots; (3) free sample band replaced by a Best Sellers section; (4) Samples
+   section replaced by a Bundle & Save feature; (5) custom order picture is a clean
+   VIP shot; (6) gallery strip + category tiles use the new filled pictures;
+   (7) CV is now 4 different complete one-page templates with real photos and data.
 try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"); } catch(e){}
 
 /* PixelNest service worker — app-shell caching.
@@ -117,7 +88,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v39";
+var CACHE_VERSION = "pixelnest-shell-v40";
 var SHELL_URLS = [
   "index.html",
   "shop.html",

@@ -94,6 +94,15 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .hero-img>img.main{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3.1}
 .hero-img .mini{position:absolute;right:14px;bottom:14px;width:31%;border:3px solid #fff;border-radius:14px;box-shadow:var(--shadow);aspect-ratio:1/1;object-fit:cover}
 .hero-img .float-tag{position:absolute;left:14px;bottom:14px;background:var(--navy);color:#fff;font-weight:800;font-size:.85rem;padding:9px 15px;border-radius:999px}
+/* HERO SLIDESHOW — VIP rotating hero (package #74) */
+.hero-img{aspect-ratio:4/3.1}
+.hero-img .hs-slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none}
+.hero-img .hs-slide.active{opacity:1;pointer-events:auto}
+.hero-img .hs-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-img .hs-dots{position:absolute;right:14px;top:12px;display:flex;gap:6px;z-index:3}
+.hero-img .hs-dots button{width:9px;height:9px;border-radius:50%;border:1px solid #fff;background:rgba(255,255,255,.45);cursor:pointer;padding:0}
+.hero-img .hs-dots button.on{background:#C9A227;border-color:#C9A227}
+
 
 /* ---------- Trust strip ---------- */
 .trust-strip{border-bottom:1px solid var(--line)}
@@ -1739,7 +1748,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <h1>Ready-made digital products, <em>delivered in 1–3 days.</em></h1>
+        <h1>Premium digital products, <em>delivered in 1–3 days.</em></h1>
         <p class="lead">Wall art, colouring packs, planners, Excel templates, CVs and social media posts — made by a working freelancer, from Rs. 490 a pack. Order and pay right here on the website, get an Order ID, and download your file right here in the app — from My Orders or the Track Order page. New here? Try the FREE Sample Pack first and check the quality before you spend anything.</p>
         <div class="hero-cta">
           <button class="btn btn-primary" data-buynow="wall-art">Buy Now — Wall Art Pack · Rs. 990</button>
@@ -1754,10 +1763,13 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           No Play Store needed, and it is free.
         </div>
       </div>
-      <div class="hero-img">
-        <img class="main" src="assets/wall-art-geometric.webp" alt="Islamic geometric star-pattern poster in gold on dark green, framed on a living-room wall — from the Wall Art Pack" fetchpriority="high" decoding="async">
-        <img class="mini" src="assets/wall-art-abstract.webp" alt="Black and gold abstract marble poster, from the Wall Art Pack" loading="lazy">
-        <span class="float-tag">Wall Art Pack · 20 Posters · Rs. 990</span>
+      <div class="hero-img" id="heroSlides">
+        <div class="hs-slide active"><img src="assets/gallery-wallart-v2.webp" alt="Gold Islamic geometric poster in a black frame — from the Wall Art Pack"><span class="float-tag">Wall Art Pack · 20 Posters · Rs. 990</span></div>
+        <div class="hs-slide"><img src="assets/excel-real-budget.webp" alt="Excel Budget Tracker — monthly budget table filled with real amounts"><span class="float-tag">Excel Budget Tracker · Rs. 790</span></div>
+        <div class="hs-slide"><img src="assets/cv-t4-vip.webp" alt="Professional CV — gold VIP template, Ayesha Khan, fully filled" style="object-fit:contain;background:#fff"><span class="float-tag">Professional CV — 4 Templates · Rs. 400</span></div>
+        <div class="hs-slide"><img src="assets/planner-real-goals.webp" alt="Ultimate Planner — goals page filled with 10 real goals"><span class="float-tag">Ultimate Planner 2026 · Rs. 990</span></div>
+        <div class="hs-slide"><img src="assets/invoice-real.webp" alt="Filled invoice INV-001 — total Rs. 6,000"><span class="float-tag">Invoice + Salary Bundle · Rs. 990</span></div>
+        <div class="hs-dots" id="heroDots"></div>
       </div>
     </div>
   </section>
@@ -1778,35 +1790,35 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
     <div class="strip-track">
       <div class="strip-group">
         <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/gallery-wallart-v2.webp" alt="Gold Islamic geometric star-pattern poster in a black frame on a cream wall" loading="lazy"><span>Wall Art Prints · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="budget"><img src="assets/gallery-excel-v2.webp" alt="Laptop showing a budget tracker dashboard with gold and teal charts" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="planner"><img src="assets/gallery-planner-v2.webp" alt="Open planner with gold foil pages on a walnut desk" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="budget"><img src="assets/excel-real-budget.webp" alt="Excel Budget Tracker — monthly budget table filled with real amounts" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
+        <a class="strip-card" href="shop.html" data-sample="planner"><img src="assets/planner-real-goals.webp" alt="Planner goals page — 10 goals filled in with reasons and dates" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail"><img src="assets/thumbnail-new.webp" alt="Laptop showing a bold Earn From Home YouTube thumbnail" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wall-art-floral.webp" alt="Pink roses and white peonies in a vase by a bright window" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide"><img src="assets/ebook-cover.webp" alt="Start Freelancing ebook with a navy and gold cover" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring"><img src="assets/gallery-colouring-v2.webp" alt="Cute kitten colouring page in bold line art" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
-        <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/cv-resume.webp" alt="Professional CV template on a desk with a pen and coffee" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
-        <a class="strip-card" href="shop.html" data-sample="social"><img src="assets/social-post.webp" alt="Phone showing a ready-made social media post with a sunset photo" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="invoice-bundle"><img src="assets/invoice-new.webp" alt="Printed invoice sheet with a calculator on a desk" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/cv-t2-navy.webp" alt="Professional CV — two-column navy template, Sara Malik, fully filled" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
+        <a class="strip-card" href="shop.html" data-sample="social"><img src="assets/social-real-posts.webp" alt="Social media post designs with real headlines and text" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="invoice-bundle"><img src="assets/invoice-real.webp" alt="Filled invoice INV-001 — data entry, product listing and design work, total Rs. 6,000" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wall-art-architecture.webp" alt="Carved Islamic stone arch with a turquoise tiled dome" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wall-art-abstract.webp" alt="Black and gold abstract marble canvas on a dark wall" loading="lazy"><span>Abstract Wall Art · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="free-sample"><img src="assets/free-sample-new.webp" alt="Free sample pages — planner, colouring page and framed line art" loading="lazy"><span>Free Sample Pack · FREE</span></a>
-        <a class="strip-card" href="#custom"><img src="assets/custom-order.webp" alt="Designer desk with a laptop, sketches and colour swatches for custom work" loading="lazy"><span>Custom Orders · Made for you</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/gallery-wallart-v2.webp" alt="Gold Islamic geometric poster in a black frame" loading="lazy"><span>Islamic Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="free-sample"><img src="assets/free-sample-real.webp" alt="Free sample pack — wall art, colouring, planner and Excel samples" loading="lazy"><span>Free Sample Pack · FREE</span></a>
+        <a class="strip-card" href="#custom"><img src="assets/custom-order-vip.webp" alt="Custom order — personalised poster, framed art and social media post" loading="lazy"><span>Custom Orders · Made for you</span></a>
       </div>
       <div class="strip-group" aria-hidden="true">
         <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/gallery-wallart-v2.webp" alt="" loading="lazy"><span>Wall Art Prints · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="budget" tabindex="-1"><img src="assets/gallery-excel-v2.webp" alt="" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="planner" tabindex="-1"><img src="assets/gallery-planner-v2.webp" alt="" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="budget" tabindex="-1"><img src="assets/excel-real-budget.webp" alt="" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
+        <a class="strip-card" href="shop.html" data-sample="planner" tabindex="-1"><img src="assets/planner-real-goals.webp" alt="" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail" tabindex="-1"><img src="assets/thumbnail-new.webp" alt="" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wall-art-floral.webp" alt="" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide" tabindex="-1"><img src="assets/ebook-cover.webp" alt="" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring" tabindex="-1"><img src="assets/gallery-colouring-v2.webp" alt="" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
-        <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/cv-resume.webp" alt="" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
-        <a class="strip-card" href="shop.html" data-sample="social" tabindex="-1"><img src="assets/social-post.webp" alt="" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="invoice-bundle" tabindex="-1"><img src="assets/invoice-new.webp" alt="" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/cv-t2-navy.webp" alt="" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
+        <a class="strip-card" href="shop.html" data-sample="social" tabindex="-1"><img src="assets/social-real-posts.webp" alt="" loading="lazy"><span>Social Media Posts · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="invoice-bundle" tabindex="-1"><img src="assets/invoice-real.webp" alt="" loading="lazy"><span>Invoice &amp; Salary Sheets · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wall-art-architecture.webp" alt="" loading="lazy"><span>Islamic Architecture Art · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wall-art-abstract.webp" alt="" loading="lazy"><span>Abstract Wall Art · Rs. 990</span></a>
-        <a class="strip-card" href="shop.html" data-sample="free-sample" tabindex="-1"><img src="assets/free-sample-new.webp" alt="" loading="lazy"><span>Free Sample Pack · FREE</span></a>
-        <a class="strip-card" href="#custom" tabindex="-1"><img src="assets/custom-order.webp" alt="" loading="lazy"><span>Custom Orders · Made for you</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/gallery-wallart-v2.webp" alt="" loading="lazy"><span>Islamic Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="free-sample" tabindex="-1"><img src="assets/free-sample-real.webp" alt="" loading="lazy"><span>Free Sample Pack · FREE</span></a>
+        <a class="strip-card" href="#custom" tabindex="-1"><img src="assets/custom-order-vip.webp" alt="" loading="lazy"><span>Custom Orders · Made for you</span></a>
       </div>
     </div>
   </div>
@@ -1828,19 +1840,19 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <span class="cc-body" style="display:block"><span class="cc-title">Colouring Packs</span><p>50 pages for kids</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="printable">
-          <img src="assets/gallery-planner-v2.webp" alt="Planners and journals — open planner with gold foil pages" loading="lazy">
+          <img src="assets/planner-real-goals.webp" alt="Planners and journals — goals page filled with 10 real goals" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Planners &amp; Journals</span><p>Full-year planner bundle</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="excel">
-          <img src="assets/gallery-excel-v2.webp" alt="Excel templates — budget tracker spreadsheet on a laptop" loading="lazy">
+          <img src="assets/excel-real-budget.webp" alt="Excel templates — monthly budget table filled with real amounts" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Excel Templates</span><p>Budget tracker with charts</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="excel">
-          <img src="assets/invoice-style2.webp" alt="Business sheets — printed invoice template with calculator" loading="lazy">
+          <img src="assets/invoice-real-salary.webp" alt="Business sheets — salary sheet filled with real employee pay" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Invoice &amp; Salary</span><p>Invoice, attendance, salary</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="design">
-          <img src="assets/social-style2.webp" alt="Social media templates — ready-made post design on a phone" loading="lazy">
+          <img src="assets/social-real-posts.webp" alt="Social media templates — post designs with real headlines" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">Social Media Posts</span><p>100 ready-made posts (JPG)</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="design">
@@ -1848,7 +1860,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <span class="cc-body" style="display:block"><span class="cc-title">YouTube Thumbnails</span><p>30 high-CTR templates</p><span class="go">View →</span></span>
         </button>
         <button type="button" class="cat-card" data-catlink="business">
-          <img src="assets/cv-single.webp" alt="Business and CV products — professional CV with photo" loading="lazy">
+          <img src="assets/cv-t4-vip.webp" alt="Business and CV products — gold VIP CV template, fully filled" loading="lazy">
           <span class="cc-body" style="display:block"><span class="cc-title">CV &amp; Ebooks</span><p>Europass CV + freelancing guide</p><span class="go">View →</span></span>
         </button>
       </div>
@@ -1865,36 +1877,33 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <div class="grid" id="featuredGrid"></div>
       <div class="see-more-row"><a class="btn btn-dark" href="shop.html">Shop All Products →</a></div>
     </section>
-<!-- FREE SAMPLE -->
-    <section class="free-band" id="free">
-      <div class="fb-imgs">
-        <img src="assets/free-sample-new.webp" alt="Free sample pack flat-lay — sample planner pages, a kids colouring page and framed line art" loading="lazy">
-        <img src="assets/colouring-puppy.webp" alt="Free sample — kids colouring page (cute puppy) included in the free sample pack" loading="lazy">
-      </div>
-      <div>
-        <span class="fb-tag">Try it free</span>
-        <h2>Not sure yet? Start with the Free Sample Pack</h2>
-        <p>See the real quality before you spend anything. The free pack has sample pages from the best-selling packs — order it like any product, right here on the website: no payment and no WhatsApp needed. The seller accepts your order and delivers the sample files in the app — the download buttons then appear in My Orders and on the Track Order page.</p>
-        <ul>
-          <li>2 printable wall art posters (sample set)</li>
-          <li>5 kids colouring pages (PNG)</li>
-          <li>1 planner page + 1 Excel budget sheet sample</li>
-        </ul>
-        <div class="fb-row">
-          <span class="fb-price">FREE<small>No payment needed</small></span>
-          <button class="btn" data-sample="free-sample">Get the Free Sample →</button>
-        </div>
-      </div>
-    </section>
-<!-- SAMPLES -->
-    <section id="samples">
+<!-- BEST SELLERS -->
+    <section id="bestsellers">
       <div class="sec-head">
-        <span class="kicker">Look before you order</span>
-        <h2>Samples</h2>
-        <p>A closer look at every product — two preview pictures of each, side by side. Tap any sample to open the full product page.</p>
+        <span class="kicker">Most ordered this week</span>
+        <h2>Best Sellers</h2>
+        <p>The packs customers order again and again — every picture below is the real file, filled in and ready to use. Tap any card to open the full product.</p>
       </div>
-      <div class="sample-grid" id="sampleGrid"></div>
-          <div class="see-more-row"><a class="btn btn-ghost" href="shop.html">See These Products in the Shop →</a></div>
+      <div class="sample-grid">
+        <button class="sample" data-sample="budget" aria-label="View product: Excel Budget Tracker"><span class="duo"><img src="assets/excel-real-budget.webp" alt="Excel Budget Tracker — monthly budget table filled with real amounts" loading="lazy"><img src="assets/excel-real-summary.webp" alt="Excel Budget Tracker — monthly summary with income, spending and savings" loading="lazy"></span><span class="cap"><span>Excel Budget Tracker<small>Rs. 790 · Excel · Formulas Ready</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="planner" aria-label="View product: Ultimate Planner Bundle 2026"><span class="duo"><img src="assets/planner-real-goals.webp" alt="Ultimate Planner — goals page filled with 10 real goals" loading="lazy"><img src="assets/planner-real-weekly.webp" alt="Ultimate Planner — weekly spread filled with real tasks" loading="lazy"></span><span class="cap"><span>Ultimate Planner 2026<small>Rs. 990 · Printable</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="cv" aria-label="View product: Professional CV — 4 Templates"><span class="duo"><img src="assets/cv-t2-navy.webp" alt="Professional CV — two-column navy template, Sara Malik, fully filled" loading="lazy"><img src="assets/cv-t4-vip.webp" alt="Professional CV — gold VIP template, Ayesha Khan, fully filled" loading="lazy"></span><span class="cap"><span>Professional CV — 4 Templates<small>Rs. 400 · 4 Templates</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="invoice-bundle" aria-label="View product: Invoice + Attendance + Salary Bundle"><span class="duo"><img src="assets/invoice-real.webp" alt="Filled invoice INV-001 — total Rs. 6,000" loading="lazy"><img src="assets/invoice-real-salary.webp" alt="Salary sheet filled with real employee pay, total Rs. 170,000" loading="lazy"></span><span class="cap"><span>Invoice + Attendance + Salary<small>Rs. 990 · Excel · For Shops</small></span><span class="view">View →</span></span></button>
+      </div>
+      <div class="see-more-row"><a class="btn btn-dark" href="shop.html">Shop All Products →</a></div>
+    </section>
+<!-- BUNDLE & SAVE -->
+    <section id="bundle-save">
+      <div class="sec-head">
+        <span class="kicker">Bundle &amp; save</span>
+        <h2>Two Best-Sellers, One Price — Save Rs. 190</h2>
+        <p>Wall Art Pack (20 posters) + Kids Colouring Pack (50 pages) together for Rs. 1,290 instead of Rs. 1,480. And LAUNCH10 gives you an extra 10% off your first order.</p>
+      </div>
+      <div class="sample-grid">
+        <button class="sample" data-sample="wall-art-colouring-bundle" aria-label="View product: Wall Art + Colouring Bundle"><span class="duo"><img src="assets/bundle-wallart.webp" alt="Wall Art + Colouring Bundle — two framed Islamic posters" loading="lazy"><img src="assets/colouring-puppy.webp" alt="Wall Art + Colouring Bundle — cute puppy colouring page" loading="lazy"></span><span class="cap"><span>Wall Art + Colouring Bundle<small>Rs. 1,290 · was Rs. 1,480 · Save Rs. 190</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="wall-art" aria-label="View product: Islamic Wall Art Pack"><span class="duo"><img src="assets/gallery-wallart-v2.webp" alt="Islamic Wall Art Pack — gold geometric poster in a black frame" loading="lazy"><img src="assets/wall-art-floral.webp" alt="Islamic Wall Art Pack — floral roses poster" loading="lazy"></span><span class="cap"><span>Islamic Wall Art Pack<small>Rs. 990 · 20 Posters</small></span><span class="view">View →</span></span></button>
+      </div>
+      <div class="see-more-row"><a class="btn btn-dark" href="shop.html">Shop All Products →</a></div>
     </section>
 <!-- HOW IT WORKS -->
     <section class="how" id="how">
@@ -1942,7 +1951,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
           <li>An invoice / budget Excel sheet for your shop</li>
           <li>YouTube thumbnails, CVs, planners — anything</li>
         </ul>
-        <img class="custom-img" src="assets/custom-order.webp" alt="Custom design work in progress — a designer desk with a laptop, sketches and colour swatches" loading="lazy">
+        <img class="custom-img" src="assets/custom-order-vip.webp" alt="Custom order — laptop showing a personalised poster with a name, framed gold Islamic poster, phone with a social media post, and colouring pages" loading="lazy">
       </div>
       <form class="custom-form" id="customForm">
         <input required id="cName" placeholder="Your name" autocomplete="name">
@@ -2179,7 +2188,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
     <div class="pp-top"><button class="back" id="ppBack">← Back to Shop</button><button class="icon-btn" id="ppClose" aria-label="Close product page">✕</button></div>
     <div class="pp-grid">
       <div class="pp-left">
-        <img class="main" id="ppImg" src="assets/wall-art-geometric.webp" alt="">
+        <img class="main" id="ppImg" src="assets/gallery-wallart-v2.webp" alt="">
         <div class="pp-thumbs" id="ppThumbs"></div>
         <h3>About this product</h3>
         <p id="ppDesc"></p>
@@ -2553,16 +2562,16 @@ function sendDeliveryReadyEmail(d){
 }
 
 var PRODUCTS = [
-  { id:"free-sample", cat:"printable", badge:"100% Free", name:"FREE Starter Sample Pack", desc:"Try the quality before you buy — sample pages from the wall art, colouring, planner and Excel packs, free to order right here on the website. No payment needed.", price:0, delivery:"within 1 day", dmax:1, img:"assets/free-sample-new.webp", img2:"assets/colouring-puppy.webp", img3:"assets/freesample-kitten.webp", img4:"assets/freesample-puppy2.webp", style1:"What's Inside — All 4 Packs", style2:"Colouring Samples", style3:"Cute Kitten", style4:"Happy Puppy", alt:"Free sample pack flat-lay — sample planner pages, a kids colouring page and framed line art from the PixelNest packs", format:"Sample files", contents:"Sample pages from 4 packs", includes:["2 printable wall art posters (sample set)","5 kids colouring pages (PNG)","1 planner page + 1 Excel budget sheet sample","Delivered in the app like every order — no payment needed"] },
-  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/wall-art-geometric.webp", img2:"assets/wall-art-floral.webp", img3:"assets/wall-art-architecture.webp", img4:"assets/wallart-calligraphy.webp", style1:"Geometric Star Pattern", style2:"Floral Roses", style3:"Islamic Architecture", style4:"Gold Calligraphy Mandala", alt:"Posters from the Wall Art Pack — a gold Islamic geometric star pattern framed in a living room, pink roses, and a carved mosque dome design", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
+  { id:"free-sample", cat:"printable", badge:"100% Free", name:"FREE Starter Sample Pack", desc:"Try the quality before you buy — sample pages from the wall art, colouring, planner and Excel packs, free to order right here on the website. No payment needed.", price:0, delivery:"within 1 day", dmax:1, img:"assets/free-sample-real.webp", img2:"assets/colouring-puppy.webp", img3:"assets/freesample-kitten.webp", img4:"assets/freesample-puppy2.webp", style1:"What's Inside — All 4 Packs", style2:"Colouring Samples", style3:"Cute Kitten", style4:"Happy Puppy", alt:"Free sample pack — wall art, colouring, planner and Excel samples, neatly shown", format:"Sample files", contents:"Sample pages from 4 packs", includes:["2 printable wall art posters (sample set)","5 kids colouring pages (PNG)","1 planner page + 1 Excel budget sheet sample","Delivered in the app like every order — no payment needed"] },
+  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/gallery-wallart-v2.webp", img2:"assets/wall-art-floral.webp", img3:"assets/wall-art-architecture.webp", img4:"assets/wallart-calligraphy.webp", style1:"Gold Geometric — Framed", style2:"Floral Roses", style3:"Islamic Architecture", style4:"Gold Calligraphy Mandala", alt:"Posters from the Wall Art Pack — a gold Islamic geometric poster in a black frame, pink roses, and a carved mosque dome design", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
   { id:"colouring", cat:"printable", badge:"For Kids", name:"Kids Colouring Pack — 50 Pages", desc:"Cute animals, flowers, cars and cartoon characters. Print at home and keep the kids busy and happy for hours.", price:490, delivery:"within 1 day", dmax:1, img:"assets/colouring-puppy.webp", img2:"assets/gallery-colouring-v2.webp", img3:"assets/colouring-elephant.webp", img4:"assets/colouring-butterfly.webp", style1:"Cute Puppy", style2:"Cute Kitten", style3:"Cute Elephant", style4:"Butterfly & Flowers", alt:"Kids colouring page from the 50-page pack — a cute puppy with a ball and a flower in bold black-and-white line art, ready to colour", format:"PNG", contents:"50 colouring pages · PNG files", includes:["50 colouring pages (PNG files)","Easy and hard levels included","Print as many copies as you like"] },
-  { id:"wall-art-colouring-bundle", cat:"design", badge:"Bundle · Save Rs. 190", name:"Wall Art + Colouring Bundle", desc:"Two best-selling packs in one order: the Islamic Wall Art Pack (20 posters) plus the Kids Colouring Pack (50 pages) — together for Rs. 1,290 instead of Rs. 1,480 when bought separately.", price:1290, was:1480, delivery:"within 1 day", dmax:1, img:"assets/wall-art-abstract.webp", img2:"assets/colouring-puppy.webp", img3:"assets/bundle-wallart.webp", img4:"assets/bundle-colouring.webp", style1:"Wall Art Pack — 20 Posters", style2:"Colouring Pack — 50 Pages", style3:"Wall Art Pair", style4:"Colouring + Wall Art", alt:"The Wall Art + Colouring Bundle — a black and gold abstract marble poster from the Wall Art Pack and a cute puppy colouring page from the Colouring Pack", format:"PNG files", contents:"20 posters + 50 colouring pages", includes:["Islamic Wall Art Pack — all 20 posters (PNG files), exactly as sold separately","Kids Colouring Pack — all 50 pages (PNG files), exactly as sold separately","Both complete packs delivered together in the app for this one order","You save Rs. 190 compared with buying the two packs separately"] },
-  { id:"planner", cat:"printable", badge:"Printable", name:"Ultimate Planner Bundle 2026", desc:"Daily, weekly and monthly planner plus habit tracker and journal pages — a full-year system in one PDF.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/planner-new.webp", img2:"assets/gallery-planner-v2.webp", img3:"assets/planner-weekly.webp", img4:"assets/planner-habit.webp", style1:"Planner Pages", style2:"Gold Foil Planner", style3:"Weekly Spread", style4:"Habit Tracker", alt:"Open printable planner on a wooden desk — daily checklist pages with a pen and a cup of coffee", format:"PDF", contents:"120+ pages", includes:["Daily + Weekly + Monthly planner","Habit tracker and goal pages","Journal / diary pages included free"] },
-  { id:"budget", cat:"excel", badge:"Excel · Formulas Ready", name:"Excel Budget Tracker", desc:"Household expenses, salary and savings — all auto-calculated, with charts. Just type the amount; the maths is done for you.", price:790, delivery:"in 2 days", dmax:2, img:"assets/excel-budget.webp", img2:"assets/gallery-excel-v2.webp", img3:"assets/excel-oneyear.webp", img4:"assets/excel-savings.webp", style1:"Budget Dashboard", style2:"Budget Dashboard — Laptop", style3:"One-Year Tracker — 12 Months", style4:"Savings Goal Tracker", alt:"Laptop on a desk showing the Excel Budget Tracker spreadsheet with expense tables and a pie chart", format:"XLSX (Excel + Google Sheets)", contents:"Monthly + yearly sheets with charts", includes:["Monthly and yearly budget sheets","Automatic charts and totals","Works in Excel and Google Sheets"] },
-  { id:"invoice-bundle", cat:"excel", badge:"Excel · For Shops", name:"Invoice + Attendance + Salary Bundle", desc:"A 3-in-1 pack for small shops and offices: professional invoice, staff attendance and salary sheet — all with formulas.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/invoice-new.webp", img2:"assets/invoice-style2.webp", img3:"assets/invoice-salary.webp", img4:"assets/invoice-attendance.webp", style1:"Invoice Template", style2:"Invoice & Attendance Sheets", style3:"Salary Slip", style4:"Attendance Sheet", alt:"Printed invoice sheet from the bundle on a desk, with a calculator and pen beside it", format:"XLSX (Excel + Google Sheets)", contents:"3 templates in one bundle", includes:["Invoice template (add your own logo)","Attendance sheet (automatic present count)","Salary sheet (automatic totals)"] },
-  { id:"social", cat:"design", badge:"100 Designs", name:"Social Media Templates — 100 Posts", desc:"100 ready-made posts for Instagram and Facebook — finished JPG images, ready to post. Business, quotes and sale styles. Just add your caption and post.", price:990, delivery:"in 2 days", dmax:2, img:"assets/social-post.webp", img2:"assets/social-style2.webp", img3:"assets/social-story.webp", img4:"assets/social-reel.webp", style1:"Post Design", style2:"Templates — Laptop & Phone", style3:"Story Template", style4:"Reel Setup", alt:"Hand holding a phone showing a ready-made social media post design with a sunset photo", format:"JPG images", contents:"100 designs · square post size", includes:["100 ready-made post designs (JPG images)","Square post size (1080×1080) — ready for Instagram & Facebook","Just add your caption and post — no editing needed"] },
-  { id:"cv", cat:"business", badge:"2 Europass Templates", name:"Professional Europass CV — 2 Templates", desc:"Two professional Europass-style CV templates, both made for you by the seller. Share your details once and receive your finished CV in both Europass styles — ready to submit, delivered as files in the app.", price:400, delivery:"in 1–2 days", dmax:2, img:"assets/cv-resume.webp", img2:"assets/cv-single.webp", img3:"assets/cv-page1.webp", img4:"assets/cv-page2.webp", style1:"CV Template", style2:"Single-Page CV — With Photo", style3:"Two-Page CV — Page 1", style4:"Two-Page CV — Page 2", alt:"Professional Europass CV template printed on a desk, with a pen and a cup of coffee", format:"PDF + DOCX", contents:"2 Europass CV templates — made for you", includes:["Two professional Europass-style CV templates, both made for you","Both templates delivered in the app (PDF + DOCX)","Your details and experience formatted to the Europass standard","One free correction if a detail needs fixing"] },
-  { id:"ebook-guide", cat:"business", badge:"Ebook", name:"Ebook: Start Freelancing — Urdu Guide", desc:"A step-by-step Urdu guide to starting with Fiverr, data entry and digital products. Written in simple language for beginners.", price:1200, delivery:"within 1 day", dmax:1, img:"assets/ebook-cover.webp", img2:"assets/ebook-style2.webp", img3:"assets/ebook-phone.webp", img4:"assets/ebook-desk.webp", style1:"Book Cover", style2:"Ebook on Tablet", style3:"Read on Phone", style4:"Study Desk Guide", alt:"The Start Freelancing ebook — navy and gold book cover standing on a wooden table", format:"PDF", contents:"60+ pages", includes:["60+ pages in simple Urdu","Step-by-step guidance with diagrams and checklists","List of common beginner mistakes"] },
+  { id:"wall-art-colouring-bundle", cat:"design", badge:"Bundle · Save Rs. 190", name:"Wall Art + Colouring Bundle", desc:"Two best-selling packs in one order: the Islamic Wall Art Pack (20 posters) plus the Kids Colouring Pack (50 pages) — together for Rs. 1,290 instead of Rs. 1,480 when bought separately.", price:1290, was:1480, delivery:"within 1 day", dmax:1, img:"assets/bundle-wallart.webp", img2:"assets/colouring-puppy.webp", img3:"assets/wall-art-abstract.webp", img4:"assets/bundle-colouring.webp", style1:"Wall Art Pair", style2:"Colouring Pack — 50 Pages", style3:"Abstract Marble Poster", style4:"Colouring + Wall Art", alt:"The Wall Art + Colouring Bundle — two framed Islamic posters from the Wall Art Pack and a cute puppy colouring page from the Colouring Pack", format:"PNG files", contents:"20 posters + 50 colouring pages", includes:["Islamic Wall Art Pack — all 20 posters (PNG files), exactly as sold separately","Kids Colouring Pack — all 50 pages (PNG files), exactly as sold separately","Both complete packs delivered together in the app for this one order","You save Rs. 190 compared with buying the two packs separately"] },
+  { id:"planner", cat:"printable", badge:"Printable", name:"Ultimate Planner Bundle 2026", desc:"Daily, weekly and monthly planner plus habit tracker and journal pages — a full-year system in one PDF.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/planner-real-goals.webp", img2:"assets/planner-real-monthly.webp", img3:"assets/planner-real-weekly.webp", img4:"assets/planner-real-habits.webp", style1:"My 2026 Goals — Filled", style2:"Monthly Calendar — Filled", style3:"Weekly Spread — Filled", style4:"Habit Tracker — Filled", alt:"Planner pages filled with real goals, calendar plans, weekly tasks and habit ticks", format:"PDF", contents:"120+ pages", includes:["Daily + Weekly + Monthly planner","Habit tracker and goal pages","Journal / diary pages included free"] },
+  { id:"budget", cat:"excel", badge:"Excel · Formulas Ready", name:"Excel Budget Tracker", desc:"Household expenses, salary and savings — all auto-calculated, with charts. Just type the amount; the maths is done for you.", price:790, delivery:"in 2 days", dmax:2, img:"assets/excel-real-budget.webp", img2:"assets/excel-real-summary.webp", img3:"assets/excel-real-transactions.webp", img4:"assets/excel-real-savings.webp", style1:"Monthly Budget — Filled", style2:"Monthly Summary — Filled", style3:"Transactions — Filled", style4:"Savings Goal — Filled", alt:"Excel Budget Tracker — monthly budget table filled with real planned and actual amounts", format:"XLSX (Excel + Google Sheets)", contents:"Monthly + yearly sheets with charts", includes:["Monthly and yearly budget sheets","Automatic charts and totals","Works in Excel and Google Sheets"] },
+  { id:"invoice-bundle", cat:"excel", badge:"Excel · For Shops", name:"Invoice + Attendance + Salary Bundle", desc:"A 3-in-1 pack for small shops and offices: professional invoice, staff attendance and salary sheet — all with formulas.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/invoice-real.webp", img2:"assets/invoice-real-bundle.webp", img3:"assets/invoice-real-salary.webp", img4:"assets/invoice-real-attendance.webp", style1:"Invoice — Filled (Rs. 6,000)", style2:"Bundle Overview", style3:"Salary Sheet — Filled", style4:"Attendance — Filled", alt:"Filled invoice INV-001 with real items and total, plus attendance and salary sheets", format:"XLSX (Excel + Google Sheets)", contents:"3 templates in one bundle", includes:["Invoice template (add your own logo)","Attendance sheet (automatic present count)","Salary sheet (automatic totals)"] },
+  { id:"social", cat:"design", badge:"100 Designs", name:"Social Media Templates — 100 Posts", desc:"100 ready-made posts for Instagram and Facebook — finished JPG images, ready to post. Business, quotes and sale styles. Just add your caption and post.", price:990, delivery:"in 2 days", dmax:2, img:"assets/social-real-posts.webp", img2:"assets/social-real-templates.webp", img3:"assets/social-real-story.webp", img4:"assets/social-real-reel.webp", style1:"Post Design", style2:"Templates — Laptop & Phone", style3:"Story Template", style4:"Reel Setup", alt:"Social media post designs with real headlines and text — motivational, offer and new arrival posts", format:"JPG images", contents:"100 designs · square post size", includes:["100 ready-made post designs (JPG images)","Square post size (1080×1080) — ready for Instagram & Facebook","Just add your caption and post — no editing needed"] },
+  { id:"cv", cat:"business", badge:"4 Templates", name:"Professional CV — 4 Templates", desc:"Four professional CV templates, each a complete one-page design with photo and full detail — pick the style you like, share your details once and receive your finished CV, ready to submit, delivered as files in the app.", price:400, delivery:"in 1–2 days", dmax:2, img:"assets/cv-t1-modern.webp", img2:"assets/cv-t2-navy.webp", img3:"assets/cv-t3-minimal.webp", img4:"assets/cv-t4-vip.webp", style1:"Modern — Ahmed Raza", style2:"Two-Column Navy — Sara Malik", style3:"Minimal Clean — Bilal Ahmed", style4:"Gold VIP — Ayesha Khan", alt:"Four complete one-page CV templates, each fully filled with photo, experience and skills", format:"PDF + DOCX", contents:"4 CV templates — made for you", includes:["Four professional CV templates, each a complete one-page design","All templates delivered in the app (PDF + DOCX)","Your details and experience formatted in the style you pick","One free correction if a detail needs fixing"] },
+  { id:"ebook-guide", cat:"business", badge:"Ebook", name:"Ebook: Start Freelancing — Urdu Guide", desc:"A step-by-step Urdu guide to starting with Fiverr, data entry and digital products. Written in simple language for beginners.", price:1200, delivery:"within 1 day", dmax:1, img:"assets/ebook-cover.webp", img2:"assets/ebook-real-contents.webp", img3:"assets/ebook-real-intro.webp", img4:"assets/ebook-real-chapter1.webp", style1:"Book Cover", style2:"Contents — 29 Chapters", style3:"Introduction — Real Text", style4:"Chapter 1 — Real Text", alt:"Start Freelancing ebook — cover, real contents list, introduction and chapter 1 pages", format:"PDF", contents:"60+ pages", includes:["60+ pages in simple Urdu","Step-by-step guidance with diagrams and checklists","List of common beginner mistakes"] },
   { id:"thumbnail", cat:"design", badge:"For YouTubers", name:"YouTube Thumbnail Pack — 30 Templates", desc:"30 ready-made YouTube thumbnails (PNG, 1280×720), designed to earn clicks. Add your own text in any free photo editor and put it on your video.", price:790, delivery:"within 1 day", dmax:1, img:"assets/thumbnail-new.webp", img2:"assets/thumbnail-style2.webp", img3:"assets/thumbnail-gaming.webp", img4:"assets/thumbnail-travel.webp", style1:"Thumbnail Design", style2:"Cooking Thumbnail", style3:"Gaming Thumbnail", style4:"Travel Thumbnail", alt:"Laptop showing a bold YouTube thumbnail design — Earn From Home, in red and yellow", format:"PNG images", contents:"30 designs + font & colour guide", includes:["30 ready-made thumbnails (PNG, 1280×720)","Vlog, tech, cooking and Islamic styles","Font and colour guide included"] }
 ];
 
@@ -8362,5 +8371,28 @@ window.SellerNotify = (function(){
 })();
 </script>
 
+<script>
+/* HERO SLIDESHOW — auto-rotate every 4.5s, dots to jump (package #74) */
+(function(){
+  var box = document.getElementById("heroSlides"); if(!box) return;
+  var slides = box.querySelectorAll(".hs-slide");
+  var dotsBox = document.getElementById("heroDots");
+  if(!slides.length || !dotsBox) return;
+  var idx = 0, timer = null;
+  function show(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach(function(s, i){ s.classList.toggle("active", i === idx); });
+    dotsBox.querySelectorAll("button").forEach(function(d, i){ d.classList.toggle("on", i === idx); });
+  }
+  slides.forEach(function(_, i){
+    var b = document.createElement("button");
+    b.type = "button"; b.setAttribute("aria-label", "Show slide " + (i+1));
+    b.addEventListener("click", function(){ show(i); restart(); });
+    dotsBox.appendChild(b);
+  });
+  function restart(){ if(timer) clearInterval(timer); timer = setInterval(function(){ show(idx+1); }, 4500); }
+  show(0); restart();
+})();
+</script>
 </body>
 </html>
