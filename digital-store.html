@@ -89,9 +89,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdro
 .hero h1 em{font-style:normal;color:var(--teal)}
 .hero p.lead{font-size:1.12rem;color:var(--muted);max-width:52ch;margin:0 0 26px}
 .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
-.hero-search{display:flex;gap:0;margin-top:20px;max-width:560px;border:2px solid #C9A227;border-radius:999px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
-.hero-search input{flex:1;min-width:0;border:0;outline:0;padding:13px 18px;font-size:.95rem;font-family:inherit;color:var(--ink);background:transparent}
-.hero-search button{border:0;background:var(--navy);color:#F3C969;font-weight:800;font-size:.9rem;padding:0 22px;cursor:pointer}
 .hero-cta .btn{min-height:56px;padding:0 30px;font-size:1rem}
 .hero-img{border-radius:22px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);position:relative}
 .hero-img>img.main{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3.1}
@@ -1421,25 +1418,25 @@ window.PixelPush = (function(){
    (search, filters, cloned page grids) follow the same rule.
    Buyers and signed-out visitors never get the class — their
    store is completely unchanged. */
-body.is-seller-view .card-btns,
-body.is-seller-view .pp-actions,
-body.is-seller-view [data-add],
-body.is-seller-view [data-buynow],
-body.is-seller-view #ppAdd,
-body.is-seller-view #ppBuy,
-body.is-seller-view .hero-cta [data-sample],
-body.is-seller-view .rate-box,
-body.is-seller-view .rev-pop,
-body.is-seller-view #reviews,
-body.is-seller-view .card .stars,
-body.is-seller-view .card-rate,
-body.is-seller-view #ppStarsLine,
-body.is-seller-view .launch-badge,
-body.is-seller-view .free-band,
+body.is-seller-view:not(.is-seller-store) .card-btns,
+body.is-seller-view:not(.is-seller-store) .pp-actions,
+body.is-seller-view:not(.is-seller-store) [data-add],
+body.is-seller-view:not(.is-seller-store) [data-buynow],
+body.is-seller-view:not(.is-seller-store) #ppAdd,
+body.is-seller-view:not(.is-seller-store) #ppBuy,
+body.is-seller-view:not(.is-seller-store) .hero-cta [data-sample],
+body.is-seller-view:not(.is-seller-store) .rate-box,
+body.is-seller-view:not(.is-seller-store) .rev-pop,
+body.is-seller-view:not(.is-seller-store) #reviews,
+body.is-seller-view:not(.is-seller-store) .card .stars,
+body.is-seller-view:not(.is-seller-store) .card-rate,
+body.is-seller-view:not(.is-seller-store) #ppStarsLine,
+body.is-seller-view:not(.is-seller-store) .launch-badge,
+body.is-seller-view:not(.is-seller-store) .free-band,
 body.is-seller-view:not(.is-seller-store) #custom,
-body.is-seller-view #openCart,
-body.is-seller-view #drawer,
-body.is-seller-view #overlay{display:none!important}
+body.is-seller-view:not(.is-seller-store) #openCart,
+body.is-seller-view:not(.is-seller-store) #drawer,
+body.is-seller-view:not(.is-seller-store) #overlay{display:none!important}
 body.is-seller-view .stats-in .ts-stat:last-child{display:none!important}
 /* Seller sees ONLY his dashboard: while the seller is signed in, the
    whole store page hides on every page — hero, products, categories,
@@ -1776,9 +1773,8 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <div>
         <h1>Premium digital products, <em>delivered in 1–3 days.</em></h1>
         <p class="lead">Wall art, colouring packs, planners, Excel templates, CVs and social media posts — made by a working freelancer, from Rs. 490 a pack. Order and pay right here on the website, get an Order ID, and download your file right here in the app — from My Orders or the Track Order page. New here? Try the FREE Sample Pack first and check the quality before you spend anything.</p>
-        <form class="hero-search" id="heroSearchForm" role="search"><input type="search" id="heroSearchInput" placeholder="Search for a product — CV, budget, poster, planner…" aria-label="Search products"><button type="submit" aria-label="Search">Search</button></form>
         <div class="hero-cta">
-          <button class="btn btn-primary" data-buynow="wall-art">Buy Now — Wall Art Pack · Rs. 990</button>
+          <button class="btn btn-primary" data-buynow="wall-art">Buy Now — Islamic Wall Art Pack · Rs. 990</button>
           <button class="btn btn-dark" data-sample="free-sample">Try the FREE Sample Pack</button>
           <button class="btn install-btn" id="installBtn" type="button"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg> Install App</button>
         </div>
@@ -1820,7 +1816,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         <a class="strip-card" href="shop.html" data-sample="budget"><img src="assets/excel-real-budget.webp" alt="Excel Budget Tracker — monthly budget table filled with real amounts" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="planner"><img src="assets/planner-real-goals.webp" alt="Planner goals page — 10 goals filled in with reasons and dates" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail"><img src="assets/thumbnail-new.webp" alt="Laptop showing a bold Earn From Home YouTube thumbnail" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art"><img src="assets/wallart-floral-v2.webp" alt="Pink roses poster in a black frame on a bright wall" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art-flower"><img src="assets/wallart-floral-v2.webp" alt="Pink roses poster in a black frame on a bright wall" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide"><img src="assets/ebook-cover.webp" alt="Start Freelancing ebook with a navy and gold cover" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring"><img src="assets/gallery-colouring-v2.webp" alt="Cute kitten colouring page in bold line art" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
         <a class="strip-card" href="shop.html" data-sample="cv"><img src="assets/cv-t2-navy.webp" alt="Professional CV — two-column navy template, Sara Malik, fully filled" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
@@ -1836,7 +1832,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
         <a class="strip-card" href="shop.html" data-sample="budget" tabindex="-1"><img src="assets/excel-real-budget.webp" alt="" loading="lazy"><span>Excel Templates · Rs. 790</span></a>
         <a class="strip-card" href="shop.html" data-sample="planner" tabindex="-1"><img src="assets/planner-real-goals.webp" alt="" loading="lazy"><span>Planners &amp; Journals · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="thumbnail" tabindex="-1"><img src="assets/thumbnail-new.webp" alt="" loading="lazy"><span>YouTube Thumbnails · Rs. 790</span></a>
-        <a class="strip-card" href="shop.html" data-sample="wall-art" tabindex="-1"><img src="assets/wallart-floral-v2.webp" alt="" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
+        <a class="strip-card" href="shop.html" data-sample="wall-art-flower" tabindex="-1"><img src="assets/wallart-floral-v2.webp" alt="" loading="lazy"><span>Floral Wall Art · Rs. 990</span></a>
         <a class="strip-card" href="shop.html" data-sample="ebook-guide" tabindex="-1"><img src="assets/ebook-cover.webp" alt="" loading="lazy"><span>Ebooks &amp; Guides · Rs. 1,200</span></a>
         <a class="strip-card" href="shop.html" data-sample="colouring" tabindex="-1"><img src="assets/gallery-colouring-v2.webp" alt="" loading="lazy"><span>Colouring Books · Rs. 490</span></a>
         <a class="strip-card" href="shop.html" data-sample="cv" tabindex="-1"><img src="assets/cv-t2-navy.webp" alt="" loading="lazy"><span>Professional CVs · Rs. 400</span></a>
@@ -1928,7 +1924,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       </div>
       <div class="sample-grid">
         <button class="sample" data-sample="wall-art-colouring-bundle" aria-label="View product: Wall Art + Colouring Bundle"><span class="duo"><img src="assets/bundle-wallart.webp" alt="Wall Art + Colouring Bundle — two framed Islamic posters" loading="lazy"><img src="assets/colouring-puppy.webp" alt="Wall Art + Colouring Bundle — cute puppy colouring page" loading="lazy"></span><span class="cap"><span>Wall Art + Colouring Bundle<small>Rs. 1,290 · was Rs. 1,480 · Save Rs. 190</small></span><span class="view">View →</span></span></button>
-        <button class="sample" data-sample="wall-art" aria-label="View product: Islamic Wall Art Pack"><span class="duo"><img src="assets/gallery-wallart-v2.webp" alt="Islamic Wall Art Pack — gold geometric poster in a black frame" loading="lazy"><img src="assets/wallart-floral-v2.webp" alt="Islamic Wall Art Pack — pink roses poster in a black frame" loading="lazy"></span><span class="cap"><span>Islamic Wall Art Pack<small>Rs. 990 · 20 Posters</small></span><span class="view">View →</span></span></button>
+        <button class="sample" data-sample="wall-art" aria-label="View product: Islamic Wall Art Pack"><span class="duo"><img src="assets/gallery-wallart-v2.webp" alt="Islamic Wall Art Pack — gold geometric poster in a black frame" loading="lazy"><img src="assets/wallart-mosque-v2.webp" alt="Islamic Wall Art Pack — golden mosque poster in a black frame" loading="lazy"></span><span class="cap"><span>Islamic Wall Art Pack<small>Rs. 990 · 20 Posters</small></span><span class="view">View →</span></span></button>
       </div>
       <div class="see-more-row"><a class="btn btn-dark" href="shop.html">Shop All Products →</a></div>
     </section>
@@ -2597,7 +2593,9 @@ function sendDeliveryReadyEmail(d){
 
 var PRODUCTS = [
   { id:"free-sample", cat:"printable", badge:"100% Free", name:"FREE Starter Sample Pack", desc:"Try the quality before you buy — sample pages from the wall art, colouring, planner and Excel packs, free to order right here on the website. No payment needed.", price:0, delivery:"within 1 day", dmax:1, img:"assets/free-sample-real.webp", img2:"assets/colouring-puppy.webp", img3:"assets/freesample-kitten.webp", img4:"assets/freesample-puppy2.webp", style1:"What's Inside — All 4 Packs", style2:"Colouring Samples", style3:"Cute Kitten", style4:"Happy Puppy", alt:"Free sample pack — wall art, colouring, planner and Excel samples, neatly shown", format:"Sample files", contents:"Sample pages from 4 packs", includes:["2 printable wall art posters (sample set)","5 kids colouring pages (PNG)","1 planner page + 1 Excel budget sheet sample","Delivered in the app like every order — no payment needed"] },
-  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print posters for your home, office or shop — 10 calligraphy posters and 10 art designs (mosque, nature and motivational styles), all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/gallery-wallart-v2.webp", img2:"assets/wallart-floral-v2.webp", img3:"assets/wallart-mosque-v2.webp", img4:"assets/wallart-calligraphy.webp", style1:"Gold Geometric — Framed", style2:"Floral Roses", style3:"Golden Mosque", style4:"Gold Calligraphy Mandala", alt:"Posters from the Wall Art Pack — a gold Islamic geometric poster in a black frame, a pink roses poster, and a golden mosque poster", format:"PNG", contents:"20 posters · PNG files", includes:["20 posters in PNG format — 10 calligraphy + 10 art designs","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
+  { id:"wall-art", cat:"design", badge:"20 Posters", name:"Islamic Wall Art Pack — 20 Posters", desc:"Ready-to-print Islamic posters for your home, office or shop — geometric patterns, golden mosques and calligraphy art, all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/gallery-wallart-v2.webp", img2:"assets/wallart-mosque-v2.webp", img3:"assets/wallart-calligraphy.webp", img4:"assets/wallart-calligraphy-v2.webp", style1:"Gold Geometric — Framed", style2:"Golden Mosque", style3:"Gold Calligraphy Mandala", style4:"Gold Calligraphy", alt:"Posters from the Islamic Wall Art Pack — a gold Islamic geometric poster, a golden mosque poster and gold calligraphy art in black frames", format:"PNG", contents:"20 posters · PNG files", includes:["20 Islamic posters in PNG format","Calligraphy posters are A4 print-ready (2480×3508, 300 dpi)","Art posters suit screens and small prints best","Ready for printing, no watermark"] },
+  { id:"wall-art-flower", cat:"design", badge:"20 Posters", name:"Flower Wall Art Pack — 20 Posters", desc:"Ready-to-print flower posters for your home, office or shop — roses, sunflowers, tulips and lavender, all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/wallart-floral-v2.webp", img2:"assets/wallart-sunflower-v2.webp", img3:"assets/wallart-tulip-v2.webp", img4:"assets/wallart-lavender-v2.webp", style1:"Pink Roses", style2:"Sunflowers", style3:"Tulips", style4:"Lavender", alt:"Posters from the Flower Wall Art Pack — pink roses, sunflowers, tulips and lavender posters in black frames", format:"PNG", contents:"20 posters · PNG files", includes:["20 flower posters in PNG format","A4 print-ready (2480×3508, 300 dpi)","Suits screens and small prints best","Ready for printing, no watermark"] },
+  { id:"wall-art-general", cat:"design", badge:"20 Posters", name:"Wall Art Pack — 20 Posters", desc:"Ready-to-print wall art posters for your home, office or shop — mountain sunsets, abstract gold, tropical leaves and city skylines, all as PNG files.", price:990, delivery:"within 1 day", dmax:1, img:"assets/wallart-mountain-v2.webp", img2:"assets/wallart-abstract-v2.webp", img3:"assets/wallart-leaves-v2.webp", img4:"assets/wallart-city-v2.webp", style1:"Mountain Sunset", style2:"Abstract Gold", style3:"Tropical Leaves", style4:"City Skyline", alt:"Posters from the Wall Art Pack — mountain sunset, abstract gold, tropical leaves and city skyline posters in black frames", format:"PNG", contents:"20 posters · PNG files", includes:["20 wall art posters in PNG format","A4 print-ready (2480×3508, 300 dpi)","Suits screens and small prints best","Ready for printing, no watermark"] },
   { id:"colouring", cat:"printable", badge:"For Kids", name:"Kids Colouring Pack — 50 Pages", desc:"Cute animals, flowers, cars and cartoon characters. Print at home and keep the kids busy and happy for hours.", price:490, delivery:"within 1 day", dmax:1, img:"assets/colouring-puppy.webp", img2:"assets/gallery-colouring-v2.webp", img3:"assets/colouring-elephant.webp", img4:"assets/colouring-butterfly.webp", style1:"Cute Puppy", style2:"Cute Kitten", style3:"Cute Elephant", style4:"Butterfly & Flowers", alt:"Kids colouring page from the 50-page pack — a cute puppy with a ball and a flower in bold black-and-white line art, ready to colour", format:"PNG", contents:"50 colouring pages · PNG files", includes:["50 colouring pages (PNG files)","Easy and hard levels included","Print as many copies as you like"] },
   { id:"wall-art-colouring-bundle", cat:"design", badge:"Bundle · Save Rs. 190", name:"Wall Art + Colouring Bundle", desc:"Two best-selling packs in one order: the Islamic Wall Art Pack (20 posters) plus the Kids Colouring Pack (50 pages) — together for Rs. 1,290 instead of Rs. 1,480 when bought separately.", price:1290, was:1480, delivery:"within 1 day", dmax:1, img:"assets/bundle-wallart.webp", img2:"assets/colouring-puppy.webp", img3:"assets/wall-art-abstract.webp", img4:"assets/bundle-colouring.webp", style1:"Wall Art Pair", style2:"Colouring Pack — 50 Pages", style3:"Abstract Marble Poster", style4:"Colouring + Wall Art", alt:"The Wall Art + Colouring Bundle — two framed Islamic posters from the Wall Art Pack and a cute puppy colouring page from the Colouring Pack", format:"PNG files", contents:"20 posters + 50 colouring pages", includes:["Islamic Wall Art Pack — all 20 posters (PNG files), exactly as sold separately","Kids Colouring Pack — all 50 pages (PNG files), exactly as sold separately","Both complete packs delivered together in the app for this one order","You save Rs. 190 compared with buying the two packs separately"] },
   { id:"planner", cat:"printable", badge:"Printable", name:"Ultimate Planner Bundle 2026", desc:"Daily, weekly and monthly planner plus habit tracker and journal pages — a full-year system in one PDF.", price:990, delivery:"in 2–3 days", dmax:3, img:"assets/planner-real-goals.webp", img2:"assets/planner-real-monthly.webp", img3:"assets/planner-real-weekly.webp", img4:"assets/planner-real-habits.webp", style1:"My 2026 Goals — Filled", style2:"Monthly Calendar — Filled", style3:"Weekly Spread — Filled", style4:"Habit Tracker — Filled", alt:"Planner pages filled with real goals, calendar plans, weekly tasks and habit ticks", format:"PDF", contents:"120+ pages", includes:["Daily + Weekly + Monthly planner","Habit tracker and goal pages","Journal / diary pages included free"] },
@@ -3059,10 +3057,10 @@ function paintDiscountUI(){
 })();
 
 function addToCart(id, silent){
-  /* Seller view: the seller never buys from his own store — every
-     Add to Cart / Buy Now path funnels through here, so this guard
-     backs up the hidden buttons. */
-  if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller()) return;
+  /* Seller dashboard view: the seller never buys from his own
+     store — but in Buy mode (previewing as a buyer) the cart works,
+     so he can see the full buyer flow. */
+  if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller() && !(document.body && document.body.classList.contains("is-seller-store"))) return;
   cart[id] = (cart[id]||0)+1;
   renderCart(); renderProducts();
   if(!silent) showToast("Added to cart — total " + fmt(cartSum()));
@@ -3101,7 +3099,7 @@ function copyText(txt, doneMsg){
   }
 }
 
-function openCart(){ /* The seller account has no cart at all — the drawer never opens for the seller. */ if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller()) return; document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); }
+function openCart(){ /* The seller account has no cart in dashboard view — but in Buy mode (previewing as a buyer) the cart opens like a buyer's. */ if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller() && !(document.body && document.body.classList.contains("is-seller-store"))) return; document.getElementById("drawer").classList.add("open"); document.getElementById("overlay").classList.add("open"); }
 function closeCart(){ document.getElementById("drawer").classList.remove("open"); document.getElementById("overlay").classList.remove("open"); }
 document.getElementById("openCart").addEventListener("click", openCart);
 document.getElementById("closeCart").addEventListener("click", closeCart);
@@ -3133,7 +3131,6 @@ var _ss=document.getElementById("sortSelect"); if(_ss) _ss.addEventListener("cha
 /* Category cards are handled by the delegated [data-catlink] click handler above (works for every card, every tap). */
 var searchTimer = null;
 /* Hero search (Fiverr-style): go to the shop with the query in the URL. */
-(function(){ var f = document.getElementById("heroSearchForm"); if(!f) return; f.addEventListener("submit", function(e){ e.preventDefault(); var q = (document.getElementById("heroSearchInput").value || "").trim(); window.location.href = "shop.html" + (q ? "?q=" + encodeURIComponent(q) : ""); }); })();
 (function(){ var q = new URLSearchParams(window.location.search).get("q"); if(!q) return; var si = document.getElementById("searchInput"); if(si){ si.value = q; } })();
 document.getElementById("searchInput").addEventListener("input", function(){
   renderProducts();
