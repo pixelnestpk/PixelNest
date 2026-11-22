@@ -5,7 +5,7 @@
    stars and the LAUNCH10 badge all show, and the cart works, so the
    seller sees the store exactly as a buyer does. */
 
-var CACHE_VERSION = "pixelnest-shell-v46";
+var CACHE_VERSION = "pixelnest-shell-v47";
 
 var SHELL_URLS = [
 

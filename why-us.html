@@ -5629,9 +5629,13 @@ window.PixelAccount = (function(){
     sellerDashAutoOpened = true;
     setTimeout(function(){
       if(!isSeller()) return;
+      if(document.body && document.body.classList.contains("is-seller-store")) return;
+      var buyFlag = false;
+      try { buyFlag = window.localStorage.getItem("pixelnest_seller_store_view") === "1"; } catch(e){}
+      if(buyFlag) return;
       var pg = document.getElementById("ordersPage");
       if(pg && pg.classList.contains("open")) return;
-      /* #87: never auto-open over product browsing — when the seller
+      /* #87/#88: never auto-open over product browsing — when the seller
          tapped a category (a filter is waiting in sessionStorage) or
          is on a browsing page (anything but home), he wants the
          products, not the dashboard. Auto-open only on the home page
@@ -5641,6 +5645,9 @@ window.PixelAccount = (function(){
       try { pendingFilter = sessionStorage.getItem("pixelnest_filter"); } catch(e){}
       if(pendingFilter) return;
       if(typeof PAGE !== "undefined" && PAGE !== "home") return;
+      var isHome = false;
+      try { var pp = window.location.pathname || ""; isHome = (pp === "/" || pp === "/index.html" || pp === "/digital-store.html" || pp.slice(-11) === "/index.html" || pp.slice(-18) === "/digital-store.html"); } catch(e){}
+      if(!isHome) return;
       if(typeof openOrdersDashboard === "function") openOrdersDashboard();
     }, 400);
   }
