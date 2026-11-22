@@ -1078,6 +1078,13 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 #ordersPage .dash-topnav-item{background:none;border:0;color:var(--navy);font:inherit;font-weight:800;font-size:.92rem;padding:8px 12px;border-radius:8px;cursor:pointer}
 #ordersPage .dash-topnav-item:hover{background:var(--soft)}
 #ordersPage .dash-topnav-item.is-active{color:var(--teal);box-shadow:inset 0 -2px 0 var(--teal)}
+#ordersPage .dash-topnav-icons{margin-inline-start:auto;display:flex;align-items:center;gap:6px}
+#ordersPage .dash-icon-btn{position:relative;background:none;border:1px solid transparent;border-radius:50%;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:var(--navy);cursor:pointer;padding:0}
+#ordersPage .dash-icon-btn:hover{background:var(--soft);border-color:var(--line)}
+#ordersPage .dash-icon-btn svg{display:block}
+#ordersPage .dash-icon-btn .dash-red-dot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#e5484d;border:2px solid #fff;display:none}
+#ordersPage .dash-icon-btn.has-unread .dash-red-dot{display:block}
+#ordersPage .dash-icon-btn .dash-avatar-img{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block}
 #ordersPage .dash-topnav-drop{position:relative}
 #ordersPage .dash-topnav-menu{position:absolute;top:calc(100% + 4px);left:0;z-index:30;min-width:180px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column}
 #ordersPage .dash-topnav-menu[hidden]{display:none}
@@ -2302,6 +2309,11 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       </div>
       <button type="button" class="dash-topnav-item" data-dashnav="notifs">Notifications</button>
       <button type="button" class="dash-topnav-item" data-dashnav="customers">Customers</button>
+      <div class="dash-topnav-icons">
+        <button type="button" class="dash-icon-btn" id="dashBellBtn" aria-label="Notifications" title="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="dash-red-dot" id="dashBellDot" aria-hidden="true"></span></button>
+        <button type="button" class="dash-icon-btn" id="dashMsgBtn" aria-label="Messages" title="Messages"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="m3.5 7 8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="dash-icon-btn" id="dashAvatarBtn" aria-label="Profile" title="Profile"><img class="dash-avatar-img" src="assets/seller-photo.webp" alt="Shakir Ullah"></button>
+      </div>
     </div>
     <div class="o-body">
       <div id="dashHome">
@@ -3936,6 +3948,10 @@ function renderNotifications(){
   if(cnt){ cnt.textContent = unread; cnt.style.display = unread ? "" : "none"; }
   var ncc = document.getElementById("notifCardCount");
   if(ncc) ncc.textContent = unread;
+  /* Fiverr-style red dot on the header bell: visible whenever there
+     is at least one unread notification, hidden when all are read. */
+  var bell = document.getElementById("dashBellBtn");
+  if(bell) bell.classList.toggle("has-unread", unread > 0);
   if(!evs.length){ box.innerHTML = '<p class="o-note">No notifications yet — new orders will appear here.</p>'; return; }
   var tick = '<span class="notif-tick" title="Read" aria-label="Read"><svg width="19" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true"><path d="M1 6.6 4.7 10 11.2 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 8.8 11.1 10.2 17.9 2.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   function rowHtml(ev){
@@ -4664,6 +4680,15 @@ document.getElementById("oStats").addEventListener("click", function(e){
       else showDashView("home");
     });
   });
+  /* Fiverr-style header icons: bell opens Notifications (the NEW /
+     Earlier list — never a dropdown), envelope opens Messages
+     (the store chatbot), avatar opens Profile. */
+  var bellBtn = document.getElementById("dashBellBtn");
+  if(bellBtn) bellBtn.addEventListener("click", function(){ renderNotifications(); showDashView("notifs"); });
+  var msgBtn = document.getElementById("dashMsgBtn");
+  if(msgBtn) msgBtn.addEventListener("click", function(){ var p = document.getElementById("pnChatPanel"); if(p && p.hidden){ var cb = document.getElementById("pnChatBtn"); if(cb) cb.click(); } });
+  var avBtn = document.getElementById("dashAvatarBtn");
+  if(avBtn) avBtn.addEventListener("click", function(){ renderDashProfile(); showDashView("profile"); });
   var bizBtn = document.getElementById("dashBizBtn");
   if(bizBtn) bizBtn.addEventListener("click", function(e){
     e.stopPropagation();
