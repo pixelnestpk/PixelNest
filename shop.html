@@ -5596,6 +5596,16 @@ window.PixelAccount = (function(){
       if(!isSeller()) return;
       var pg = document.getElementById("ordersPage");
       if(pg && pg.classList.contains("open")) return;
+      /* #87: never auto-open over product browsing — when the seller
+         tapped a category (a filter is waiting in sessionStorage) or
+         is on a browsing page (anything but home), he wants the
+         products, not the dashboard. Auto-open only on the home page
+         with no pending filter. The dashboard still opens on demand
+         via "Open Seller Dashboard". */
+      var pendingFilter = null;
+      try { pendingFilter = sessionStorage.getItem("pixelnest_filter"); } catch(e){}
+      if(pendingFilter) return;
+      if(typeof PAGE !== "undefined" && PAGE !== "home") return;
       if(typeof openOrdersDashboard === "function") openOrdersDashboard();
     }, 400);
   }
