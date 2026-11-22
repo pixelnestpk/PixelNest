@@ -87,7 +87,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v30";
+var CACHE_VERSION = "pixelnest-shell-v31";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
