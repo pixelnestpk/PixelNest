@@ -1104,7 +1104,7 @@ body.auth-pending #acctLoading{display:inline-flex!important}
 #ordersPage .dash-prod-table-row b{font-weight:900}
 #ordersPage .dash-prod-table-row .dash-prod-cell-name{font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #ordersPage .dash-prod-table-row .dash-prod-cell-num{color:var(--muted)}
-@media (max-width:640px){#ordersPage .dash-prod-table-head,#ordersPage .dash-prod-table-row{grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));padding:9px 10px;font-size:.82rem}}
+@media (max-width:640px){#ordersPage .dash-prod-table{overflow-x:auto}#ordersPage .dash-prod-table-head,#ordersPage .dash-prod-table-row{min-width:600px;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));padding:9px 10px;font-size:.82rem}#ordersPage .dash-prod-table-head span{white-space:nowrap}}
 #ordersPage .dash-view[hidden]{display:none!important}
 #ordersPage .dash-view-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 #ordersPage .dash-view-head h3{margin:0;font-size:1.05rem;color:var(--navy)}
@@ -2382,7 +2382,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <div id="dashProductsView" class="dash-view" hidden>
         <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Products</h3><span class="dash-perf-range">LAST 30 DAYS</span></div>
         <div class="dash-prod-table" id="dashProdTable"><p class="o-note">Loading products…</p></div>
-        <p class="o-note" style="margin-top:10px">Impressions and clicks need a view counter — not tracked yet, so they show "—". Orders and Earned are real, from your orders.</p>
+        <p class="o-note" style="margin-top:10px">Impressions and clicks need a view counter — not tracked yet, so they show "—". Orders are real, from your orders. Price is the product's list price — earned money shows on the Earnings page.</p>
       </div>
       <div id="dashProfileView" class="dash-view" hidden>
         <div class="dash-view-head"><button type="button" class="dash-back" data-dashback>← Dashboard</button><h3>Profile</h3></div>
@@ -4449,8 +4449,9 @@ function renderOrders(){
 }
 /* Fiverr-style Products page (My Business → Products): one row per
    product, like Fiverr's Gigs table — Product | Impressions |
-   Clicks | Orders | Earned. Impressions and clicks are "—" until a
-   view counter exists; Orders and Earned are real, from lastGroups. */
+   Clicks | Orders | Price. Impressions and clicks are "—" until a
+   view counter exists; Orders are real, from lastGroups; Price is the
+   product's list price (Earned lives on the Earnings page). */
 function renderDashProducts(){
   var box = document.getElementById("dashProdTable");
   if(!box) return;
@@ -4460,10 +4461,10 @@ function renderDashProducts(){
     if(!g.product) return;
     total++;
     var n = (g.counts.Pending || 0) + (g.counts.Active || 0) + (g.counts.Completed || 0);
-    rows += '<div class="dash-prod-table-row"><span class="dash-prod-cell-name">' + escHtml(g.name) + '</span><span class="dash-prod-cell-num">—</span><span class="dash-prod-cell-num">—</span><span><b>' + n + '</b></span><span><b>' + fmt(g.earned || 0) + '</b></span></div>';
+    rows += '<div class="dash-prod-table-row"><span class="dash-prod-cell-name">' + escHtml(g.name) + '</span><span class="dash-prod-cell-num">—</span><span class="dash-prod-cell-num">—</span><span><b>' + n + '</b></span><span><b>' + fmt((g.product && g.product.price) || 0) + '</b></span></div>';
   });
   var cnt = document.getElementById("dashProdCountAll");
-  box.innerHTML = '<div class="dash-prod-table-head"><span>Product</span><span>Impressions</span><span>Clicks</span><span>Orders</span><span>Earned</span></div>' + (rows || '<p class="o-note">No products yet.</p>');
+  box.innerHTML = '<div class="dash-prod-table-head"><span>Product</span><span>Impressions</span><span>Clicks</span><span>Orders</span><span>Price</span></div>' + (rows || '<p class="o-note">No products yet.</p>');
 }
 /* Profile page (My Business → Profile): the seller's own profile
    card — photo, name, level, rating, products and strength. */

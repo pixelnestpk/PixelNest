@@ -1,10 +1,11 @@
+/* v45: Package #84 — Products table Price column + mobile scroll fix; forces fresh shell cache so the #83 categories fix reaches phones.
 /* v44: Package #76c — (1) hero search bar REMOVED (only Install App
    stays in the hero; header search remains); (2) Buy mode is now a
    TRUE buyer preview — Buy Now / Add to Cart, cart drawer, reviews,
    stars and the LAUNCH10 badge all show, and the cart works, so the
    seller sees the store exactly as a buyer does. */
 
-var CACHE_VERSION = "pixelnest-shell-v44";
+var CACHE_VERSION = "pixelnest-shell-v45";
 
 var SHELL_URLS = [
 
