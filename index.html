@@ -6096,11 +6096,6 @@ window.PixelAccount = (function(){
     }
     var fsl = $("footSignIn");
     if(fsl) fsl.textContent = currentUser ? "My Account" : "Sign In";
-    /* Seller lands straight on his orders: when the seller is
-       signed in (and not previewing as a buyer), open the orders
-       dashboard by itself — no extra tap on "Open Seller
-       Dashboard". Once per page load; closing it keeps it closed. */
-    if(sellerOn && document.body && !document.body.classList.contains("is-seller-store")) maybeAutoOpenSellerDash();
   }
 
   /* ----- auth page ----- */
