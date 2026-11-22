@@ -2875,7 +2875,7 @@ function renderProducts(){ if(!document.getElementById("productGrid")) return;
     var inCart = cart[p.id] ? " · In cart ("+cart[p.id]+")" : "";
     return '<article class="card'+(p.price===0?" free-card":"")+'">'
       + '<div class="thumb" data-sample="'+p.id+'" role="button" tabindex="0" aria-label="View product: '+p.name+'"><img src="'+p.img+'" alt="'+p.alt+'" loading="lazy"></div>'
-      + '<div class="card-seller"><span class="card-seller-ava" aria-hidden="true">S</span><span><b>Shakir Ullah</b><i>Level 1 Seller · Pakistan</i></span><span class="card-seller-tag">SELLER</span></div>'
+
       + '<div class="card-body">'
       + '<h3 data-sample="'+p.id+'">'+p.name+'</h3>'
       + starLine(p)
