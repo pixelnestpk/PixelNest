@@ -1482,6 +1482,7 @@ body.is-seller-view:not(.is-seller-store) main,
 body.is-seller-view:not(.is-seller-store) footer,
 body.is-seller-view:not(.is-seller-store) .wa-float,
 body.is-seller-view:not(.is-seller-store) #pnChatBtn,
+body.is-seller-view:not(.is-seller-store) #waFloatBtn,
 body.is-seller-view:not(.is-seller-store) #pnChatPanel,
 body.is-seller-view:not(.is-seller-store) .nav,
 body.is-seller-view:not(.is-seller-store) .mobile-nav,
@@ -1583,6 +1584,11 @@ a{color:#7C6213}
 
 /* ================= PixelNest Assistant (violet) ================= */
 #pnChatBtn{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:95;background:var(--chat);color:#fff;border:0;border-radius:999px;min-height:52px;padding:0 20px;display:flex;align-items:center;gap:9px;font-weight:800;font-size:.95rem;box-shadow:0 14px 34px rgba(109,40,217,.42);cursor:pointer;font-family:inherit}
+/* Floating WhatsApp button (home page, bottom-left): anyone can
+   message the seller on WhatsApp — no sign-in, no chatbot. */
+#waFloatBtn{position:fixed;left:18px;bottom:18px;z-index:60;width:56px;height:56px;border-radius:50%;background:#25d366;border:0;box-shadow:0 8px 24px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#waFloatBtn:hover{transform:scale(1.06)}
+#waFloatBtn svg{display:block}
 #pnChatBtn:hover{background:var(--chat-dark)}
 #pnChatBtn svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 #pnChatPanel{position:fixed;inset:0;z-index:200;width:100%;height:100dvh;background:#fff;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:contain}
@@ -2311,7 +2317,7 @@ try { if(window.sessionStorage.getItem("pixelnest_intro_seen")) document.documen
       <button type="button" class="dash-topnav-item" data-dashnav="customers">Customers</button>
       <div class="dash-topnav-icons">
         <button type="button" class="dash-icon-btn" id="dashBellBtn" aria-label="Notifications" title="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 20a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="dash-red-dot" id="dashBellDot" aria-hidden="true"></span></button>
-        <button type="button" class="dash-icon-btn" id="dashMsgBtn" aria-label="Messages" title="Messages"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="m3.5 7 8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="dash-icon-btn" id="dashMsgBtn" aria-label="Message on WhatsApp" title="Message on WhatsApp"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="m3.5 7 8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button type="button" class="dash-icon-btn" id="dashAvatarBtn" aria-label="Profile" title="Profile"><img class="dash-avatar-img" src="assets/seller-photo.webp" alt="Shakir Ullah"></button>
       </div>
     </div>
@@ -4686,7 +4692,7 @@ document.getElementById("oStats").addEventListener("click", function(e){
   var bellBtn = document.getElementById("dashBellBtn");
   if(bellBtn) bellBtn.addEventListener("click", function(){ renderNotifications(); showDashView("notifs"); });
   var msgBtn = document.getElementById("dashMsgBtn");
-  if(msgBtn) msgBtn.addEventListener("click", function(){ var p = document.getElementById("pnChatPanel"); if(p && p.hidden){ var cb = document.getElementById("pnChatBtn"); if(cb) cb.click(); } });
+  if(msgBtn) msgBtn.addEventListener("click", function(){ window.open("https://wa.me/923355290894", "_blank", "noopener"); });
   var avBtn = document.getElementById("dashAvatarBtn");
   if(avBtn) avBtn.addEventListener("click", function(){ renderDashProfile(); showDashView("profile"); });
   var bizBtn = document.getElementById("dashBizBtn");
@@ -7545,6 +7551,7 @@ window.SellerNotify = (function(){
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
   <span>Help — Ask Us</span>
 </button>
+<a id="waFloatBtn" href="https://wa.me/923355290894" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp" title="Chat with us on WhatsApp"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.6 4.6c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.1s.9 2.5 1.1 2.6c.1.2 1.9 2.9 4.6 4 .6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3l-2-.9c-.3-.1-.5-.2-.7.1l-.9 1c-.2.2-.3.2-.6.1a7.6 7.6 0 0 1-2.2-1.4 8.3 8.3 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.5-.6c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5Z"/></svg></a>
 <div id="pnChatPanel" role="dialog" aria-modal="true" aria-label="PixelNest assistant chat" hidden>
   <div class="pnc-head">
     <div>
