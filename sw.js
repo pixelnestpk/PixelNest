@@ -1,4 +1,15 @@
-/* v38: Google sign-in on phones — the popup never opens the Google
+/* v39: Fiverr-style seller dashboard + refresh fix — (1) the dashboard
+   now opens like a Fiverr seller profile: seller profile header
+   (photo, name, SELLER badge, bio, level, store rating), "Your path
+   to the next level" progress bar (completed orders toward the next
+   milestone), and a My Products table with real orders + earned per
+   product. (2) Refresh fix: the seller dashboard no longer
+   auto-opens on page load/refresh — it opens only when he taps
+   Seller Orders / Seller Account — and the buyer ("View Store")
+   view now survives a refresh via localStorage. Same as v38
+   otherwise.
+
+   v38: Google sign-in on phones — the popup never opens the Google
    account chooser on mobile / installed-app (PWA) phones, so Google
    sign-in now goes straight to the full-page redirect flow there
    (Google account page opens in the same tab and returns to the
@@ -106,7 +117,7 @@ try { importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js")
    its own URL — a navigation is stored and served by the exact
    address it was requested with, falling back to the cached
    copy of that same page, then to the Home page. */
-var CACHE_VERSION = "pixelnest-shell-v38";
+var CACHE_VERSION = "pixelnest-shell-v39";
 var SHELL_URLS = [
   "index.html",
   "shop.html",
