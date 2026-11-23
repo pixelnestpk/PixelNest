@@ -3181,6 +3181,7 @@ function addToCart(id, silent){
      so he can see the full buyer flow. */
   if(window.PixelAccount && window.PixelAccount.isSeller && window.PixelAccount.isSeller() && !(document.body && document.body.classList.contains("is-seller-store"))) return;
   cart[id] = (cart[id]||0)+1;
+  if(window.ttq){ try{ var _tp = byId(id); ttq.track('AddToCart', {content_id: id, content_name: _tp ? _tp.name : id, value: _tp ? (Number(_tp.price)||0) : 0, currency: 'PKR'}); }catch(e){} }
   renderCart(); renderProducts();
   if(!silent) showToast("Added to cart — total " + fmt(cartSum()));
 }
@@ -3437,6 +3438,7 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   var cvDetailsEl = document.getElementById("fCvDetails");
   var cvDetails = (cart["cv"] && cvDetailsEl) ? cvDetailsEl.value.trim() : "";
   recordOrder({ id: currentOrderId, product: orderProductStr, name: document.getElementById("fName").value.trim(), phone: document.getElementById("fPhone").value.trim(), status: "Pending", pay: payMethod, trx: trxId, cvDetails: cvDetails, discountCode: usedDiscountCode, discountAmount: usedDiscountAmount });
+  if(window.ttq){ try{ ttq.track('CompletePayment', {value: orderTotal, currency: 'PKR'}); }catch(e){} }
   /* Public tracking copy in Firestore ("orders") — ONLY orderId,
      productName, quantity, total, status, createdAt, deliveryNote and
      the customer's uid. The payment method, Trx ID and delivery files
