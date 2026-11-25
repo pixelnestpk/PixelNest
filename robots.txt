@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pixelnestpk.store/sitemap.xml
